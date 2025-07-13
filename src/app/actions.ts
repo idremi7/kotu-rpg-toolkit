@@ -1,11 +1,19 @@
 'use server';
 
-import { saveSystem, getSystem as getSystemFromFile, listSystems as listSystemsFromFile } from '@/lib/data-service';
+import {
+  saveSystem,
+  getSystem as getSystemFromFile,
+  listSystems as listSystemsFromFile,
+  saveCharacter,
+} from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
+import { randomUUID } from 'crypto';
 
-export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'>) {
+export async function saveSystemAction(
+  systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'>
+) {
   const systemId = systemData.systemName.toLowerCase().replace(/\s+/g, '-');
-  
+
   const formSchemaProperties: any = {
     name: { type: 'string', default: '' },
     class: { type: 'string', default: '' },
@@ -16,7 +24,7 @@ export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' |
     },
     skills: { type: 'array', items: { type: 'string' } },
     feats: { type: 'array', items: { type: 'string' } },
-    backstory: { type: 'string', default: '' },
+    backstory: { type: 'string', widget: 'textarea', default: '' },
   };
 
   const uiSchema: any = {
@@ -33,17 +41,27 @@ export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' |
     backstory: { 'ui:widget': 'textarea', 'ui:label': 'Backstory' },
   };
 
-  systemData.attributes.forEach(attr => {
-    formSchemaProperties.attributes.properties[attr.name] = { type: 'number', default: 10 };
-    uiSchema.attributes.fields[attr.name] = { 'ui:widget': 'number', 'ui:label': attr.name };
+  systemData.attributes.forEach((attr) => {
+    formSchemaProperties.attributes.properties[attr.name] = {
+      type: 'number',
+      default: 10,
+    };
+    uiSchema.attributes.fields[attr.name] = {
+      'ui:widget': 'number',
+      'ui:label': attr.name,
+    };
   });
 
   const schemas = {
-    formSchema: JSON.stringify({
+    formSchema: JSON.stringify(
+      {
         type: 'object',
         properties: formSchemaProperties,
         required: ['name', 'class', 'level'],
-    }, null, 2),
+      },
+      null,
+      2
+    ),
     uiSchema: JSON.stringify(uiSchema, null, 2),
   };
 
@@ -64,9 +82,26 @@ export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' |
 }
 
 export async function getSystemAction(systemId: string) {
-    return await getSystemFromFile(systemId);
+  return await getSystemFromFile(systemId);
 }
 
 export async function listSystemsAction() {
-    return await listSystemsFromFile();
+  return await listSystemsFromFile();
+}
+
+export async function saveCharacterAction(systemId: string, characterData: any) {
+  const characterId = `${systemId}-${randomUUID()}`;
+  const character = {
+    characterId,
+    systemId,
+    data: characterData,
+  };
+
+  try {
+    await saveCharacter(character);
+    return { success: true, characterId };
+  } catch (error) {
+    console.error('Failed to save character:', error);
+    return { success: false, error: 'Failed to save character to file.' };
+  }
 }

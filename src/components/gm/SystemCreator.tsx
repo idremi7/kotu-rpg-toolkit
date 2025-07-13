@@ -59,23 +59,31 @@ export function SystemCreator() {
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
-    
+
     const result = await saveSystemAction(data);
-    
-    if (result.success && result.systemId) {
+    try {
+      if (result.success && result.systemId) {
         toast({
-            title: "System Saved!",
-            description: `${data.systemName} has been successfully saved.`,
+          title: "System Saved!",
+          description: `${data.systemName} has been successfully saved.`,
         });
         router.push(`/gm/systems/${result.systemId}`);
-    } else {
+      } else {
         toast({
-            variant: "destructive",
-            title: "Failed to save system",
-            description: result.error || "An unknown error occurred while saving the system.",
+          variant: "destructive",
+          title: "Failed to save system",
+          description: result.error || "An unknown error occurred while saving the system.",
         });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Failed to save system",
+        description: "An unknown error occurred while saving the system.",
+      });
+      setIsSaving(false);
     } finally {
-        setIsSaving(false);
+      setIsSaving(false);
     }
   };
 
@@ -112,7 +120,7 @@ export function SystemCreator() {
             <CardContent className="space-y-4">
               {attributeFields.map((field, index) => (
                 <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                   <FormField
+                  <FormField
                     control={form.control}
                     name={`attributes.${index}.name`}
                     render={({ field }) => (
@@ -129,7 +137,7 @@ export function SystemCreator() {
                     control={form.control}
                     name={`attributes.${index}.description`}
                     render={({ field }) => (
-                       <FormItem className="flex-1">
+                      <FormItem className="flex-1">
                         <FormLabel>Description</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -153,7 +161,7 @@ export function SystemCreator() {
             <CardContent className="space-y-4">
               {skillFields.map((field, index) => (
                 <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                   <FormField
+                  <FormField
                     control={form.control}
                     name={`skills.${index}.name`}
                     render={({ field }) => (
@@ -185,8 +193,8 @@ export function SystemCreator() {
               <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
             </CardContent>
           </Card>
-          
-           <Card>
+
+          <Card>
             <CardHeader>
               <CardTitle>Feats</CardTitle>
               <CardDescription>Special talents characters can acquire.</CardDescription>
@@ -194,7 +202,7 @@ export function SystemCreator() {
             <CardContent className="space-y-4">
               {featFields.map((field, index) => (
                 <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                   <FormField
+                  <FormField
                     control={form.control}
                     name={`feats.${index}.name`}
                     render={({ field }) => (
@@ -207,7 +215,7 @@ export function SystemCreator() {
                       </FormItem>
                     )}
                   />
-                   <FormField
+                  <FormField
                     control={form.control}
                     name={`feats.${index}.description`}
                     render={({ field }) => (
@@ -236,13 +244,13 @@ export function SystemCreator() {
                   <Button type="button" variant="destructive" size="icon" onClick={() => removeFeat(index)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: ''})}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
+              <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
             </CardContent>
           </Card>
-            <Button type="submit" disabled={isSaving} className="w-full" size="lg">
-                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                Save System
-            </Button>
+          <Button type="submit" disabled={isSaving} className="w-full" size="lg">
+            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            Save System
+          </Button>
         </form>
       </Form>
     </div>

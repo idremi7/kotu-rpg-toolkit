@@ -29,6 +29,7 @@ async function ensureDir(dirPath: string) {
 export interface GameSystem {
     systemId: string;
     systemName: string;
+    description: string;
     attributes: { name: string; description: string }[];
     skills: { name: string; baseAttribute: string }[];
     feats: { name: string; description: string; prerequisites: string }[];
@@ -63,13 +64,54 @@ export async function listSystems(): Promise<{ id: string; name: string; descrip
                 return {
                     id: system.systemId,
                     name: system.systemName,
-                    // For now, let's create a generic description.
-                    description: `A custom system with ${system.attributes.length} attributes.`,
+                    description: system.description,
                 };
             });
         return await Promise.all(systemPromises);
     } catch (error) {
         console.error('Failed to list systems:', error);
+        return [];
+    }
+}
+
+
+// =========== Characters API ===========
+
+export interface Character {
+    characterId: string;
+    systemId: string;
+    data: any; // The actual character sheet data
+}
+
+export async function saveCharacter(characterData: Character): Promise<void> {
+    const filePath = path.join(charactersDir, `${characterData.characterId}.json`);
+    await fs.writeFile(filePath, JSON.stringify(characterData, null, 2));
+}
+
+export async function getCharacter(characterId: string): Promise<Character | null> {
+    const filePath = path.join(charactersDir, `${characterId}.json`);
+    try {
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(fileContent) as Character;
+    } catch (error) {
+        console.error(`Failed to read character file for ${characterId}:`, error);
+        return null;
+    }
+}
+
+export async function listCharacters(): Promise<Character[]> {
+    try {
+        const files = await fs.readdir(charactersDir);
+        const characterPromises = files
+            .filter(file => file.endsWith('.json'))
+            .map(async file => {
+                const filePath = path.join(charactersDir, file);
+                const fileContent = await fs.readFile(filePath, 'utf-8');
+                return JSON.parse(fileContent) as Character;
+            });
+        return await Promise.all(characterPromises);
+    } catch (error) {
+        console.error('Failed to list characters:', error);
         return [];
     }
 }
