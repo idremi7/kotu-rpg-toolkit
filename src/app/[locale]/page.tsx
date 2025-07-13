@@ -2,10 +2,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Swords, Shield, ScrollText, User, Users } from 'lucide-react';
 import Link from 'next/link';
-import { getTranslations, getLocale, createT } from '@/lib/i18n';
+import { getTranslations, createT } from '@/lib/i18n';
 
-export default async function Home() {
-  const locale = getLocale();
+export default async function Home({ params: { locale } }: { params: { locale: 'en' | 'fr' } }) {
   const translations = await getTranslations(locale);
   const t = createT(translations);
 
