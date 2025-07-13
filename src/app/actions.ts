@@ -2,16 +2,16 @@
 
 import {
   saveSystem,
-  getSystem as getSystemFromFile,
-  listSystems as listSystemsFromFile,
+  getSystem as getSystemFromDb,
+  listSystems as listSystemsFromDb,
   saveCharacter,
-  getCharacter as getCharacterFromFile,
-  listCharacters as listCharactersFromFile,
+  getCharacter as getCharacterFromDb,
+  listCharacters as listCharactersFromDb,
 } from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
-import { randomUUID } from 'crypto';
 import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
 import type { SuggestSkillsInput } from '@/ai/flows/suggest-skills-flow';
+import { db } from '@/lib/firebase-admin';
 
 export async function saveSystemAction(
   systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'>
@@ -26,9 +26,9 @@ export async function saveSystemAction(
       type: 'object',
       properties: {},
     },
+    saves: { type: 'array', items: { type: 'string' } },
     skills: { type: 'array', items: { type: 'string' } },
     feats: { type: 'array', items: { type: 'string' } },
-    saves: { type: 'array', items: { type: 'string' } },
     backstory: { type: 'string', widget: 'textarea', default: '' },
   };
 
@@ -41,9 +41,9 @@ export async function saveSystemAction(
       'ui:label': 'Attributes',
       fields: {},
     },
+    saves: { 'ui:widget': 'checkboxes', 'ui:label': 'Saves' },
     skills: { 'ui:widget': 'checkboxes', 'ui:label': 'Skills' },
     feats: { 'ui:widget': 'checkboxes', 'ui:label': 'Feats' },
-    saves: { 'ui:widget': 'checkboxes', 'ui:label': 'Saves' },
     backstory: { 'ui:widget': 'textarea', 'ui:label': 'Backstory' },
   };
 
@@ -83,20 +83,23 @@ export async function saveSystemAction(
     return { success: true, systemId };
   } catch (error) {
     console.error('Failed to save system:', error);
-    return { success: false, error: 'Failed to save system to file.' };
+    return { success: false, error: 'Failed to save system to database.' };
   }
 }
 
 export async function getSystemAction(systemId: string) {
-  return await getSystemFromFile(systemId);
+  return await getSystemFromDb(systemId);
 }
 
 export async function listSystemsAction() {
-  return await listSystemsFromFile();
+  return await listSystemsFromDb();
 }
 
 export async function saveCharacterAction(systemId: string, characterData: any) {
-  const characterId = characterData.characterId || `${systemId}-${randomUUID()}`;
+  // Generate a new document reference with a unique ID
+  const characterRef = db.collection('characters').doc();
+  const characterId = characterRef.id;
+
   const character = {
     characterId,
     systemId,
@@ -104,20 +107,21 @@ export async function saveCharacterAction(systemId: string, characterData: any) 
   };
 
   try {
+    // Use the generated ID to save the document
     await saveCharacter(character);
     return { success: true, characterId };
   } catch (error) {
     console.error('Failed to save character:', error);
-    return { success: false, error: 'Failed to save character to file.' };
+    return { success: false, error: 'Failed to save character to database.' };
   }
 }
 
 export async function getCharacterAction(characterId: string) {
-    return await getCharacterFromFile(characterId);
+    return await getCharacterFromDb(characterId);
 }
 
 export async function listCharactersAction() {
-    return await listCharactersFromFile();
+    return await listCharactersFromDb();
 }
 
 export async function suggestSkillsAction(input: SuggestSkillsInput) {
