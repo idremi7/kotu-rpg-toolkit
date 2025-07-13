@@ -1,62 +1,18 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { getTranslations, createT } from '@/lib/i18n';
+import { getSystemAction } from '@/app/actions';
+import { notFound } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
-import { getTranslations, createT } from '@/lib/i18n';
-import type { I18n } from '@/lib/i18n';
 
-// Since this is a client component, we need to handle translations a bit differently.
-const useTranslations = (locale: string) => {
-  const [t, setT] = useState<(key: string) => string>(() => (key: string) => key);
+export default async function SystemDetailsPage({ params }: { params: { systemId: string, locale: string }}) {
+  const translations = await getTranslations(params.locale as 'en' | 'fr');
+  const t = createT(translations);
 
-  useEffect(() => {
-    async function loadTranslations() {
-      const translations = await getTranslations(locale as 'en' | 'fr');
-      setT(() => createT(translations));
-    }
-    loadTranslations();
-  }, [locale]);
+  const system = await getSystemAction(params.systemId);
 
-  return t;
-};
-
-export default function SystemDetailsPage({ params }: { params: { systemId: string, locale: string }}) {
-  const [system, setSystem] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const t = useTranslations(params.locale);
-
-  useEffect(() => {
-    try {
-      const savedSystem = localStorage.getItem(`system-${params.systemId}`);
-      if (savedSystem) {
-        setSystem(JSON.parse(savedSystem));
-      }
-    } catch (error) {
-       console.error("Failed to parse system from localStorage", error);
-    } finally {
-        setIsLoading(false);
-    }
-  }, [params.systemId]);
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center text-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin mb-4" />
-        <p>{t('systemDetails.loading')}</p>
-      </div>
-    );
-  }
-  
   if (!system) {
-    return (
-       <div className="text-center py-16">
-        <h2 className="text-2xl font-bold">{t('systemDetails.noSystem')}</h2>
-        <p className="text-muted-foreground">{t('systemDetails.noSystemDesc')}</p>
-      </div>
-    );
+    notFound();
   }
 
   const { systemName, attributes, skills, feats, schemas } = system;

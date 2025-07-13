@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2, Wand2, Loader2, Save } from 'lucide-react';
-import { generateFormAction } from '@/app/actions';
+import { generateFormAction, saveSystemAction } from '@/app/actions';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -82,33 +82,33 @@ export function SystemCreator() {
   };
   
   const handleSaveSystem = async () => {
+    if (!generatedSchemas) {
+        toast({
+            variant: "destructive",
+            title: "Schemas not generated",
+            description: "Please generate the form schemas before saving.",
+        });
+        return;
+    }
+    
     setIsSaving(true);
     const systemData = form.getValues();
-    const systemId = systemData.systemName.toLowerCase().replace(/\s+/g, '-');
+    const result = await saveSystemAction(systemData, generatedSchemas);
     
-    // In a real app, you would save systemData and generatedSchemas to a database.
-    // For this mock, we'll store it in localStorage to pass it to the next page.
-    try {
-      localStorage.setItem(`system-${systemId}`, JSON.stringify({
-        ...systemData,
-        schemas: generatedSchemas
-      }));
-
-      toast({
-        title: "System Saved!",
-        description: `${systemData.systemName} has been successfully saved.`,
-      });
-      
-      router.push(`/gm/systems/${systemId}`);
-
-    } catch (e) {
-      toast({
-        variant: "destructive",
-        title: "Failed to save system",
-        description: "Could not save to local storage. Your browser might not support it or be in private mode.",
-      });
+    if (result.success && result.systemId) {
+        toast({
+            title: "System Saved!",
+            description: `${systemData.systemName} has been successfully saved.`,
+        });
+        router.push(`/gm/systems/${result.systemId}`);
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Failed to save system",
+            description: result.error || "An unknown error occurred while saving the system.",
+        });
     } finally {
-      setIsSaving(false);
+        setIsSaving(false);
     }
   };
 
