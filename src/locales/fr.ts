@@ -21,9 +21,9 @@ export default {
         title: '1. Le MJ Crée un Monde',
         description: 'En tant que Maître de Jeu, vous définissez les règles de votre univers. Créez des attributs, compétences et dons personnalisés pour construire un système unique pour votre campagne.',
       },
-      ai: {
-        title: "2. L'IA Génère l'Interface",
-        description: "Notre IA utilise les règles de votre système et génère instantanément les schémas de données nécessaires et un formulaire convivial pour la création de personnages. Aucun code requis.",
+      form: {
+        title: '2. Un Formulaire Dynamique est Prêt',
+        description: "Le système fournit une fiche de personnage standardisée qui s'adapte aux règles que vous avez créées, prête à être utilisée par les joueurs.",
       },
       player: {
         title: '3. Les Joueurs Créent Leurs Héros',

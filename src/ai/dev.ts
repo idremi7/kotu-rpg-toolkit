@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/generate-system-form.ts';
+// This file is used to register Genkit flows for development.
+// You can add imports to your flow files here.

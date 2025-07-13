@@ -18,9 +18,9 @@ export default async function Home({ params: { locale } }: { params: { locale: '
       aiHint: "fantasy map"
     },
     {
-      icon: <Wand2 className="w-10 h-10 mb-4 text-primary" />,
-      title: t('home.howItWorks.ai.title'),
-      description: t('home.howItWorks.ai.description'),
+      icon: <FileText className="w-10 h-10 mb-4 text-primary" />,
+      title: t('home.howItWorks.form.title'),
+      description: t('home.howItWorks.form.description'),
       image: "https://placehold.co/1024x768.png",
       aiHint: "character sheet form"
     },

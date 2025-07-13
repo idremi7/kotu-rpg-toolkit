@@ -21,9 +21,9 @@ export default {
         title: '1. The GM Crafts a World',
         description: 'As a Game Master, you define the rules of your universe. Create custom attributes, skills, and feats to build a unique system for your campaign.',
       },
-      ai: {
-        title: '2. AI Generates the Interface',
-        description: 'Our AI takes your system rules and instantly generates the necessary data schemas and a user-friendly form for character creation. No code required.',
+      form: {
+        title: '2. A Dynamic Form is Ready',
+        description: 'The system provides a standardized character sheet form that adapts to the rules you created, ready for players to use.',
       },
       player: {
         title: '3. Players Create Their Heroes',

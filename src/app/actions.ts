@@ -1,22 +1,9 @@
 'use server';
 
-import { generateSystemForm } from '@/ai/flows/generate-system-form';
 import { saveSystem as saveSystemToFile, getSystem as getSystemFromFile, listSystems as listSystemsFromFile } from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
 
-export async function generateFormAction(systemConfig: any) {
-  try {
-    const result = await generateSystemForm({
-      systemConfiguration: JSON.stringify(systemConfig, null, 2),
-    });
-    return { success: true, data: { formSchema: result.formSchema, uiSchema: result.uiSchema } };
-  } catch (error) {
-    console.error(error);
-    return { success: false, error: 'Failed to generate form schemas.' };
-  }
-}
-
-export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId'>, schemas: { formSchema: string, uiSchema: string }) {
+export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' | 'schemas'>, schemas: { formSchema: string, uiSchema: string }) {
   const systemId = systemData.systemName.toLowerCase().replace(/\s+/g, '-');
   const fullSystemData: GameSystem = {
     ...systemData,
