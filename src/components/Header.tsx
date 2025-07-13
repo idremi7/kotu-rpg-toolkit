@@ -5,14 +5,25 @@ import { Button } from './ui/button';
 import { Logo } from './Logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
+import { LayoutDashboard, LogIn, UserPlus, Languages } from 'lucide-react';
+import { useI18n } from '@/locales/client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useChangeLocale, useCurrentLocale } from '@/locales/client';
 
 export function Header() {
   const pathname = usePathname();
+  const t = useI18n();
+  const changeLocale = useChangeLocale();
+  const locale = useCurrentLocale();
 
   const navLinks = [
-    { href: '/gm/dashboard', label: 'GM Dashboard' },
-    { href: '/player/dashboard', label: 'Player Dashboard' },
+    { href: '/gm/dashboard', label: t('header.gmDashboard') },
+    { href: '/player/dashboard', label: t('header.playerDashboard') },
   ];
 
   return (
@@ -31,7 +42,7 @@ export function Header() {
               href={link.href}
               className={cn(
                 'transition-colors hover:text-primary',
-                pathname === link.href ? 'text-primary' : 'text-foreground/60'
+                pathname.endsWith(link.href) ? 'text-primary' : 'text-foreground/60'
               )}
             >
               {link.label}
@@ -39,19 +50,36 @@ export function Header() {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end gap-2">
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Languages className="h-[1.2rem] w-[1.2rem]" />
+                <span className="sr-only">{t('header.toggleLanguage')}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => changeLocale('en')}>
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLocale('fr')}>
+                Français
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
            <Button variant="ghost" size="sm" asChild className='md:hidden'>
              <Link href="/gm/dashboard"><LayoutDashboard/> <span className="sr-only">Dashboards</span></Link>
            </Button>
            <Button variant="outline" size="sm" asChild>
             <Link href="/login">
               <LogIn className="mr-2 h-4 w-4" />
-              Login
+              {t('header.login')}
             </Link>
           </Button>
           <Button size="sm" asChild>
             <Link href="/signup">
               <UserPlus className="mr-2 h-4 w-4" />
-              Sign Up
+              {t('header.signUp')}
             </Link>
           </Button>
         </div>

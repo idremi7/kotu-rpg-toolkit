@@ -1,0 +1,40 @@
+export default {
+  header: {
+    gmDashboard: 'GM Dashboard',
+    playerDashboard: 'Player Dashboard',
+    login: 'Login',
+    signUp: 'Sign Up',
+    toggleLanguage: 'Toggle language',
+  },
+  home: {
+    title: 'KOTU: RPG Toolkit',
+    subtitle: 'Your digital companion for crafting and embarking on epic tabletop adventures. Create bespoke game systems as a Game Master, or bring your heroes to life as a Player.',
+    gmCard: {
+      title: 'For Game Masters',
+      description: "The Architect's Workshop",
+      body: 'Forge unique worlds with custom rules. Define attributes, skills, feats, and saves to build the backbone of your next campaign. Our AI-powered tools help you generate character sheets and forms dynamically.',
+      button: 'Go to GM Dashboard',
+    },
+    playerCard: {
+      title: 'For Players',
+      description: "The Hero's Forge",
+      body: 'Step into a world of adventure. Create detailed characters using your GM\'s custom system. Allocate points, choose your path, and watch your character sheet update in real-time. Your legend begins here.',
+      button: 'Go to Player Dashboard',
+    },
+    features: {
+      title: 'Core Features',
+      systemBuilder: {
+        title: 'Custom System Builder',
+        description: 'Design RPG systems with unique attributes, skills, and feats.',
+      },
+      formGeneration: {
+        title: 'Intelligent Form Generation',
+        description: 'Automatically create character creation forms from your system rules.',
+      },
+      liveSheets: {
+        title: 'Live Character Sheets',
+        description: 'Interactive, real-time character sheets that are easy to view and export.',
+      },
+    },
+  },
+} as const;
