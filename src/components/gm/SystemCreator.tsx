@@ -155,8 +155,32 @@ export function SystemCreator() {
             <CardContent className="space-y-4">
               {attributeFields.map((field, index) => (
                 <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                  <FormField name={`attributes.${index}.name`} control={form.control} render={({ field }) => <FormItem className="flex-1"><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
-                  <FormField name={`attributes.${index}.description`} control={form.control} render={({ field }) => <FormItem className="flex-1"><FormLabel>Description</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
+                   <FormField
+                    control={form.control}
+                    name={`attributes.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`attributes.${index}.description`}
+                    render={({ field }) => (
+                       <FormItem className="flex-1">
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <Button type="button" variant="destructive" size="icon" onClick={() => removeAttribute(index)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               ))}
@@ -172,8 +196,32 @@ export function SystemCreator() {
             <CardContent className="space-y-4">
               {skillFields.map((field, index) => (
                 <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                  <FormField name={`skills.${index}.name`} control={form.control} render={({ field }) => <FormItem className="flex-1"><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
-                  <FormField name={`skills.${index}.baseAttribute`} control={form.control} render={({ field }) => <FormItem className="flex-1"><FormLabel>Base Attribute</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
+                   <FormField
+                    control={form.control}
+                    name={`skills.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`skills.${index}.baseAttribute`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Base Attribute</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <Button type="button" variant="destructive" size="icon" onClick={() => removeSkill(index)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               ))}
@@ -189,9 +237,45 @@ export function SystemCreator() {
             <CardContent className="space-y-4">
               {featFields.map((field, index) => (
                 <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                  <FormField name={`feats.${index}.name`} control={form.control} render={({ field }) => <FormItem className="flex-1"><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
-                  <FormField name={`feats.${index}.description`} control={form.control} render={({ field }) => <FormItem className="flex-1"><FormLabel>Description</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
-                  <FormField name={`feats.${index}.prerequisites`} control={form.control} render={({ field }) => <FormItem className="flex-1"><FormLabel>Prerequisites</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>} />
+                   <FormField
+                    control={form.control}
+                    name={`feats.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                   <FormField
+                    control={form.control}
+                    name={`feats.${index}.description`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`feats.${index}.prerequisites`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Prerequisites</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <Button type="button" variant="destructive" size="icon" onClick={() => removeFeat(index)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               ))}
