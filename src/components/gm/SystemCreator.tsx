@@ -17,12 +17,14 @@ import { useRouter } from 'next/navigation';
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
 const featSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string(), prerequisites: z.string() });
+const saveSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
 
 const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
   attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
   skills: z.array(skillSchema),
   feats: z.array(featSchema),
+  saves: z.array(saveSchema),
 });
 
 type SystemFormData = z.infer<typeof systemSchema>;
@@ -39,6 +41,7 @@ export function SystemCreator() {
       attributes: [{ name: 'Strength', description: 'Physical power' }],
       skills: [{ name: 'Athletics', baseAttribute: 'Strength' }],
       feats: [{ name: 'Power Attack', description: 'Trade accuracy for damage', prerequisites: 'Strength 13' }],
+      saves: [{ name: 'Fortitude', baseAttribute: 'Constitution' }],
     },
   });
 
@@ -57,31 +60,35 @@ export function SystemCreator() {
     name: 'feats',
   });
 
+   const { fields: saveFields, append: appendSave, remove: removeSave } = useFieldArray({
+    control: form.control,
+    name: 'saves',
+  });
+
+
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
-
-    const result = await saveSystemAction(data);
     try {
-      if (result.success && result.systemId) {
-        toast({
-          title: "System Saved!",
-          description: `${data.systemName} has been successfully saved.`,
-        });
-        router.push(`/gm/systems/${result.systemId}`);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Failed to save system",
-          description: result.error || "An unknown error occurred while saving the system.",
-        });
-      }
+        const result = await saveSystemAction(data as any);
+        if (result.success && result.systemId) {
+            toast({
+            title: "System Saved!",
+            description: `${data.systemName} has been successfully saved.`,
+            });
+            router.push(`/gm/systems/${result.systemId}`);
+        } else {
+            toast({
+            variant: "destructive",
+            title: "Failed to save system",
+            description: result.error || "An unknown error occurred while saving the system.",
+            });
+        }
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Failed to save system",
-        description: "An unknown error occurred while saving the system.",
-      });
-      setIsSaving(false);
+        toast({
+            variant: "destructive",
+            title: "Failed to save system",
+            description: "An unknown error occurred while saving the system.",
+        });
     } finally {
       setIsSaving(false);
     }
@@ -191,6 +198,47 @@ export function SystemCreator() {
                 </div>
               ))}
               <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Saves</CardTitle>
+              <CardDescription>Define character saving throws.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {saveFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
+                  <FormField
+                    control={form.control}
+                    name={`saves.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`saves.${index}.baseAttribute`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Base Attribute</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="button" variant="destructive" size="icon" onClick={() => removeSave(index)}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              ))}
+              <Button type="button" variant="outline" onClick={() => appendSave({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Save</Button>
             </CardContent>
           </Card>
 

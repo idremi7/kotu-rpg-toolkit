@@ -12,6 +12,7 @@ interface CharacterSheetPreviewProps {
 }
 
 const getModifier = (score: number) => {
+  if (typeof score !== 'number' || isNaN(score)) return '+0';
   const mod = Math.floor((score - 10) / 2);
   return mod >= 0 ? `+${mod}` : mod;
 };
@@ -58,8 +59,16 @@ export function CharacterSheetPreview({ data, onPrint }: CharacterSheetPreviewPr
         
         <Separator />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-1">
+                <h3 className="font-headline text-lg mb-2">Saves</h3>
+                <div className="flex flex-wrap gap-2">
+                {(data.saves && data.saves.length > 0) ? data.saves.map((save: string) => (
+                    <Badge key={save} variant="secondary">{save}</Badge>
+                )) : <p className="text-sm text-muted-foreground">No saves selected.</p>}
+                </div>
+            </div>
+            <div className="md:col-span-2">
                 <h3 className="font-headline text-lg mb-2">Skills</h3>
                 <div className="flex flex-wrap gap-2">
                 {(data.skills && data.skills.length > 0) ? data.skills.map((skill: string) => (
@@ -67,15 +76,19 @@ export function CharacterSheetPreview({ data, onPrint }: CharacterSheetPreviewPr
                 )) : <p className="text-sm text-muted-foreground">No skills selected.</p>}
                 </div>
             </div>
-            <div>
-                <h3 className="font-headline text-lg mb-2">Feats</h3>
-                 <div className="flex flex-wrap gap-2">
-                {(data.feats && data.feats.length > 0) ? data.feats.map((feat: string) => (
-                    <Badge key={feat} variant="secondary">{feat}</Badge>
-                )) : <p className="text-sm text-muted-foreground">No feats selected.</p>}
-                </div>
-            </div>
         </div>
+
+        <Separator />
+
+        <div>
+            <h3 className="font-headline text-lg mb-2">Feats</h3>
+              <div className="flex flex-wrap gap-2">
+              {(data.feats && data.feats.length > 0) ? data.feats.map((feat: string) => (
+                  <Badge key={feat} variant="secondary">{feat}</Badge>
+              )) : <p className="text-sm text-muted-foreground">No feats selected.</p>}
+              </div>
+        </div>
+
 
         <Separator />
 

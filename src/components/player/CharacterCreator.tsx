@@ -76,7 +76,7 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType }: a
                 control={control}
                 name={name}
                 render={({ field }) => {
-                  const currentValues = field.value || [];
+                  const currentValues = Array.isArray(field.value) ? field.value : [];
                   return (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                       <FormControl>
@@ -201,7 +201,7 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
     );
   }
 
-  const { systemName, skills, feats } = system;
+  const { systemName, skills, feats, saves } = system;
   const uiSchema = JSON.parse(system.schemas.uiSchema);
   const formSchema = JSON.parse(system.schemas.formSchema);
 
@@ -238,11 +238,13 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
                 </Card>
               );
             }
-            if (fieldName === 'skills' || fieldName === 'feats') {
+            if (fieldName === 'skills' || fieldName === 'feats' || fieldName === 'saves') {
               const options =
                 fieldName === 'skills'
                   ? skills.map((s: any) => s.name)
-                  : feats.map((f: any) => f.name);
+                  : fieldName === 'feats' 
+                  ? feats.map((f: any) => f.name)
+                  : saves.map((s: any) => s.name);
               return (
                 <Card key={fieldName}>
                   <CardHeader>

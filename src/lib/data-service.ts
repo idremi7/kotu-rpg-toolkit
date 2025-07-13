@@ -33,6 +33,7 @@ export interface GameSystem {
     attributes: { name: string; description: string }[];
     skills: { name: string; baseAttribute: string }[];
     feats: { name: string; description: string; prerequisites: string }[];
+    saves: { name: string; baseAttribute: string }[];
     schemas: { formSchema: string; uiSchema: string };
 }
 

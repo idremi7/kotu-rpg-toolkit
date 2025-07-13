@@ -5,6 +5,8 @@ import {
   getSystem as getSystemFromFile,
   listSystems as listSystemsFromFile,
   saveCharacter,
+  getCharacter as getCharacterFromFile,
+  listCharacters as listCharactersFromFile,
 } from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
 import { randomUUID } from 'crypto';
@@ -24,6 +26,7 @@ export async function saveSystemAction(
     },
     skills: { type: 'array', items: { type: 'string' } },
     feats: { type: 'array', items: { type: 'string' } },
+    saves: { type: 'array', items: { type: 'string' } },
     backstory: { type: 'string', widget: 'textarea', default: '' },
   };
 
@@ -38,6 +41,7 @@ export async function saveSystemAction(
     },
     skills: { 'ui:widget': 'checkboxes', 'ui:label': 'Skills' },
     feats: { 'ui:widget': 'checkboxes', 'ui:label': 'Feats' },
+    saves: { 'ui:widget': 'checkboxes', 'ui:label': 'Saves' },
     backstory: { 'ui:widget': 'textarea', 'ui:label': 'Backstory' },
   };
 
@@ -90,7 +94,7 @@ export async function listSystemsAction() {
 }
 
 export async function saveCharacterAction(systemId: string, characterData: any) {
-  const characterId = `${systemId}-${randomUUID()}`;
+  const characterId = characterData.characterId || `${systemId}-${randomUUID()}`;
   const character = {
     characterId,
     systemId,
@@ -104,4 +108,12 @@ export async function saveCharacterAction(systemId: string, characterData: any) 
     console.error('Failed to save character:', error);
     return { success: false, error: 'Failed to save character to file.' };
   }
+}
+
+export async function getCharacterAction(characterId: string) {
+    return await getCharacterFromFile(characterId);
+}
+
+export async function listCharactersAction() {
+    return await listCharactersFromFile();
 }
