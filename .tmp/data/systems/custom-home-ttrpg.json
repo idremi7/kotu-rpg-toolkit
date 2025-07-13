@@ -1,0 +1,137 @@
+{
+  "systemName": "Custom home ttrpg",
+  "attributes": [
+    {
+      "name": "Strength",
+      "description": "Physical power"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Athletics",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Intimidation",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Brawling",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Melee Combat",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Weaponry",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Powerlifting",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Immovable",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Brutality",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Acrobatics",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Climbing",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Swimming",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Wrestling",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Breaking",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Jumping",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Sprinting",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Charging",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Grappling",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Lifting",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Throwing",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Shield Bashing",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Hammering",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Toughness",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Berserking",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Crushing",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Bulwark",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Power Strike",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Body Control",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Physical Prowess",
+      "baseAttribute": "Strength"
+    }
+  ],
+  "feats": [
+    {
+      "name": "Power Attack",
+      "description": "Trade accuracy for damage",
+      "prerequisites": "Strength 13"
+    }
+  ],
+  "saves": [],
+  "systemId": "custom-home-ttrpg",
+  "description": "A custom system with 1 attributes.",
+  "schemas": {
+    "formSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"class\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"level\": {\n      \"type\": \"number\",\n      \"default\": 1\n    },\n    \"attributes\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Strength\": {\n          \"type\": \"number\",\n          \"default\": 10\n        }\n      }\n    },\n    \"saves\": {\n      \"type\": \"object\",\n      \"properties\": {}\n    },\n    \"skills\": {\n      \"type\": \"array\",\n      \"default\": [],\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"value\": {\n            \"type\": \"number\",\n            \"default\": 0\n          }\n        }\n      }\n    },\n    \"feats\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"default\": []\n    },\n    \"backstory\": {\n      \"type\": \"string\",\n      \"widget\": \"textarea\",\n      \"default\": \"\"\n    }\n  },\n  \"required\": [\n    \"name\",\n    \"class\",\n    \"level\"\n  ]\n}",
+    "uiSchema": "{\n  \"name\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Character Name\"\n  },\n  \"class\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Class\"\n  },\n  \"level\": {\n    \"ui:widget\": \"number\",\n    \"ui:label\": \"Level\"\n  },\n  \"attributes\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Attributes\",\n    \"fields\": {\n      \"Strength\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Strength\"\n      }\n    }\n  },\n  \"saves\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Saves\",\n    \"fields\": {}\n  },\n  \"skills\": {\n    \"ui:widget\": \"custom\",\n    \"ui:label\": \"Skills\"\n  },\n  \"feats\": {\n    \"ui:widget\": \"checkboxes\",\n    \"ui:label\": \"Feats\"\n  },\n  \"backstory\": {\n    \"ui:widget\": \"textarea\",\n    \"ui:label\": \"Backstory\"\n  }\n}"
+  }
+}

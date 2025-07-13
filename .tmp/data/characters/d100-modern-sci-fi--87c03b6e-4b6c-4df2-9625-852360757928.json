@@ -1,0 +1,24 @@
+{
+  "characterId": "d100-modern-sci-fi--87c03b6e-4b6c-4df2-9625-852360757928",
+  "systemId": "d100-modern-sci-fi-",
+  "data": {
+    "name": "Luka",
+    "class": "Technical Engineer ",
+    "level": 5,
+    "attributes": {
+      "Force": 1,
+      "Dexterité ": 2,
+      "Constitution ": 2,
+      "Vitesse ": 1,
+      "Intelligence ": 5,
+      "Sagesse ": 1,
+      "Charisme ": 1
+    },
+    "skills": [],
+    "feats": [
+      "Maîtrise de l'informatique"
+    ],
+    "saves": [],
+    "backstory": ""
+  }
+}
