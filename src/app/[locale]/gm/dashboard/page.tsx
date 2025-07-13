@@ -23,35 +23,39 @@ export default async function GMDashboard({ params: { locale } }: { params: { lo
       </div>
       <p className="text-muted-foreground mb-8">{t('gmDashboard.description')}</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {systems.map(system => (
-          <Card key={system.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="font-headline flex items-center gap-2">
-                <Swords className="text-primary"/>
-                {system.name}
-              </CardTitle>
-              <CardDescription>{system.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              {/* Future content can go here, like player count or last played date */}
-            </CardContent>
-            <div className="p-4 pt-0">
-               <Button asChild variant="secondary" className="w-full">
-                  <Link href={`/gm/systems/${system.id}`}>{t('gmDashboard.manageButton')}</Link>
-                </Button>
-            </div>
-          </Card>
-        ))}
-         <Card className="border-dashed flex items-center justify-center min-h-[250px]">
-            <Button variant="ghost" className="w-full h-full text-lg" asChild>
-                 <Link href="/gm/systems/create">
-                    <PlusCircle className="mr-2 h-6 w-6" />
-                    {t('gmDashboard.createSystemPrompt')}
-                 </Link>
-            </Button>
-        </Card>
-      </div>
+      {systems.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {systems.map(system => (
+            <Card key={system.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2">
+                  <Swords className="text-primary"/>
+                  {system.name}
+                </CardTitle>
+                <CardDescription>{system.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+              </CardContent>
+              <div className="p-4 pt-0">
+                 <Button asChild variant="secondary" className="w-full">
+                    <Link href={`/gm/systems/${system.id}`}>{t('gmDashboard.manageButton')}</Link>
+                  </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-16 border-2 border-dashed rounded-lg">
+          <h2 className="text-2xl font-semibold mb-2">{t('gmDashboard.noSystemsTitle')}</h2>
+          <p className="text-muted-foreground mb-4">{t('gmDashboard.noSystemsDescription')}</p>
+          <Button asChild size="lg">
+            <Link href="/gm/systems/create">
+              <PlusCircle className="mr-2 h-5 w-5" />
+              {t('gmDashboard.createFirstSystemButton')}
+            </Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

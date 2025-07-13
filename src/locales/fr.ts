@@ -64,6 +64,9 @@ export default {
     description: 'Gérez vos systèmes de jeu et vos campagnes.',
     manageButton: 'Gérer le système',
     createSystemPrompt: 'Créer un système',
+    noSystemsTitle: 'Aucun système trouvé',
+    noSystemsDescription: 'Il semble que vous n\'ayez encore créé aucun système de jeu.',
+    createFirstSystemButton: 'Créez votre premier système',
   },
   playerDashboard: {
     title: 'Tableau de bord du joueur',
@@ -85,8 +88,5 @@ export default {
     schemas: 'Schémas Générés',
     formSchema: 'Schéma de Formulaire',
     uiSchema: 'Schéma d\'Interface',
-    noSystem: 'Système non trouvé',
-    noSystemDesc: 'Le système demandé n\'a pas pu être trouvé dans votre stockage local.',
-    loading: 'Chargement des données du système...',
   }
 } as const;

@@ -64,6 +64,9 @@ export default {
     description: 'Manage your game systems and campaigns.',
     manageButton: 'Manage System',
     createSystemPrompt: 'Create a System',
+    noSystemsTitle: 'No Systems Found',
+    noSystemsDescription: 'It looks like you haven\'t created any game systems yet.',
+    createFirstSystemButton: 'Create Your First System',
   },
   playerDashboard: {
     title: 'Player Dashboard',
@@ -85,8 +88,5 @@ export default {
     schemas: 'Generated Schemas',
     formSchema: 'Form Schema',
     uiSchema: 'UI Schema',
-    noSystem: 'System not found',
-    noSystemDesc: 'The requested system could not be found in local storage.',
-    loading: 'Loading system data...',
   }
 } as const;
