@@ -8,11 +8,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle, Trash2, Loader2, Save, Sparkles } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown } from 'lucide-react';
 import { saveSystemAction, suggestSkillsAction } from '@/app/actions';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { getTranslations, createT } from '@/lib/i18n';
+import { useMounted } from '@/hooks/use-mounted';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -29,11 +37,23 @@ const systemSchema = z.object({
 
 type SystemFormData = z.infer<typeof systemSchema>;
 
+// Mock translations for client-side component
+const t = (key: string) => {
+  const translations: { [key: string]: string } = {
+    'createSystem.suggestOneSkill': 'Suggest 1 Skill',
+    'createSystem.suggestTenSkills': 'Suggest 10 Skills',
+    'createSystem.suggestTwentySkills': 'Suggest 20 Skills'
+  };
+  return translations[key] || key;
+};
+
 export function SystemCreator() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSuggestingSkills, setIsSuggestingSkills] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const mounted = useMounted();
+
 
   const form = useForm<SystemFormData>({
     resolver: zodResolver(systemSchema),
@@ -95,20 +115,21 @@ export function SystemCreator() {
     }
   };
 
-  const handleSuggestSkills = async () => {
+  const handleSuggestSkills = async (count: number) => {
     setIsSuggestingSkills(true);
     const formData = form.getValues();
     const result = await suggestSkillsAction({
       systemName: formData.systemName,
       attributes: formData.attributes,
+      existingSkills: formData.skills.map(s => s.name),
+      count: count,
     });
     
     if (result.success && result.skills) {
-      removeSkill(); // clear existing skills
       appendSkill(result.skills);
       toast({
         title: "Skills Suggested",
-        description: "AI has added a list of suggested skills.",
+        description: `AI has added ${result.skills.length} new skill suggestions.`,
       });
     } else {
       toast({
@@ -120,7 +141,10 @@ export function SystemCreator() {
     
     setIsSuggestingSkills(false);
   };
-
+  
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="space-y-8">
@@ -268,10 +292,20 @@ export function SystemCreator() {
               ))}
               <div className="flex gap-2">
                 <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
-                <Button type="button" variant="secondary" onClick={handleSuggestSkills} disabled={isSuggestingSkills}>
-                  {isSuggestingSkills ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                  Suggest with AI
-                </Button>
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button type="button" variant="secondary" disabled={isSuggestingSkills}>
+                        {isSuggestingSkills ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        Suggest with AI
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleSuggestSkills(1)}>{t('createSystem.suggestOneSkill')}</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSuggestSkills(10)}>{t('createSystem.suggestTenSkills')}</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSuggestSkills(20)}>{t('createSystem.suggestTwentySkills')}</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </CardContent>
           </Card>

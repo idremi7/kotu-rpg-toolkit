@@ -18,6 +18,8 @@ const AttributeSchema = z.object({
 const SuggestSkillsInputSchema = z.object({
   systemName: z.string().describe("Le nom du système de JDR pour lequel suggérer des compétences."),
   attributes: z.array(AttributeSchema).describe("La liste des attributs du système de jeu."),
+  existingSkills: z.array(z.string()).optional().describe("Une liste de compétences déjà existantes à ne pas suggérer à nouveau."),
+  count: z.number().optional().default(10).describe("Le nombre de compétences à suggérer."),
 });
 export type SuggestSkillsInput = z.infer<typeof SuggestSkillsInputSchema>;
 
@@ -41,14 +43,21 @@ const prompt = ai.definePrompt({
   input: { schema: SuggestSkillsInputSchema },
   output: { schema: SuggestSkillsOutputSchema },
   prompt: `Vous êtes un concepteur de jeux de rôle expert avec des décennies d'expérience dans la création de systèmes de jeu de table (JDR).
-Votre tâche est de suggérer une liste de 10 compétences de base pour un nouveau système de JDR appelé "{{systemName}}".
+Votre tâche est de suggérer une liste de {{count}} compétences pour un nouveau système de JDR appelé "{{systemName}}".
 
 Voici les attributs de base pour ce système :
 {{#each attributes}}
 - {{name}}: {{description}}
 {{/each}}
 
-Veuillez suggérer une liste de 10 compétences qui seraient appropriées pour un système avec ces attributs. Inspirez-vous de systèmes populaires comme Dungeons & Dragons, Pathfinder, ou World of Darkness, mais assurez-vous que les compétences sont logiques dans le contexte des attributs fournis.
+{{#if existingSkills}}
+Voici les compétences qui existent déjà. Veuillez ne pas suggérer de doublons ou de variations très similaires.
+{{#each existingSkills}}
+- {{this}}
+{{/each}}
+{{/if}}
+
+Veuillez suggérer une liste de {{count}} nouvelles compétences qui seraient appropriées pour un système avec ces attributs. Inspirez-vous de systèmes populaires comme Dungeons & Dragons, Pathfinder, ou World of Darkness, mais assurez-vous que les compétences sont logiques dans le contexte des attributs fournis.
 
 Pour chaque compétence que vous suggérez, vous devez spécifier son "baseAttribute". Cet attribut de base DOIT correspondre EXACTEMENT à l'un des noms d'attributs fournis dans la liste ci-dessus. Ne créez pas de nouveaux attributs.
 `,
