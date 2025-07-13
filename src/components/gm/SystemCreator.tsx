@@ -162,47 +162,6 @@ export function SystemCreator() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Skills</CardTitle>
-              <CardDescription>Define character abilities.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {skillFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                  <FormField
-                    control={form.control}
-                    name={`skills.${index}.name`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`skills.${index}.baseAttribute`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Base Attribute</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="button" variant="destructive" size="icon" onClick={() => removeSkill(index)}><Trash2 className="h-4 w-4" /></Button>
-                </div>
-              ))}
-              <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
               <CardTitle>Saves</CardTitle>
               <CardDescription>Define character saving throws.</CardDescription>
             </CardHeader>
@@ -239,6 +198,47 @@ export function SystemCreator() {
                 </div>
               ))}
               <Button type="button" variant="outline" onClick={() => appendSave({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Save</Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Skills</CardTitle>
+              <CardDescription>Define character abilities.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {skillFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
+                  <FormField
+                    control={form.control}
+                    name={`skills.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`skills.${index}.baseAttribute`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Base Attribute</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="button" variant="destructive" size="icon" onClick={() => removeSkill(index)}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              ))}
+              <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
             </CardContent>
           </Card>
 
