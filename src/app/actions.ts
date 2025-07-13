@@ -1,9 +1,9 @@
 'use server';
 
-import { saveSystem as saveSystemToFile, getSystem as getSystemFromFile, listSystems as listSystemsFromFile } from '@/lib/data-service';
+import { saveSystem, getSystem as getSystemFromFile, listSystems as listSystemsFromFile } from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
 
-export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' | 'schemas'>) {
+export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'>) {
   const systemId = systemData.systemName.toLowerCase().replace(/\s+/g, '-');
   
   const formSchemaProperties: any = {
@@ -16,6 +16,7 @@ export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' |
     },
     skills: { type: 'array', items: { type: 'string' } },
     feats: { type: 'array', items: { type: 'string' } },
+    backstory: { type: 'string', default: '' },
   };
 
   const uiSchema: any = {
@@ -29,6 +30,7 @@ export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' |
     },
     skills: { 'ui:widget': 'checkboxes', 'ui:label': 'Skills' },
     feats: { 'ui:widget': 'checkboxes', 'ui:label': 'Feats' },
+    backstory: { 'ui:widget': 'textarea', 'ui:label': 'Backstory' },
   };
 
   systemData.attributes.forEach(attr => {
@@ -48,11 +50,12 @@ export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' |
   const fullSystemData: GameSystem = {
     ...systemData,
     systemId,
+    description: `A custom system with ${systemData.attributes.length} attributes.`,
     schemas,
   };
 
   try {
-    await saveSystemToFile(fullSystemData);
+    await saveSystem(fullSystemData);
     return { success: true, systemId };
   } catch (error) {
     console.error('Failed to save system:', error);
