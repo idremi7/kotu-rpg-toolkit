@@ -14,14 +14,14 @@ export default async function GMDashboard({ params: { locale } }: { params: { lo
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="font-headline text-4xl font-bold">{t('gmDashboard.title')}</h1>
-        {systems.length === 0 ? null : (
+        {systems.length > 0 ? (
           <Button asChild>
             <Link href="/gm/systems/create">
               <PlusCircle className="mr-2 h-4 w-4" />
               {t('gmDashboard.newSystemButton')}
             </Link>
           </Button>
-        )}
+        ) : null}
       </div>
       <p className="text-muted-foreground mb-8">{t('gmDashboard.description')}</p>
       

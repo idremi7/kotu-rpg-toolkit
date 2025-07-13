@@ -1,0 +1,99 @@
+
+{
+  "systemId": "dnd-3-5",
+  "systemName": "Dungeons & Dragons 3.5",
+  "attributes": [
+    {
+      "name": "Strength",
+      "description": "Measures physical power and force."
+    },
+    {
+      "name": "Dexterity",
+      "description": "Measures agility, reflexes, and balance."
+    },
+    {
+      "name": "Constitution",
+      "description": "Measures health and stamina."
+    },
+    {
+      "name": "Intelligence",
+      "description": "Measures reasoning and learning ability."
+    },
+    {
+      "name": "Wisdom",
+      "description": "Measures perception and willpower."
+    },
+    {
+      "name": "Charisma",
+      "description": "Measures force of personality and charm."
+    }
+  ],
+  "skills": [
+    {
+      "name": "Climb",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Hide",
+      "baseAttribute": "Dexterity"
+    },
+    {
+      "name": "Move Silently",
+      "baseAttribute": "Dexterity"
+    },
+    {
+      "name": "Concentration",
+      "baseAttribute": "Constitution"
+    },
+    {
+      "name": "Knowledge (Arcana)",
+      "baseAttribute": "Intelligence"
+    },
+    {
+      "name": "Spellcraft",
+      "baseAttribute": "Intelligence"
+    },
+    {
+      "name": "Heal",
+      "baseAttribute": "Wisdom"
+    },
+    {
+      "name": "Spot",
+      "baseAttribute": "Wisdom"
+    },
+    {
+      "name": "Bluff",
+      "baseAttribute": "Charisma"
+    },
+    {
+      "name": "Diplomacy",
+      "baseAttribute": "Charisma"
+    }
+  ],
+  "feats": [
+    {
+      "name": "Power Attack",
+      "description": "Trade attack bonus for damage.",
+      "prerequisites": "Strength 13"
+    },
+    {
+      "name": "Dodge",
+      "description": "Gain a dodge bonus to AC against one target.",
+      "prerequisites": "Dexterity 13"
+    },
+    {
+      "name": "Iron Will",
+      "description": "Gain a bonus on Will saving throws.",
+      "prerequisites": "None"
+    },
+    {
+      "name": "Spell Focus",
+      "description": "Increase the DC for saving throws against your spells of a chosen school.",
+      "prerequisites": "None"
+    }
+  ],
+  "schemas": {
+    "formSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"class\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"level\": {\n      \"type\": \"number\",\n      \"default\": 1\n    },\n    \"attributes\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Strength\": {\n          \"type\": \"number\"\n        },\n        \"Dexterity\": {\n          \"type\": \"number\"\n        },\n        \"Constitution\": {\n          \"type\": \"number\"\n        },\n        \"Intelligence\": {\n          \"type\": \"number\"\n        },\n        \"Wisdom\": {\n          \"type\": \"number\"\n        },\n        \"Charisma\": {\n          \"type\": \"number\"\n        }\n      }\n    },\n    \"skills\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"feats\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\n    \"name\",\n    \"class\",\n    \"level\"\n  ]\n}",
+    "uiSchema": "{\n  \"name\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Character Name\"\n  },\n  \"class\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Class\"\n  },\n  \"level\": {\n    \"ui:widget\": \"number\",\n    \"ui:label\": \"Level\"\n  },\n  \"attributes\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Attributes\",\n    \"fields\": {\n      \"Strength\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Strength\"\n      },\n      \"Dexterity\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Dexterity\"\n      },\n      \"Constitution\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Constitution\"\n      },\n      \"Intelligence\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Intelligence\"\n      },\n      \"Wisdom\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Wisdom\"\n      },\n      \"Charisma\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Charisma\"\n      }\n    }\n  },\n  \"skills\": {\n    \"ui:widget\": \"checkboxes\",\n    \"ui:label\": \"Skills\"\n  },\n  \"feats\": {\n    \"ui:widget\": \"checkboxes\",\n    \"ui:label\": \"Feats\"\n  }\n}"
+  }
+}
