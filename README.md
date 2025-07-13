@@ -40,3 +40,17 @@ To get started with development:
     npm run dev
     ```
 This will start the Next.js application, typically on `http://localhost:9002`.
+
+### First-Time Git Setup (Important)
+
+If you get an error from GitHub about large files, you need to clean your Git cache. Run the following commands **once**:
+
+1.  Make the setup script executable:
+    ```bash
+    chmod +x init.sh
+    ```
+2.  Run the script:
+    ```bash
+    ./init.sh
+    ```
+This will remove large, ignored files (like `node_modules`) from your Git history. You can now push your code to GitHub without issues.
