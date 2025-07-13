@@ -1,8 +1,8 @@
 import { SystemCreator } from "@/components/gm/SystemCreator";
 import { getTranslations, createT } from '@/lib/i18n';
 
-export default async function CreateSystemPage({ params: { locale } }: { params: { locale: string }}) {
-  const translations = await getTranslations(locale as 'en' | 'fr');
+export default async function CreateSystemPage({ params: { locale } }: { params: { locale: 'en' | 'fr' }}) {
+  const translations = await getTranslations(locale);
   const t = createT(translations);
 
   return (
