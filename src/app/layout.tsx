@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
-import { I18nProvider } from '@/locales/client';
-import { getI18n, getCurrentLocale } from '@/locales/server';
+import { getTranslations, getLocale, createT } from '@/lib/i18n';
 
 export const metadata: Metadata = {
   title: 'KOTU: RPG Toolkit',
@@ -15,8 +14,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = getCurrentLocale();
-  const t = await getI18n();
+  const locale = getLocale();
+  const translations = await getTranslations(locale);
+  const t = createT(translations);
+
   const headerTranslations = {
     gmDashboard: t('header.gmDashboard'),
     playerDashboard: t('header.playerDashboard'),
@@ -33,11 +34,9 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col">
-        <I18nProvider locale={locale}>
           <Header translations={headerTranslations} />
           <main className="flex-grow">{children}</main>
           <Toaster />
-        </I18nProvider>
       </body>
     </html>
   );

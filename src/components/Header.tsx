@@ -12,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useChangeLocale } from '@/locales/client';
 
 type HeaderTranslations = {
   gmDashboard: string;
@@ -28,7 +27,13 @@ interface HeaderProps {
 
 export function Header({ translations }: HeaderProps) {
   const pathname = usePathname();
-  const changeLocale = useChangeLocale();
+
+  const changeLocale = (locale: 'en' | 'fr') => {
+    const segments = pathname.split('/');
+    segments[1] = locale;
+    const newPath = segments.join('/');
+    window.location.href = newPath;
+  };
 
   const navLinks = [
     { href: '/gm/dashboard', label: translations.gmDashboard },
@@ -51,7 +56,7 @@ export function Header({ translations }: HeaderProps) {
               href={link.href}
               className={cn(
                 'transition-colors hover:text-primary',
-                pathname.endsWith(link.href) ? 'text-primary' : 'text-foreground/60'
+                pathname.includes(link.href) ? 'text-primary' : 'text-foreground/60'
               )}
             >
               {link.label}

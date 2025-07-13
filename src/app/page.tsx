@@ -2,10 +2,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Swords, Shield, ScrollText, User, Users } from 'lucide-react';
 import Link from 'next/link';
-import { getI18n } from '@/locales/server';
+import { getTranslations, getLocale, createT } from '@/lib/i18n';
 
 export default async function Home() {
-  const t = await getI18n();
+  const locale = getLocale();
+  const translations = await getTranslations(locale);
+  const t = createT(translations);
 
   return (
     <div className="container mx-auto px-4 py-12">
