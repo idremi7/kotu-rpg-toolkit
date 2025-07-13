@@ -3,8 +3,48 @@
 import { saveSystem as saveSystemToFile, getSystem as getSystemFromFile, listSystems as listSystemsFromFile } from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
 
-export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' | 'schemas'>, schemas: { formSchema: string, uiSchema: string }) {
+export async function saveSystemAction(systemData: Omit<GameSystem, 'systemId' | 'schemas'>) {
   const systemId = systemData.systemName.toLowerCase().replace(/\s+/g, '-');
+  
+  const formSchemaProperties: any = {
+    name: { type: 'string', default: '' },
+    class: { type: 'string', default: '' },
+    level: { type: 'number', default: 1 },
+    attributes: {
+      type: 'object',
+      properties: {},
+    },
+    skills: { type: 'array', items: { type: 'string' } },
+    feats: { type: 'array', items: { type: 'string' } },
+  };
+
+  const uiSchema: any = {
+    name: { 'ui:widget': 'text', 'ui:label': 'Character Name' },
+    class: { 'ui:widget': 'text', 'ui:label': 'Class' },
+    level: { 'ui:widget': 'number', 'ui:label': 'Level' },
+    attributes: {
+      'ui:fieldset': true,
+      'ui:label': 'Attributes',
+      fields: {},
+    },
+    skills: { 'ui:widget': 'checkboxes', 'ui:label': 'Skills' },
+    feats: { 'ui:widget': 'checkboxes', 'ui:label': 'Feats' },
+  };
+
+  systemData.attributes.forEach(attr => {
+    formSchemaProperties.attributes.properties[attr.name] = { type: 'number', default: 10 };
+    uiSchema.attributes.fields[attr.name] = { 'ui:widget': 'number', 'ui:label': attr.name };
+  });
+
+  const schemas = {
+    formSchema: JSON.stringify({
+        type: 'object',
+        properties: formSchemaProperties,
+        required: ['name', 'class', 'level'],
+    }, null, 2),
+    uiSchema: JSON.stringify(uiSchema, null, 2),
+  };
+
   const fullSystemData: GameSystem = {
     ...systemData,
     systemId,

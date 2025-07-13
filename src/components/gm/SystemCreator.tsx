@@ -13,7 +13,6 @@ import { saveSystemAction } from '@/app/actions';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { defaultFormSchema, defaultUiSchema } from '@/lib/schemas';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -21,7 +20,7 @@ const featSchema = z.object({ name: z.string().min(1, 'Name is required'), descr
 
 const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
-  attributes: z.array(attributeSchema),
+  attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
   skills: z.array(skillSchema),
   feats: z.array(featSchema),
 });
@@ -60,12 +59,8 @@ export function SystemCreator() {
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
-    const schemas = {
-      formSchema: JSON.stringify(defaultFormSchema, null, 2),
-      uiSchema: JSON.stringify(defaultUiSchema, null, 2),
-    };
     
-    const result = await saveSystemAction(data, schemas);
+    const result = await saveSystemAction(data);
     
     if (result.success && result.systemId) {
         toast({
