@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 56% 95%; /* #F5F5DC light beige */
+    --foreground: 24 15% 15%; /* Dark brown for text */
+    --card: 60 33% 98%;
+    --card-foreground: 24 15% 15%;
+    --popover: 60 33% 98%;
+    --popover-foreground: 24 15% 15%;
+    --primary: 41 100% 50%; /* #FFB300 warm amber */
+    --primary-foreground: 24 15% 10%;
+    --secondary: 41 30% 85%;
+    --secondary-foreground: 24 15% 10%;
+    --muted: 60 20% 90%;
+    --muted-foreground: 24 15% 40%;
+    --accent: 16 100% 63%; /* #FF7043 burnt orange */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 60 20% 85%;
+    --input: 60 20% 92%;
+    --ring: 41 100% 50%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 24 15% 10%;
+    --foreground: 60 30% 92%;
+    --card: 24 15% 12%;
+    --card-foreground: 60 30% 92%;
+    --popover: 24 15% 10%;
+    --popover-foreground: 60 30% 92%;
+    --primary: 41 100% 50%;
+    --primary-foreground: 24 15% 10%;
+    --secondary: 41 50% 20%;
+    --secondary-foreground: 60 30% 92%;
+    --muted: 24 15% 15%;
+    --muted-foreground: 60 30% 70%;
+    --accent: 16 100% 63%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 24 15% 20%;
+    --input: 24 15% 18%;
+    --ring: 41 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #character-sheet-preview, #character-sheet-preview * {
+    visibility: visible;
+  }
+  #character-sheet-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .no-print {
+    display: none;
+  }
+}
