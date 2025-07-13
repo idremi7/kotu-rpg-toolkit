@@ -6,24 +6,33 @@ import { Logo } from './Logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, LogIn, UserPlus, Languages } from 'lucide-react';
-import { useI18n } from '@/locales/client';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useChangeLocale, useCurrentLocale } from '@/locales/client';
+import { useChangeLocale } from '@/locales/client';
 
-export function Header() {
+type HeaderTranslations = {
+  gmDashboard: string;
+  playerDashboard: string;
+  login: string;
+  signUp: string;
+  toggleLanguage: string;
+};
+
+interface HeaderProps {
+  translations: HeaderTranslations;
+}
+
+export function Header({ translations }: HeaderProps) {
   const pathname = usePathname();
-  const t = useI18n();
   const changeLocale = useChangeLocale();
-  const locale = useCurrentLocale();
 
   const navLinks = [
-    { href: '/gm/dashboard', label: t('header.gmDashboard') },
-    { href: '/player/dashboard', label: t('header.playerDashboard') },
+    { href: '/gm/dashboard', label: translations.gmDashboard },
+    { href: '/player/dashboard', label: translations.playerDashboard },
   ];
 
   return (
@@ -54,7 +63,7 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Languages className="h-[1.2rem] w-[1.2rem]" />
-                <span className="sr-only">{t('header.toggleLanguage')}</span>
+                <span className="sr-only">{translations.toggleLanguage}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -73,13 +82,13 @@ export function Header() {
            <Button variant="outline" size="sm" asChild>
             <Link href="/login">
               <LogIn className="mr-2 h-4 w-4" />
-              {t('header.login')}
+              {translations.login}
             </Link>
           </Button>
           <Button size="sm" asChild>
             <Link href="/signup">
               <UserPlus className="mr-2 h-4 w-4" />
-              {t('header.signUp')}
+              {translations.signUp}
             </Link>
           </Button>
         </div>

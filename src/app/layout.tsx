@@ -3,19 +3,28 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
 import { I18nProvider } from '@/locales/client';
-import { getLocale } from '@/locales/server';
+import { getI18n, getLocale } from '@/locales/server';
 
 export const metadata: Metadata = {
   title: 'KOTU: RPG Toolkit',
   description: 'Create and manage custom RPG systems and characters.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = getLocale();
+  const locale = await getLocale();
+  const t = await getI18n();
+  const headerTranslations = {
+    gmDashboard: t('header.gmDashboard'),
+    playerDashboard: t('header.playerDashboard'),
+    login: t('header.login'),
+    signUp: t('header.signUp'),
+    toggleLanguage: t('header.toggleLanguage'),
+  };
+
   return (
     <html lang={locale} className="dark">
       <head>
@@ -25,7 +34,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased min-h-screen flex flex-col">
         <I18nProvider locale={locale}>
-          <Header />
+          <Header translations={headerTranslations} />
           <main className="flex-grow">{children}</main>
           <Toaster />
         </I18nProvider>
