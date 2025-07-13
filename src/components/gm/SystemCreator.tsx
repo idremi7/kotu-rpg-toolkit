@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle, Trash2, Loader2, Save } from 'lucide-react';
-import { saveSystemAction } from '@/app/actions';
+import { PlusCircle, Trash2, Loader2, Save, Sparkles } from 'lucide-react';
+import { saveSystemAction, suggestSkillsAction } from '@/app/actions';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -31,6 +31,7 @@ type SystemFormData = z.infer<typeof systemSchema>;
 
 export function SystemCreator() {
   const [isSaving, setIsSaving] = useState(false);
+  const [isSuggestingSkills, setIsSuggestingSkills] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -93,6 +94,33 @@ export function SystemCreator() {
       setIsSaving(false);
     }
   };
+
+  const handleSuggestSkills = async () => {
+    setIsSuggestingSkills(true);
+    const formData = form.getValues();
+    const result = await suggestSkillsAction({
+      systemName: formData.systemName,
+      attributes: formData.attributes,
+    });
+    
+    if (result.success && result.skills) {
+      removeSkill(); // clear existing skills
+      appendSkill(result.skills);
+      toast({
+        title: "Skills Suggested",
+        description: "AI has added a list of suggested skills.",
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Suggestion Failed",
+        description: result.error || "Could not get suggestions from AI.",
+      });
+    }
+    
+    setIsSuggestingSkills(false);
+  };
+
 
   return (
     <div className="space-y-8">
@@ -204,7 +232,7 @@ export function SystemCreator() {
           <Card>
             <CardHeader>
               <CardTitle>Skills</CardTitle>
-              <CardDescription>Define character abilities.</CardDescription>
+              <CardDescription>Define character abilities. You can add them manually or use AI to get suggestions based on your attributes.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {skillFields.map((field, index) => (
@@ -238,7 +266,13 @@ export function SystemCreator() {
                   <Button type="button" variant="destructive" size="icon" onClick={() => removeSkill(index)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
+                <Button type="button" variant="secondary" onClick={handleSuggestSkills} disabled={isSuggestingSkills}>
+                  {isSuggestingSkills ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                  Suggest with AI
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

@@ -19,7 +19,7 @@ export default {
       title: 'How It Works',
       gm: {
         title: '1. The GM Crafts a World',
-        description: 'As a Game Master, you define the rules of your universe. Create custom attributes, skills, and feats to build a unique system for your campaign.',
+        description: 'As a Game Master, you define the rules of your universe. Create custom attributes, skills, and feats to build a unique system for your campaign. Use AI to get suggestions and speed up your creative process.',
       },
       form: {
         title: '2. A Dynamic Form is Ready',
@@ -76,6 +76,12 @@ export default {
   createSystem: {
     title: 'System Architect',
     description: 'Define the rules of your world. Add attributes, skills, and feats to create a unique game system.',
+    suggestSkills: 'Suggest with AI',
+    skillsDescription: 'Define character abilities. You can add them manually or use AI to get suggestions based on your attributes.',
+    skillsSuggestedTitle: 'Skills Suggested',
+    skillsSuggestedDescription: 'AI has added a list of suggested skills.',
+    suggestionFailedTitle: 'Suggestion Failed',
+    suggestionFailedDescription: 'Could not get suggestions from AI.',
   },
   systemDetails: {
     title: 'System Details',

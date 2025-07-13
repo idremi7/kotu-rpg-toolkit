@@ -10,6 +10,8 @@ import {
 } from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
 import { randomUUID } from 'crypto';
+import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
+import type { SuggestSkillsInput } from '@/ai/flows/suggest-skills-flow';
 
 export async function saveSystemAction(
   systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'>
@@ -116,4 +118,14 @@ export async function getCharacterAction(characterId: string) {
 
 export async function listCharactersAction() {
     return await listCharactersFromFile();
+}
+
+export async function suggestSkillsAction(input: SuggestSkillsInput) {
+  try {
+    const result = await suggestSkills(input);
+    return { success: true, skills: result.skills };
+  } catch (error) {
+    console.error('AI failed to suggest skills:', error);
+    return { success: false, error: 'AI failed to suggest skills.' };
+  }
 }

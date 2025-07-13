@@ -19,7 +19,7 @@ export default {
       title: 'Comment ça marche ?',
       gm: {
         title: '1. Le MJ Crée un Monde',
-        description: 'En tant que Maître de Jeu, vous définissez les règles de votre univers. Créez des attributs, compétences et dons personnalisés pour construire un système unique pour votre campagne.',
+        description: 'En tant que Maître de Jeu, vous définissez les règles de votre univers. Créez des attributs, compétences et dons personnalisés pour construire un système unique pour votre campagne. Utilisez l\'IA pour obtenir des suggestions et accélérer votre processus créatif.',
       },
       form: {
         title: '2. Un Formulaire Dynamique est Prêt',
@@ -76,6 +76,12 @@ export default {
   createSystem: {
     title: 'Architecte de Système',
     description: 'Définissez les règles de votre monde. Ajoutez des attributs, des compétences et des dons pour créer un système de jeu unique.',
+    suggestSkills: 'Suggérer avec l\'IA',
+    skillsDescription: 'Définissez les capacités des personnages. Vous pouvez les ajouter manuellement ou utiliser l\'IA pour obtenir des suggestions basées sur vos attributs.',
+    skillsSuggestedTitle: 'Compétences Suggérées',
+    skillsSuggestedDescription: 'L\'IA a ajouté une liste de compétences suggérées.',
+    suggestionFailedTitle: 'La suggestion a échoué',
+    suggestionFailedDescription: 'Impossible d\'obtenir des suggestions de l\'IA.',
   },
   systemDetails: {
     title: 'Détails du Système',
