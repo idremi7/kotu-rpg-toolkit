@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
 import { I18nProvider } from '@/locales/client';
-import { getI18n, getLocale } from '@/locales/server';
+import { getI18n, getCurrentLocale } from '@/locales/server';
 
 export const metadata: Metadata = {
   title: 'KOTU: RPG Toolkit',
@@ -15,7 +15,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
+  const locale = getCurrentLocale();
   const t = await getI18n();
   const headerTranslations = {
     gmDashboard: t('header.gmDashboard'),
