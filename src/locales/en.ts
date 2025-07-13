@@ -10,32 +10,31 @@ export default {
     title: 'KOTU: RPG Toolkit',
     subtitle: 'Your digital companion for crafting and embarking on epic tabletop adventures. Create bespoke game systems as a Game Master, or bring your heroes to life as a Player.',
     gmCard: {
-      title: 'For Game Masters',
-      description: "The Architect's Workshop",
-      body: 'Forge unique worlds with custom rules. Define attributes, skills, feats, and saves to build the backbone of your next campaign. Our AI-powered tools help you generate character sheets and forms dynamically.',
-      button: 'Go to GM Dashboard',
+      button: 'Start as GM',
     },
     playerCard: {
-      title: 'For Players',
-      description: "The Hero's Forge",
-      body: 'Step into a world of adventure. Create detailed characters using your GM\'s custom system. Allocate points, choose your path, and watch your character sheet update in real-time. Your legend begins here.',
-      button: 'Go to Player Dashboard',
+      button: 'Start as Player',
     },
-    features: {
-      title: 'Core Features',
-      systemBuilder: {
-        title: 'Custom System Builder',
-        description: 'Design RPG systems with unique attributes, skills, and feats.',
+    howItWorks: {
+      title: 'How It Works',
+      gm: {
+        title: '1. The GM Crafts a World',
+        description: 'As a Game Master, you define the rules of your universe. Create custom attributes, skills, and feats to build a unique system for your campaign.',
       },
-      formGeneration: {
-        title: 'Intelligent Form Generation',
-        description: 'Automatically create character creation forms from your system rules.',
+      ai: {
+        title: '2. AI Generates the Interface',
+        description: 'Our AI takes your system rules and instantly generates the necessary data schemas and a user-friendly form for character creation. No code required.',
       },
-      liveSheets: {
-        title: 'Live Character Sheets',
-        description: 'Interactive, real-time character sheets that are easy to view and export.',
+      player: {
+        title: '3. Players Create Their Heroes',
+        description: 'Players can then use the generated form to create their characters, fill out their stats, and choose their abilities, ready to jump into the adventure.',
       },
     },
+    finalCta: {
+      title: "Ready to Start Your Adventure?",
+      subtitle: "Create an account for free and begin building your worlds or your next great hero.",
+      button: "Sign Up Now"
+    }
   },
   login: {
     title: 'Welcome Back',
@@ -63,7 +62,6 @@ export default {
     newSystemButton: 'Create New System',
     description: 'Manage your game systems and campaigns.',
     manageButton: 'Manage System',
-    createSystemPrompt: 'Create a System',
     noSystemsTitle: 'No Systems Found',
     noSystemsDescription: 'It looks like you haven\'t created any game systems yet.',
     createFirstSystemButton: 'Create Your First System',

@@ -1,86 +1,103 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Swords, Shield, ScrollText, User, Users } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Shield, Swords, Users, FileText, Wand2, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { getTranslations, createT } from '@/lib/i18n';
+import Image from 'next/image';
 
 export default async function Home({ params: { locale } }: { params: { locale: 'en' | 'fr' } }) {
   const translations = await getTranslations(locale);
   const t = createT(translations);
 
+  const steps = [
+    {
+      icon: <Users className="w-10 h-10 mb-4 text-primary" />,
+      title: t('home.howItWorks.gm.title'),
+      description: t('home.howItWorks.gm.description'),
+      image: "https://placehold.co/1024x768.png",
+      aiHint: "fantasy map"
+    },
+    {
+      icon: <Wand2 className="w-10 h-10 mb-4 text-primary" />,
+      title: t('home.howItWorks.ai.title'),
+      description: t('home.howItWorks.ai.description'),
+      image: "https://placehold.co/1024x768.png",
+      aiHint: "character sheet form"
+    },
+    {
+      icon: <UserPlus className="w-10 h-10 mb-4 text-primary" />,
+      title: t('home.howItWorks.player.title'),
+      description: t('home.howItWorks.player.description'),
+      image: "https://placehold.co/1024x768.png",
+      aiHint: "dungeons dragons players"
+    }
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <section className="text-center mb-16">
+    <div className="flex flex-col">
+      <section className="text-center py-20 px-4 bg-card/50">
         <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight text-primary">
           {t('home.title')}
         </h1>
         <p className="mt-4 text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto">
           {t('home.subtitle')}
         </p>
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg">
+              <Link href="/gm/dashboard">
+                <Users className="mr-2" />
+                {t('home.gmCard.button')}
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="secondary">
+               <Link href="/player/dashboard">
+                <Swords className="mr-2" />
+                {t('home.playerCard.button')}
+              </Link>
+            </Button>
+        </div>
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        <Card className="hover:shadow-lg hover:border-primary/50 transition-all duration-300">
-          <CardHeader className="flex-row items-center gap-4">
-            <Users className="w-12 h-12 text-primary" />
-            <div>
-              <CardTitle className="font-headline text-2xl">{t('home.gmCard.title')}</CardTitle>
-              <CardDescription>{t('home.gmCard.description')}</CardDescription>
+      <section id="how-it-works" className="py-20 px-4">
+        <div className="container mx-auto">
+            <h2 className="text-4xl font-headline font-bold text-center mb-12">{t('home.howItWorks.title')}</h2>
+            <div className="space-y-16">
+              {steps.map((step, index) => (
+                <div key={index} className={`flex flex-col md:flex-row items-center gap-12 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+                    <div className="md:w-1/2 text-center md:text-left">
+                        <div className="flex justify-center md:justify-start">
+                            {step.icon}
+                        </div>
+                        <h3 className="text-3xl font-bold font-headline mb-4">{step.title}</h3>
+                        <p className="text-lg text-muted-foreground">{step.description}</p>
+                    </div>
+                    <div className="md:w-1/2">
+                        <Card className="overflow-hidden shadow-2xl">
+                          <CardContent className="p-0">
+                            <Image 
+                              src={step.image} 
+                              alt={step.title}
+                              width={1024}
+                              height={768}
+                              data-ai-hint={step.aiHint}
+                              className="object-cover w-full h-full" 
+                            />
+                          </CardContent>
+                        </Card>
+                    </div>
+                </div>
+              ))}
             </div>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-6">
-              {t('home.gmCard.body')}
-            </p>
-            <Button asChild className="w-full" size="lg">
-              <Link href="/gm/dashboard">{t('home.gmCard.button')}</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        </div>
+      </section>
 
-        <Card className="hover:shadow-lg hover:border-primary/50 transition-all duration-300">
-          <CardHeader className="flex-row items-center gap-4">
-            <User className="w-12 h-12 text-primary" />
-            <div>
-              <CardTitle className="font-headline text-2xl">{t('home.playerCard.title')}</CardTitle>
-              <CardDescription>{t('home.playerCard.description')}</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-6">
-              {t('home.playerCard.body')}
-            </p>
-            <Button asChild className="w-full" size="lg">
-              <Link href="/player/dashboard">{t('home.playerCard.button')}</Link>
+      <section className="bg-muted py-20 px-4">
+        <div className="container mx-auto text-center">
+            <h2 className="text-4xl font-headline font-bold mb-4">{t('home.finalCta.title')}</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">{t('home.finalCta.subtitle')}</p>
+            <Button asChild size="lg">
+              <Link href="/signup">{t('home.finalCta.button')}</Link>
             </Button>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <section className="mt-20 text-center">
-        <h2 className="font-headline text-3xl font-bold mb-6">{t('home.features.title')}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
-          <div className="flex items-start gap-4">
-            <Swords className="w-8 h-8 text-accent flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-bold text-lg">{t('home.features.systemBuilder.title')}</h3>
-              <p className="text-foreground/80">{t('home.features.systemBuilder.description')}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <Shield className="w-8 h-8 text-accent flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-bold text-lg">{t('home.features.formGeneration.title')}</h3>
-              <p className="text-foreground/80">{t('home.features.formGeneration.description')}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <ScrollText className="w-8 h-8 text-accent flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-bold text-lg">{t('home.features.liveSheets.title')}</h3>
-              <p className="text-foreground/80">{t('home.features.liveSheets.description')}</p>
-            </div>
-          </div>
         </div>
       </section>
     </div>
