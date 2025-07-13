@@ -1,12 +1,16 @@
 import { SystemCreator } from "@/components/gm/SystemCreator";
+import { getTranslations, createT } from '@/lib/i18n';
 
-export default function CreateSystemPage() {
+export default async function CreateSystemPage({ params: { locale } }: { params: { locale: string }}) {
+  const translations = await getTranslations(locale as 'en' | 'fr');
+  const t = createT(translations);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
-        <h1 className="font-headline text-4xl font-bold">System Architect</h1>
+        <h1 className="font-headline text-4xl font-bold">{t('createSystem.title')}</h1>
         <p className="text-muted-foreground">
-          Define the rules of your world. Add attributes, skills, and feats to create a unique game system.
+          {t('createSystem.description')}
         </p>
       </div>
       <SystemCreator />

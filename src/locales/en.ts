@@ -71,5 +71,22 @@ export default {
     description: 'Manage your heroes and embark on new adventures.',
     viewSheetButton: 'View Character Sheet',
     createCharacterPrompt: 'Create a Character',
+  },
+  createSystem: {
+    title: 'System Architect',
+    description: 'Define the rules of your world. Add attributes, skills, and feats to create a unique game system.',
+  },
+  systemDetails: {
+    title: 'System Details',
+    description: 'Configuration for the {systemName} system.',
+    attributes: 'Attributes',
+    skills: 'Skills',
+    feats: 'Feats',
+    schemas: 'Generated Schemas',
+    formSchema: 'Form Schema',
+    uiSchema: 'UI Schema',
+    noSystem: 'System not found',
+    noSystemDesc: 'The requested system could not be found in local storage.',
+    loading: 'Loading system data...',
   }
 } as const;

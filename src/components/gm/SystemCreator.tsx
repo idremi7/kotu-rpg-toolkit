@@ -8,11 +8,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle, Trash2, Wand2, Loader2 } from 'lucide-react';
+import { PlusCircle, Trash2, Wand2, Loader2, Save } from 'lucide-react';
 import { generateFormAction } from '@/app/actions';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Separator } from '../ui/separator';
+import { useRouter } from 'next/navigation';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -28,9 +28,11 @@ const systemSchema = z.object({
 type SystemFormData = z.infer<typeof systemSchema>;
 
 export function SystemCreator() {
-  const [generatedCode, setGeneratedCode] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [generatedSchemas, setGeneratedSchemas] = useState<{formSchema: string, uiSchema: string} | null>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<SystemFormData>({
     resolver: zodResolver(systemSchema),
@@ -57,30 +59,63 @@ export function SystemCreator() {
     name: 'feats',
   });
 
-  const onSubmit = async (data: SystemFormData) => {
-    setIsLoading(true);
-    setGeneratedCode(null);
+  const handleGenerateSchemas = async () => {
+    const data = form.getValues();
+    setIsGenerating(true);
+    setGeneratedSchemas(null);
     const result = await generateFormAction(data);
-    setIsLoading(false);
-    if (result.success && result.data?.formCode) {
-      setGeneratedCode(result.data.formCode);
+    setIsGenerating(false);
+
+    if (result.success && result.data) {
+      setGeneratedSchemas(result.data);
       toast({
-        title: "Form Generated Successfully!",
-        description: "The React code for your character sheet form is ready.",
+        title: "Schemas Generated Successfully!",
+        description: "The JSON schemas for your character sheet form are ready.",
       });
     } else {
       toast({
         variant: "destructive",
-        title: "Error Generating Form",
+        title: "Error Generating Schemas",
         description: result.error || "An unknown error occurred.",
       });
     }
   };
+  
+  const handleSaveSystem = async () => {
+    setIsSaving(true);
+    const systemData = form.getValues();
+    const systemId = systemData.systemName.toLowerCase().replace(/\s+/g, '-');
+    
+    // In a real app, you would save systemData and generatedSchemas to a database.
+    // For this mock, we'll store it in localStorage to pass it to the next page.
+    try {
+      localStorage.setItem(`system-${systemId}`, JSON.stringify({
+        ...systemData,
+        schemas: generatedSchemas
+      }));
+
+      toast({
+        title: "System Saved!",
+        description: `${systemData.systemName} has been successfully saved.`,
+      });
+      
+      router.push(`/gm/systems/${systemId}`);
+
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Failed to save system",
+        description: "Could not save to local storage. Your browser might not support it or be in private mode.",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="space-y-8">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
           <Card>
             <CardHeader>
               <CardTitle>System Details</CardTitle>
@@ -153,34 +188,32 @@ export function SystemCreator() {
               <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: ''})}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
             </CardContent>
           </Card>
-
-          <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-            Generate Character Form
-          </Button>
         </form>
       </Form>
       
       <div className="space-y-4">
-        <h2 className="font-headline text-2xl font-bold">Generated Form Code</h2>
-        <Card className="min-h-[400px] bg-muted/30">
-          <CardContent className="p-4">
-            {isLoading && (
-              <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                <Loader2 className="h-16 w-16 animate-spin text-primary mb-4"/>
-                <p>Generating your form with GenAI...</p>
-                <p className="text-sm">This may take a moment.</p>
+        <Card className="bg-muted/30">
+          <CardHeader>
+            <CardTitle>Next Steps</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+              <div>
+                <h3 className="font-semibold mb-2">Step 1: Generate Form Schemas</h3>
+                <p className="text-sm text-muted-foreground mb-3">Use GenAI to create the data and UI schemas for your character sheet based on the configuration above.</p>
+                <Button onClick={handleGenerateSchemas} disabled={isGenerating}>
+                  {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+                  Generate Schemas
+                </Button>
               </div>
-            )}
-            {!isLoading && generatedCode && (
-              <pre className="text-sm whitespace-pre-wrap overflow-auto bg-background p-4 rounded-md">
-                <code>{generatedCode}</code>
-              </pre>
-            )}
-             {!isLoading && !generatedCode && (
-              <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 text-center">
-                 <Wand2 className="h-16 w-16 text-primary/50 mb-4"/>
-                <p>Fill out your system details and click "Generate Character Form" to see the AI-generated React code here.</p>
+
+            {generatedSchemas && (
+              <div>
+                <h3 className="font-semibold mb-2">Step 2: Save System</h3>
+                <p className="text-sm text-muted-foreground mb-3">Save the system configuration and the generated schemas. This will make it available for players.</p>
+                <Button onClick={handleSaveSystem} disabled={isSaving}>
+                  {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  Save System
+                </Button>
               </div>
             )}
           </CardContent>

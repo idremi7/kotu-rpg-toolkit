@@ -7,9 +7,10 @@ export async function generateFormAction(systemConfig: any) {
     const result = await generateSystemForm({
       systemConfiguration: JSON.stringify(systemConfig, null, 2),
     });
-    return { success: true, data: result };
+    // We only need the schemas now, not the formCode.
+    return { success: true, data: { formSchema: result.formSchema, uiSchema: result.uiSchema } };
   } catch (error) {
     console.error(error);
-    return { success: false, error: 'Failed to generate form.' };
+    return { success: false, error: 'Failed to generate form schemas.' };
   }
 }

@@ -71,5 +71,22 @@ export default {
     description: 'Gérez vos héros et lancez-vous dans de nouvelles aventures.',
     viewSheetButton: 'Voir la fiche de personnage',
     createCharacterPrompt: 'Créer un personnage',
+  },
+  createSystem: {
+    title: 'Architecte de Système',
+    description: 'Définissez les règles de votre monde. Ajoutez des attributs, des compétences et des dons pour créer un système de jeu unique.',
+  },
+  systemDetails: {
+    title: 'Détails du Système',
+    description: 'Configuration pour le système {systemName}.',
+    attributes: 'Attributs',
+    skills: 'Compétences',
+    feats: 'Dons',
+    schemas: 'Schémas Générés',
+    formSchema: 'Schéma de Formulaire',
+    uiSchema: 'Schéma d\'Interface',
+    noSystem: 'Système non trouvé',
+    noSystemDesc: 'Le système demandé n\'a pas pu être trouvé dans votre stockage local.',
+    loading: 'Chargement des données du système...',
   }
 } as const;

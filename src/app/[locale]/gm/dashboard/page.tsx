@@ -4,6 +4,8 @@ import { PlusCircle, Shield, Swords } from "lucide-react";
 import Link from "next/link";
 import { getTranslations, createT } from '@/lib/i18n';
 
+// In a real app, this would come from a database.
+// We'll add new systems here via SystemCreator's localStorage logic.
 const mockSystems = [
   { id: 'd20-fantasy', name: 'D20 Fantasy', description: 'A classic system with attributes, skills, and feats.' },
   { id: 'space-opera', name: 'Cosmic Drift', description: 'A sci-fi system focusing on ship combat and psionics.' },
@@ -40,7 +42,9 @@ export default async function GMDashboard({ params: { locale } }: { params: { lo
               {/* Future content can go here, like player count or last played date */}
             </CardContent>
             <div className="p-4 pt-0">
-               <Button variant="secondary" className="w-full">{t('gmDashboard.manageButton')}</Button>
+               <Button asChild variant="secondary" className="w-full">
+                  <Link href={`/gm/systems/${system.id}`}>{t('gmDashboard.manageButton')}</Link>
+                </Button>
             </div>
           </Card>
         ))}
