@@ -39,23 +39,3 @@ To get started with development:
     npm run dev
     ```
 This will start the Next.js application, typically on `http://localhost:9002`.
-
-### Fixing Git Push Errors (Important)
-
-If you get an error from GitHub about "large files" when you try to `git push`, it means large directories (like `.firebase` or `node_modules`) were accidentally committed in the past. To fix this, you must clean your Git history.
-
-Run the following commands **only once**:
-
-1.  **Make the setup script executable**:
-    ```bash
-    chmod +x init.sh
-    ```
-2.  **Run the script to rewrite history**: This will remove the large files from Git's entire history.
-    ```bash
-    ./init.sh
-    ```
-3.  **Force push the cleaned history to GitHub**: This is a required final step.
-    ```bash
-    git push --force
-    ```
-This will permanently remove the large files from your remote repository's history, and you will be able to push your code without issues.
