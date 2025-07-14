@@ -52,6 +52,28 @@
     --input: 24 15% 18%;
     --ring: 41 100% 50%;
   }
+
+  .synthwave {
+    --background: 265 60% 8%;
+    --foreground: 300 100% 95%;
+    --card: 265 60% 12%;
+    --card-foreground: 300 100% 95%;
+    --popover: 265 60% 8%;
+    --popover-foreground: 300 100% 95%;
+    --primary: 320 100% 60%; /* Hot Pink */
+    --primary-foreground: 300 100% 98%;
+    --secondary: 190 70% 25%;
+    --secondary-foreground: 190 100% 95%;
+    --muted: 265 60% 18%;
+    --muted-foreground: 300 30% 70%;
+    --accent: 185 100% 50%; /* Cyan */
+    --accent-foreground: 265 60% 8%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 320 100% 40%;
+    --input: 265 60% 20%;
+    --ring: 185 100% 50%;
+  }
 }
 
 @layer base {
