@@ -349,7 +349,8 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         </Card>
       );
     }
-
+    
+    // For non-fieldset sections like skills, feats, backstory
     return (
       <Card key={fieldName}>
         <CardHeader>
