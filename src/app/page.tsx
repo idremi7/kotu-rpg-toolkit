@@ -51,7 +51,7 @@ export default function Home() {
               Start as GM
             </Link>
           </Button>
-          <Button asChild size="lg" variant="secondary">
+          <Button asChild size="lg" variant="outline">
             <Link href="/player/dashboard">
               <Swords className="mr-2" />
               Start as Player
