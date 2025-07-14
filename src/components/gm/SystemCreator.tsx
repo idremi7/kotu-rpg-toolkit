@@ -46,12 +46,23 @@ interface SystemCreatorProps {
     initialData?: GameSystem;
 }
 
+const LanguageToggle = ({ selectedLang, onLangChange }: { selectedLang: 'en' | 'fr' | 'all', onLangChange: (lang: 'en' | 'fr' | 'all') => void }) => {
+    return (
+        <div className="flex justify-center gap-2 my-2">
+            <Button size="sm" variant={selectedLang === 'en' ? 'default' : 'outline'} onClick={() => onLangChange('en')}>English</Button>
+            <Button size="sm" variant={selectedLang === 'fr' ? 'default' : 'outline'} onClick={() => onLangChange('fr')}>Français</Button>
+            <Button size="sm" variant={selectedLang === 'all' ? 'default' : 'outline'} onClick={() => onLangChange('all')}>All</Button>
+        </div>
+    );
+};
+
 const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: string, category: string}[]) => void }) => {
     const { toast } = useToast();
     const [selectedSkills, setSelectedSkills] = useState<Record<string, {isSelected: boolean, category: string}>>({});
     const [isOpen, setIsOpen] = useState(false);
     const [allSkills, setAllSkills] = useState<SkillFromLibrary[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [lang, setLang] = useState<'en' | 'fr' | 'all'>('en');
 
     useEffect(() => {
         if (isOpen && allSkills.length === 0) {
@@ -62,15 +73,17 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
     }, [isOpen, allSkills.length]);
 
     const filteredSkills = useMemo(() => {
-        if (!searchQuery) {
-            return allSkills;
-        }
-        const lowercasedQuery = searchQuery.toLowerCase();
-        return allSkills.filter(skill => 
-            skill.name.toLowerCase().includes(lowercasedQuery) || 
-            skill.description.toLowerCase().includes(lowercasedQuery)
-        );
-    }, [searchQuery, allSkills]);
+        return allSkills.filter(skill => {
+            const langMatch = lang === 'all' || skill.lang === lang;
+            if (!langMatch) return false;
+
+            if (!searchQuery) return true;
+
+            const lowercasedQuery = searchQuery.toLowerCase();
+            return skill.name.toLowerCase().includes(lowercasedQuery) || 
+                   skill.description.toLowerCase().includes(lowercasedQuery);
+        });
+    }, [searchQuery, allSkills, lang]);
     
     const handleSelectSkill = (skillName: string, category: string, isSelected: boolean) => {
         setSelectedSkills(prev => ({...prev, [skillName]: { isSelected, category }}));
@@ -105,21 +118,22 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
                 </SheetHeader>
                 <div className="py-4 h-[calc(100%-120px)] flex flex-col">
                     <Input 
-                        placeholder="Search for a skill..."
+                        placeholder="Search skills..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="mb-4"
+                        className="mb-2"
                     />
+                    <LanguageToggle selectedLang={lang} onLangChange={setLang} />
                     <ScrollArea className="flex-grow pr-4">
                        <div className="space-y-2">
                             {filteredSkills.map(skill => (
-                                <div key={skill.name} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
+                                <div key={`${skill.name}-${skill.lang}`} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
                                     <Checkbox 
-                                        id={`lib-${skill.name}`}
+                                        id={`lib-${skill.name}-${skill.lang}`}
                                         checked={!!selectedSkills[skill.name]?.isSelected}
                                         onCheckedChange={(checked) => handleSelectSkill(skill.name, skill.category, !!checked)}
                                     />
-                                    <label htmlFor={`lib-${skill.name}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
+                                    <label htmlFor={`lib-${skill.name}-${skill.lang}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
                                         <div className="flex justify-between">
                                           <span>{skill.name}</span>
                                           <span className="text-xs text-muted-foreground">{skill.category}</span>
@@ -146,6 +160,7 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
     const [isOpen, setIsOpen] = useState(false);
     const [allFeats, setAllFeats] = useState<FeatFromLibrary[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [lang, setLang] = useState<'en' | 'fr' | 'all'>('en');
 
     useEffect(() => {
         if (isOpen && allFeats.length === 0) {
@@ -156,15 +171,17 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
     }, [isOpen, allFeats.length]);
 
     const filteredFeats = useMemo(() => {
-        if (!searchQuery) {
-            return allFeats;
-        }
-        const lowercasedQuery = searchQuery.toLowerCase();
-        return allFeats.filter(feat => 
-            feat.name.toLowerCase().includes(lowercasedQuery) || 
-            feat.description.toLowerCase().includes(lowercasedQuery)
-        );
-    }, [searchQuery, allFeats]);
+        return allFeats.filter(feat => {
+            const langMatch = lang === 'all' || feat.lang === lang;
+            if (!langMatch) return false;
+
+            if (!searchQuery) return true;
+
+            const lowercasedQuery = searchQuery.toLowerCase();
+            return feat.name.toLowerCase().includes(lowercasedQuery) || 
+                   feat.description.toLowerCase().includes(lowercasedQuery);
+        });
+    }, [searchQuery, allFeats, lang]);
     
     const handleSelectFeat = (feat: FeatFromLibrary, isSelected: boolean) => {
         setSelectedFeats(prev => ({...prev, [feat.name]: { isSelected, feat }}));
@@ -207,18 +224,19 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
                         placeholder="Search for a feat..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="mb-4"
+                        className="mb-2"
                     />
+                    <LanguageToggle selectedLang={lang} onLangChange={setLang} />
                     <ScrollArea className="flex-grow pr-4">
                        <div className="space-y-2">
                             {filteredFeats.map((feat, index) => (
-                                <div key={`${feat.name}-${index}`} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
+                                <div key={`${feat.name}-${feat.lang}-${index}`} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
                                     <Checkbox 
-                                        id={`lib-feat-${feat.name}-${index}`}
+                                        id={`lib-feat-${feat.name}-${feat.lang}-${index}`}
                                         checked={!!selectedFeats[feat.name]?.isSelected}
                                         onCheckedChange={(checked) => handleSelectFeat(feat, !!checked)}
                                     />
-                                    <label htmlFor={`lib-feat-${feat.name}-${index}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
+                                    <label htmlFor={`lib-feat-${feat.name}-${feat.lang}-${index}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
                                         <div className="flex justify-between">
                                           <span>{feat.name}</span>
                                           <span className="text-xs text-muted-foreground">{feat.prerequisites}</span>
