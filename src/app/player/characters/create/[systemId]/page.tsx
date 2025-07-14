@@ -1,7 +1,15 @@
+import { getSystemAction } from "@/actions";
 import { BackButton } from "@/components/BackButton";
 import { CharacterCreator } from "@/components/player/CharacterCreator";
+import { notFound } from "next/navigation";
 
-export default function CreateCharacterPage({ params }: { params: { systemId: string }}) {
+export default async function CreateCharacterPage({ params }: { params: { systemId: string }}) {
+  const system = await getSystemAction(params.systemId);
+
+  if (!system) {
+      notFound();
+  }
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="relative mb-8 flex items-center justify-center">
@@ -11,12 +19,12 @@ export default function CreateCharacterPage({ params }: { params: { systemId: st
         <div className="text-center">
             <h1 className="font-headline text-4xl font-bold">Forge Your Hero</h1>
             <p className="text-muted-foreground">
-            You are creating a character for the <span className="text-primary font-semibold">{params.systemId}</span>{' '}
+            You are creating a character for the <span className="text-primary font-semibold">{system.systemName}</span>{' '}
             system.
             </p>
         </div>
       </div>
-      <CharacterCreator systemId={params.systemId} />
+      <CharacterCreator systemId={params.systemId} system={system} />
     </div>
   );
 }

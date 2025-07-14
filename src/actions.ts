@@ -17,8 +17,6 @@ import type { SuggestSkillsInput } from '@/ai/flows/suggest-skills-flow';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 
-let characterIdCounter = Date.now();
-
 const GameSystemSchemaForImport = z.object({
   systemId: z.string(),
   systemName: z.string(),
@@ -161,28 +159,24 @@ export async function listSystemsAction() {
   return await listSystemsFromDb();
 }
 
-export async function saveCharacterAction(systemData: any, characterData: any, isImport: boolean = false) {
-    let character: Character;
+export async function saveCharacterAction(character: Character) {
+    // Validate the basic structure of the character object.
+    const CharacterSchema = z.object({
+        characterId: z.string().min(1),
+        systemId: z.string().min(1),
+        data: z.object({}).passthrough(),
+    });
 
-    if (isImport) {
-        const parseResult = CharacterSchemaForImport.safeParse(characterData);
-        if (!parseResult.success) {
-            console.error('Invalid character data for import:', parseResult.error);
-            return { success: false, error: 'Invalid character file format.' };
-        }
-        character = parseResult.data;
-    } else {
-        const characterId = `char_${characterIdCounter++}`;
-        character = {
-            characterId,
-            systemId: systemData, // Here systemData is systemId
-            data: characterData,
-        };
+    const parseResult = CharacterSchema.safeParse(character);
+    if (!parseResult.success) {
+        console.error('Invalid character data for save:', parseResult.error);
+        return { success: false, error: 'Invalid character data format.' };
     }
-
+    
     try {
         await saveCharacter(character);
         revalidatePath('/player/dashboard');
+        revalidatePath(`/player/characters/${character.characterId}`);
         return { success: true, characterId: character.characterId };
     } catch (error) {
         console.error('Failed to save character:', error);

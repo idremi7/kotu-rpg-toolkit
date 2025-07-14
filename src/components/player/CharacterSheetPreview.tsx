@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "../ui/badge";
-import { Printer } from 'lucide-react';
+import { Printer, Pencil } from 'lucide-react';
 import { BackButton } from "../BackButton";
 import type { Character, GameSystem } from "@/lib/data-service";
 import { ExportCharacterButton } from "../ExportCharacterButton";
+import Link from "next/link";
 
 interface CharacterSheetPreviewProps {
   character: Character;
@@ -39,6 +40,12 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
         <div className="flex justify-between items-center mb-4 no-print">
             <BackButton />
             <div className="flex items-center gap-2">
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/player/characters/${character.characterId}/edit`}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </Link>
+              </Button>
               <ExportCharacterButton character={character} />
               <Button onClick={handlePrint} variant="outline" size="sm">
                   <Printer className="mr-2 h-4 w-4" />

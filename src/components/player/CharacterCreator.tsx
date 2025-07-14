@@ -9,12 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { UserPlus, Loader2, PlusCircle, Trash2 } from 'lucide-react';
+import { UserPlus, Loader2, PlusCircle, Trash2, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { getSystemAction, saveCharacterAction } from '@/actions';
-import type { GameSystem } from '@/lib/data-service';
+import type { GameSystem, Character } from '@/lib/data-service';
 import { useRouter } from 'next/navigation';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const CustomSkillWidget = ({ control, name, options }: { control: any, name: string, options: any[] }) => {
   const { fields, append, remove } = useFieldArray({ control, name });
@@ -200,46 +199,27 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, sys
   }
 };
 
-export function CharacterCreator({ systemId }: { systemId: string }) {
-  const [system, setSystem] = useState<GameSystem | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+interface CharacterCreatorProps {
+    systemId: string;
+    system: GameSystem;
+    initialCharacter?: Character;
+}
+
+export function CharacterCreator({ systemId, system, initialCharacter }: CharacterCreatorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+
+  const isEditMode = !!initialCharacter;
 
   const form = useForm({
     // We can't use a resolver here because the schema is dynamic
   });
   
   useEffect(() => {
-    async function loadSystem() {
-      try {
-        const loadedSystem = await getSystemAction(systemId);
-        if (loadedSystem) {
-          setSystem(loadedSystem);
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'System not found',
-            description: 'This game system could not be loaded.',
-          });
-        }
-      } catch (error) {
-        toast({
-          variant: 'destructive',
-          title: 'Failed to load system',
-          description: 'Check the console for more details.',
-        });
-        console.error('Failed to load system from server action', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadSystem();
-  }, [systemId, toast]);
-
-  useEffect(() => {
-    if (system) {
+    if (isEditMode && initialCharacter) {
+        form.reset(initialCharacter.data);
+    } else if (system) {
       const defaultValues: any = {};
       const formSchema = JSON.parse(system.schemas.formSchema);
 
@@ -265,48 +245,37 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
       });
       form.reset(defaultValues);
     }
-  }, [system, form]);
+  }, [system, form, isEditMode, initialCharacter]);
 
   const onSubmit = async (data: any) => {
     setIsSaving(true);
-    const result = await saveCharacterAction(systemId, data, false);
+    
+    const characterToSave: Character = {
+        characterId: isEditMode ? initialCharacter.characterId : `char_${Date.now()}`,
+        systemId,
+        data,
+    }
+
+    const result = await saveCharacterAction(characterToSave);
     
     if (result.success && result.characterId) {
         toast({
-            title: "Character Saved!",
+            title: `Character ${isEditMode ? 'Updated' : 'Created'}!`,
             description: `${data.name} has been successfully saved.`
         });
         router.push(`/player/characters/${result.characterId}`);
     } else {
         toast({
             variant: "destructive",
-            title: "Failed to save character",
+            title: `Failed to save character`,
             description: result.error || "An unknown error occurred."
         });
     }
     setIsSaving(false);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (!system) {
-    return (
-      <div className="text-center py-16">
-        <h2 className="text-2xl font-bold">System Not Found</h2>
-        <p className="text-muted-foreground">The requested game system could not be found.</p>
-      </div>
-    );
-  }
-
-  const { systemName, feats } = system;
+  const { feats } = system;
   const uiSchema = JSON.parse(system.schemas.uiSchema);
-  const formSchema = JSON.parse(system.schemas.formSchema);
 
   return (
       <Form {...form}>
@@ -388,8 +357,14 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
           })}
 
           <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
-            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
-            Create Character
+            {isSaving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : isEditMode ? (
+              <Save className="mr-2 h-4 w-4" />
+            ) : (
+              <UserPlus className="mr-2 h-4 w-4" />
+            )}
+            {isEditMode ? 'Update Character' : 'Create Character'}
           </Button>
         </form>
       </Form>

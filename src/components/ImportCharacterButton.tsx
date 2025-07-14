@@ -6,6 +6,7 @@ import { Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { saveCharacterAction } from '@/actions';
 import { cn } from '@/lib/utils';
+import type { Character } from '@/lib/data-service';
 
 interface ImportCharacterButtonProps {
     className?: string;
@@ -32,10 +33,9 @@ export function ImportCharacterButton({ className }: ImportCharacterButtonProps)
     reader.onload = async (e) => {
       try {
         const text = e.target?.result as string;
-        const characterData = JSON.parse(text);
+        const characterData = JSON.parse(text) as Character;
         
-        // Pass a dummy value for the first argument as it's not used in import mode
-        const result = await saveCharacterAction(null, characterData, true);
+        const result = await saveCharacterAction(characterData);
 
         if (result.success) {
           toast({
