@@ -21,8 +21,8 @@ const CustomSkillWidget = ({ control, name, options }: { control: any, name: str
   return (
     <div className="space-y-4">
        <datalist id={datalistId}>
-        {options.map((opt: any) => (
-          <option key={opt.name} value={opt.name} />
+        {options.map((opt: any, index: number) => (
+          <option key={`${opt.name}-${index}`} value={opt.name} />
         ))}
       </datalist>
       {fields.map((field, index) => (
@@ -85,8 +85,8 @@ const CustomFeatWidget = ({ control, name, options }: { control: any; name: stri
   return (
     <div className="space-y-4">
       <datalist id={datalistId}>
-        {options.map((opt: any) => (
-          <option key={opt.name} value={opt.name} />
+        {options.map((opt: any, index: number) => (
+          <option key={`${opt.name}-${index}`} value={opt.name} />
         ))}
       </datalist>
       <div className="space-y-2">
@@ -258,16 +258,22 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     }
 
     if (isEditMode && initialCharacter?.data) {
-        const charData = { ...initialCharacter.data };
-        // Ensure feats are in object format for the form.
+        let charData = JSON.parse(JSON.stringify(initialCharacter.data));
+
+        // Ensure feats is an array of objects
         if (charData.feats && Array.isArray(charData.feats)) {
-            charData.feats = charData.feats.map((feat: any) => {
-                if (typeof feat === 'string') {
-                    return { name: feat, effect: '' };
-                }
-                return feat;
-            });
+            charData.feats = charData.feats.map((feat: any) => 
+                typeof feat === 'string' ? { name: feat, effect: '' } : feat
+            );
+        } else {
+            charData.feats = [];
         }
+
+        // Ensure skills is an array of objects
+        if (!charData.skills || !Array.isArray(charData.skills)) {
+            charData.skills = [];
+        }
+
         defaultValues = { ...defaultValues, ...charData };
     }
     
@@ -280,10 +286,10 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     const processedData = {
         ...data,
         feats: Array.isArray(data.feats) 
-            ? data.feats.filter(feat => typeof feat === 'object' && feat.name && feat.name.trim() !== '')
+            ? data.feats.filter((feat: any) => typeof feat === 'object' && feat.name && feat.name.trim() !== '')
             : [],
         skills: Array.isArray(data.skills)
-            ? data.skills.filter(skill => typeof skill === 'object' && skill.name && skill.name.trim() !== '')
+            ? data.skills.filter((skill: any) => typeof skill === 'object' && skill.name && skill.name.trim() !== '')
             : [],
     };
 
@@ -311,70 +317,90 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     setIsSaving(false);
   };
 
+  if (!system?.schemas?.uiSchema) {
+    return (
+      <div className="flex justify-center items-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="ml-2">Loading character sheet template...</p>
+      </div>
+    );
+  }
+
   const uiSchema = JSON.parse(system.schemas.uiSchema);
+  const allFieldNames = Object.keys(uiSchema).filter(key => !key.startsWith('ui:'));
+  
+  const basicInfoFields = ['name', 'class', 'level'];
+  const vitalFields = uiSchema['ui:groups']?.find((g:any) => g.title === 'Vitals')?.fields || ['hp', 'maxHp'];
+  const mainFieldNames = allFieldNames.filter(name => !basicInfoFields.includes(name) && !vitalFields.includes(name));
 
-  const renderField = (fieldName: string) => {
-    const fieldConfig = uiSchema[fieldName];
-    if (!fieldConfig) return null;
-
-    if (fieldConfig['ui:fieldset']) {
-      return (
-        <Card key={fieldName}>
-          <CardHeader>
-            <CardTitle>{fieldConfig['ui:label']}</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  const renderFieldset = (fieldName: string, fieldConfig: any) => (
+    <Card key={fieldName}>
+        <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(fieldConfig.fields).map(([subFieldName, subFieldConfig]: [string, any]) => (
-              <NumberFieldRenderer
+            <NumberFieldRenderer
                 key={subFieldName}
                 control={form.control}
                 name={`${fieldName}.${subFieldName}`}
                 label={subFieldConfig['ui:label']}
                 widget={subFieldConfig['ui:widget']}
-              />
-            ))}
-          </CardContent>
-        </Card>
-      );
-    }
-    
-    if (fieldConfig['ui:widget'] === 'custom') {
-      return (
-        <Card key={fieldName}>
-          <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
-          <CardContent>
-            <FormFieldRenderer
-              control={form.control}
-              name={fieldName}
-              fieldConfig={fieldConfig}
-              system={system}
             />
-          </CardContent>
-        </Card>
-      );
-    }
-    return null;
-  };
-  
-  const allFieldNames = Object.keys(uiSchema).filter(key => !key.startsWith('ui:'));
+            ))}
+        </CardContent>
+    </Card>
+  );
 
+  const renderCustomWidget = (fieldName: string, fieldConfig: any) => (
+    <Card key={fieldName}>
+        <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
+        <CardContent>
+            <FormFieldRenderer
+                control={form.control}
+                name={fieldName}
+                fieldConfig={fieldConfig}
+                system={system}
+            />
+        </CardContent>
+    </Card>
+  );
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto">
         <Card>
-            <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
-            <CardContent className="pt-0 grid grid-cols-1 md:grid-cols-2 gap-4">
-               {['name', 'class', 'level', 'hp', 'maxHp'].map(fieldName => {
-                  const fieldConfig = uiSchema[fieldName];
-                  if (!fieldConfig) return null;
-                  return <FormFieldRenderer key={fieldName} control={form.control} name={fieldName} fieldConfig={fieldConfig} system={system} />
-               })}
+            <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {basicInfoFields.map(fieldName => {
+                    const fieldConfig = uiSchema[fieldName];
+                    return fieldConfig ? <FormFieldRenderer key={fieldName} control={form.control} name={fieldName} fieldConfig={fieldConfig} system={system} /> : null;
+                })}
             </CardContent>
         </Card>
         
-        {allFieldNames.map(fieldName => {
-            if (['name', 'class', 'level', 'hp', 'maxHp'].includes(fieldName)) return null;
-            return renderField(fieldName);
+        <Card>
+            <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {vitalFields.map((fieldName: string) => {
+                    const fieldConfig = uiSchema[fieldName];
+                    return fieldConfig ? <FormFieldRenderer key={fieldName} control={form.control} name={fieldName} fieldConfig={fieldConfig} system={system} /> : null;
+                })}
+            </CardContent>
+        </Card>
+        
+        {mainFieldNames.map(fieldName => {
+            const fieldConfig = uiSchema[fieldName];
+            if (!fieldConfig) return null;
+            if (fieldConfig['ui:fieldset']) return renderFieldset(fieldName, fieldConfig);
+            if (fieldConfig['ui:widget'] === 'custom') return renderCustomWidget(fieldName, fieldConfig);
+            if (fieldConfig['ui:widget'] === 'textarea') return (
+                <Card key={fieldName}>
+                    <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
+                    <CardContent>
+                        <FormFieldRenderer control={form.control} name={fieldName} fieldConfig={fieldConfig} system={system} />
+                    </CardContent>
+                </Card>
+            );
+            return null;
         })}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
