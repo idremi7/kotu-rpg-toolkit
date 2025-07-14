@@ -103,11 +103,41 @@ export async function saveSystemAction(
   } else {
     const creationData = systemData as Omit<GameSystem, 'systemId' | 'schemas' | 'description'>;
     const systemId = creationData.systemName.toLowerCase().replace(/\s+/g, '-');
-    const schemas = generateSchemas(creationData);
-    fullSystemData = {
+    
+    // Trim attribute names and update skill/save baseAttributes
+    const attributeNameMap: Record<string, string> = {};
+    const trimmedAttributes = creationData.attributes.map(attr => {
+        const trimmedName = attr.name.trim();
+        if (attr.name !== trimmedName) {
+            attributeNameMap[attr.name] = trimmedName;
+        }
+        return { ...attr, name: trimmedName };
+    });
+
+    const trimmedSaves = creationData.saves.map(save => ({
+        ...save,
+        name: save.name.trim(),
+        baseAttribute: attributeNameMap[save.baseAttribute] || save.baseAttribute,
+    }));
+
+    const trimmedSkills = creationData.skills.map(skill => ({
+        ...skill,
+        baseAttribute: attributeNameMap[skill.baseAttribute] || skill.baseAttribute,
+    }));
+
+    const cleanedData = {
       ...creationData,
+      attributes: trimmedAttributes,
+      saves: trimmedSaves,
+      skills: trimmedSkills,
+    };
+
+    const schemas = generateSchemas(cleanedData);
+
+    fullSystemData = {
+      ...cleanedData,
       systemId,
-      description: `A custom system with ${creationData.attributes.length} attributes.`,
+      description: `A custom system with creationData.attributes.length} attributes.`,
       schemas,
     };
   }
