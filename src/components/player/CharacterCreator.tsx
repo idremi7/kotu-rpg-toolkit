@@ -242,6 +242,14 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
     if (system) {
       const defaultValues: any = {};
       const formSchema = JSON.parse(system.schemas.formSchema);
+
+      // Override attribute defaults to 0
+      if (formSchema.properties.attributes && formSchema.properties.attributes.properties) {
+          Object.keys(formSchema.properties.attributes.properties).forEach(attrKey => {
+              formSchema.properties.attributes.properties[attrKey].default = 0;
+          });
+      }
+
       Object.keys(formSchema.properties).forEach((key) => {
         const prop = formSchema.properties[key];
         if (prop.type === 'object') {
@@ -302,7 +310,7 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
 
   return (
     <>
-      <div className="text-center mb-8">
+      <div className="relative mb-8 text-center">
         <h1 className="font-headline text-4xl font-bold">Forge Your Hero</h1>
         <p className="text-muted-foreground">
         You are creating a character for the <span className="text-primary font-semibold">{systemName}</span>{' '}
