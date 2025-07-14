@@ -71,7 +71,9 @@ export default {
     newCharacterButton: 'Créer un nouveau personnage',
     description: 'Gérez vos héros et lancez-vous dans de nouvelles aventures.',
     viewSheetButton: 'Voir la fiche de personnage',
-    createCharacterPrompt: 'Créer un personnage',
+    noCharactersTitle: 'Aucun personnage trouvé',
+    noCharactersDescription: 'Il semble que vous n\'ayez encore créé aucun personnage.',
+    createFirstCharacterButton: 'Créez votre premier personnage',
   },
   createSystem: {
     title: 'Architecte de Système',
@@ -90,10 +92,8 @@ export default {
     title: 'Détails du Système',
     description: 'Configuration pour le système {systemName}.',
     attributes: 'Attributs',
+    saves: 'Sauvegardes',
     skills: 'Compétences',
     feats: 'Dons',
-    schemas: 'Schémas Générés',
-    formSchema: 'Schéma de Formulaire',
-    uiSchema: 'Schéma d\'Interface',
   }
 } as const;

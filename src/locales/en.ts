@@ -71,7 +71,9 @@ export default {
     newCharacterButton: 'Create New Character',
     description: 'Manage your heroes and embark on new adventures.',
     viewSheetButton: 'View Character Sheet',
-    createCharacterPrompt: 'Create a Character',
+    noCharactersTitle: 'No Characters Found',
+    noCharactersDescription: "It looks like you haven't created any characters yet.",
+    createFirstCharacterButton: 'Create Your First Character',
   },
   createSystem: {
     title: 'System Architect',
@@ -90,10 +92,8 @@ export default {
     title: 'System Details',
     description: 'Configuration for the {systemName} system.',
     attributes: 'Attributes',
+    saves: 'Saves',
     skills: 'Skills',
     feats: 'Feats',
-    schemas: 'Generated Schemas',
-    formSchema: 'Form Schema',
-    uiSchema: 'UI Schema',
   }
 } as const;

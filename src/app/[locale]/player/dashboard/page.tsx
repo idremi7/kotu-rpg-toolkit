@@ -26,33 +26,38 @@ export default async function PlayerDashboard({ params: { locale } }: { params: 
       </div>
       <p className="text-muted-foreground mb-8">{t('playerDashboard.description')}</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockCharacters.map(char => (
-          <Card key={char.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="font-headline flex items-center gap-2">
-                <User className="text-primary"/>
-                {char.name}
-              </CardTitle>
-              <CardDescription>{char.class} Level {char.level} ({char.system})</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              {/* Future content like status or inventory snippets */}
-            </CardContent>
-             <div className="p-4 pt-0">
-               <Button variant="secondary" className="w-full">{t('playerDashboard.viewSheetButton')}</Button>
-            </div>
-          </Card>
-        ))}
-         <Card className="border-dashed flex items-center justify-center">
-            <Button variant="ghost" className="w-full h-full text-lg" asChild>
-                 <Link href="/player/characters/create">
-                    <PlusCircle className="mr-2 h-6 w-6" />
-                    {t('playerDashboard.createCharacterPrompt')}
-                 </Link>
-            </Button>
-        </Card>
-      </div>
+      {mockCharacters.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {mockCharacters.map(char => (
+            <Card key={char.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2">
+                  <User className="text-primary"/>
+                  {char.name}
+                </CardTitle>
+                <CardDescription>{char.class} Level {char.level} ({char.system})</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                {/* Future content like status or inventory snippets */}
+              </CardContent>
+               <div className="p-4 pt-0">
+                 <Button variant="secondary" className="w-full">{t('playerDashboard.viewSheetButton')}</Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+         <div className="text-center py-16 border-2 border-dashed rounded-lg">
+          <h2 className="text-2xl font-semibold mb-2">{t('playerDashboard.noCharactersTitle')}</h2>
+          <p className="text-muted-foreground mb-4">{t('playerDashboard.noCharactersDescription')}</p>
+          <Button asChild size="lg">
+            <Link href="/player/characters/create">
+              <PlusCircle className="mr-2 h-5 w-5" />
+              {t('playerDashboard.createFirstCharacterButton')}
+            </Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
