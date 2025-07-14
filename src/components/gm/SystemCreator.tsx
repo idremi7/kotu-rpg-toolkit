@@ -194,6 +194,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   });
 
   const watchedAttributes = form.watch('attributes');
+  const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
@@ -291,7 +292,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`attributes.${index}.name`}
                     render={({ field }) => (
-                      <FormItem className="flex-1 space-y-1">
+                      <FormItem className="flex-1">
                         <FormLabel>Name</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -304,7 +305,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`attributes.${index}.description`}
                     render={({ field }) => (
-                      <FormItem className="flex-1 space-y-1">
+                      <FormItem className="flex-1">
                         <FormLabel>Description</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -332,7 +333,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`saves.${index}.name`}
                     render={({ field }) => (
-                      <FormItem className="flex-1 space-y-1">
+                      <FormItem className="flex-1">
                         <FormLabel>Name</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -345,7 +346,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`saves.${index}.baseAttribute`}
                     render={({ field }) => (
-                      <FormItem className="flex-1 space-y-1">
+                      <FormItem className="flex-1">
                         <FormLabel>Base Attribute</FormLabel>
                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
@@ -354,7 +355,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {watchedAttributes.map(attr => (
+                              {validAttributes.map(attr => (
                                 <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
                               ))}
                             </SelectContent>
@@ -382,7 +383,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`skills.${index}.name`}
                     render={({ field }) => (
-                      <FormItem className="flex-1 space-y-1">
+                      <FormItem className="flex-1">
                         <FormLabel>Name</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -395,7 +396,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`skills.${index}.baseAttribute`}
                     render={({ field }) => (
-                      <FormItem className="flex-1 space-y-1">
+                      <FormItem className="flex-1">
                         <FormLabel>Base Attribute</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
@@ -404,7 +405,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {watchedAttributes.map(attr => (
+                              {validAttributes.map(attr => (
                                 <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
                               ))}
                             </SelectContent>
@@ -449,7 +450,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`feats.${index}.name`}
                     render={({ field }) => (
-                      <FormItem className="md:col-span-1 space-y-1">
+                      <FormItem className="md:col-span-1">
                         <FormLabel>Name</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -462,7 +463,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`feats.${index}.description`}
                     render={({ field }) => (
-                      <FormItem className="md:col-span-1 space-y-1">
+                      <FormItem className="md:col-span-1">
                         <FormLabel>Description</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -475,7 +476,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`feats.${index}.prerequisites`}
                     render={({ field }) => (
-                      <FormItem className="md:col-span-1 space-y-1">
+                      <FormItem className="md:col-span-1">
                         <FormLabel>Prerequisites</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -488,7 +489,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     control={form.control}
                     name={`feats.${index}.effect`}
                     render={({ field }) => (
-                      <FormItem className="md:col-span-1 space-y-1">
+                      <FormItem className="md:col-span-1">
                         <FormLabel>Effect</FormLabel>
                         <FormControl>
                           <Input placeholder="+2, -10%, etc." {...field} />
