@@ -1,0 +1,46 @@
+{
+  "characterId": "char_1752536691232",
+  "systemId": "dnd-5e",
+  "data": {
+    "name": "Noctis",
+    "class": "Guerrier",
+    "level": 2,
+    "attributes": {
+      "Strength": 15,
+      "Dexterity": 15,
+      "Constitution": 12,
+      "Intelligence": 10,
+      "Wisdom": 9,
+      "Charisma": 10
+    },
+    "saves": {
+      "Strength Save": 5,
+      "Dexterity Save": 2,
+      "Constitution Save": 4,
+      "Intelligence Save": 1,
+      "Wisdom Save": 3,
+      "Charisma Save": 5
+    },
+    "skills": [
+      {
+        "name": "Corps à corps ",
+        "value": 5
+      },
+      {
+        "name": "Athlétisme",
+        "value": 6
+      }
+    ],
+    "feats": [
+      {
+        "name": "Lucky",
+        "effect": "+5"
+      }
+    ],
+    "backstory": "Noctis is the prince of the kingdom and must save the world!",
+    "vitals": {
+      "hp": 7,
+      "maxHp": 7
+    }
+  }
+}
