@@ -17,14 +17,9 @@ export default async function CharacterSheetPage({ params }: { params: { charact
     notFound();
   }
 
-  const handlePrint = () => {
-    'use client';
-    window.print();
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
-      <CharacterSheetPreview data={character.data} system={system} onPrint={handlePrint} />
+      <CharacterSheetPreview data={character.data} system={system} />
     </div>
   );
 }

@@ -10,7 +10,6 @@ import { BackButton } from "../BackButton";
 interface CharacterSheetPreviewProps {
   data: any;
   system: any;
-  onPrint: () => void;
 }
 
 const getModifier = (score: number) => {
@@ -19,8 +18,12 @@ const getModifier = (score: number) => {
   return mod >= 0 ? `+${mod}` : mod;
 };
 
-export function CharacterSheetPreview({ data, system, onPrint }: CharacterSheetPreviewProps) {
+export function CharacterSheetPreview({ data, system }: CharacterSheetPreviewProps) {
   if (!data || !system) return null;
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const getFeatDetails = (featName: string) => {
     return system.feats.find((f: any) => f.name === featName);
@@ -30,7 +33,7 @@ export function CharacterSheetPreview({ data, system, onPrint }: CharacterSheetP
     <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-4 no-print">
             <BackButton />
-            <Button onClick={onPrint} variant="outline" size="sm">
+            <Button onClick={handlePrint} variant="outline" size="sm">
                 <FileDown className="mr-2 h-4 w-4" />
                 Export PDF
             </Button>
