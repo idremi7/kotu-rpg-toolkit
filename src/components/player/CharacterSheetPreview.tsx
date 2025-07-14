@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,7 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
         <CardContent className="space-y-6">
             <div>
                 <h3 className="font-headline text-lg mb-2">Attributes</h3>
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-center">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 text-center">
                     {data.attributes && Object.entries(data.attributes).map(([key, value]) => (
                         <div key={key} className="bg-muted/50 rounded-md p-2">
                             <div className="text-xs uppercase text-muted-foreground">{key}</div>
@@ -77,7 +78,7 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
 
              <div>
                 <h3 className="font-headline text-lg mb-2">Saves</h3>
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-center">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 text-center">
                     {data.saves && Object.entries(data.saves).map(([key, value]) => (
                         <div key={key} className="bg-muted/50 rounded-md p-2">
                             <div className="text-xs uppercase text-muted-foreground">{key}</div>
