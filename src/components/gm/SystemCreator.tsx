@@ -100,8 +100,8 @@ const SkillLibraryBrowser = ({ onAddSkills, systemAttributes }: { onAddSkills: (
         
         onAddSkills(skillsToAdd);
         toast({
-            title: "Compétences ajoutées",
-            description: `${skillsToAdd.length} compétences ont été ajoutées depuis la bibliothèque. Veuillez leur assigner un attribut de base si nécessaire.`
+            title: "Skills Added",
+            description: `${skillsToAdd.length} skills were added from the library. Please assign a base attribute if needed.`
         });
         setSelectedSkills({});
         setIsOpen(false);
@@ -111,18 +111,18 @@ const SkillLibraryBrowser = ({ onAddSkills, systemAttributes }: { onAddSkills: (
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-                <Button type="button" variant="secondary"><BookOpen className="mr-2"/>Piocher dans la bibliothèque</Button>
+                <Button type="button" variant="secondary"><BookOpen className="mr-2"/>Browse Skill Library</Button>
             </SheetTrigger>
             <SheetContent className="w-full sm:max-w-lg">
                 <SheetHeader>
-                    <SheetTitle>Bibliothèque de compétences</SheetTitle>
+                    <SheetTitle>Skill Library</SheetTitle>
                     <SheetDescription>
-                        Parcourez et sélectionnez des compétences communes à ajouter à votre système.
+                        Browse and select common skills to add to your system.
                     </SheetDescription>
                 </SheetHeader>
                 <div className="py-4 h-[calc(100%-120px)] flex flex-col">
                     <Input 
-                        placeholder="Rechercher une compétence..."
+                        placeholder="Search for a skill..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="mb-4"
@@ -154,7 +154,7 @@ const SkillLibraryBrowser = ({ onAddSkills, systemAttributes }: { onAddSkills: (
                     </ScrollArea>
                     <div className="pt-4 border-t mt-auto">
                         <Button onClick={handleAdd} className="w-full" disabled={Object.values(selectedSkills).every(v => !v.isSelected)}>
-                            Ajouter les compétences sélectionnées
+                            Add Selected Skills
                         </Button>
                     </div>
                 </div>
