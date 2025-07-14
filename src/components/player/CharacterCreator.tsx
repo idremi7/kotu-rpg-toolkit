@@ -260,13 +260,6 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
       const defaultValues: any = {};
       const formSchema = JSON.parse(system.schemas.formSchema);
 
-      // Override attribute defaults to 0
-      if (formSchema.properties.attributes && formSchema.properties.attributes.properties) {
-          Object.keys(formSchema.properties.attributes.properties).forEach(attrKey => {
-              formSchema.properties.attributes.properties[attrKey].default = 0;
-          });
-      }
-
       Object.keys(formSchema.properties).forEach((key) => {
         const prop = formSchema.properties[key];
         if (prop.type === 'object') {
@@ -319,11 +312,23 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     setIsSaving(false);
   };
 
-  const { feats } = system;
   const uiSchema = JSON.parse(system.schemas.uiSchema);
-  const fieldGroups = uiSchema['ui:groups'] || [];
 
-  const renderField = (fieldName: string, fieldConfig: any) => {
+  // Define the order of field sections for rendering
+  const fieldOrder = [
+    'name', 'class', 'level', // Vitals First
+    'hp', 'maxHp',
+    'attributes',
+    'saves',
+    'skills',
+    'feats',
+    'backstory',
+  ];
+
+  const renderField = (fieldName: string) => {
+    const fieldConfig = uiSchema[fieldName];
+    if (!fieldConfig) return null;
+
     // Render fieldsets (Attributes, Saves)
     if (fieldConfig['ui:fieldset']) {
       return (
@@ -362,8 +367,8 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         </Card>
       );
     }
-
-    // Render standalone fields (Name, Class, Level, Backstory)
+    
+    // Render standalone fields
     const { 'ui:widget': widget } = fieldConfig;
     if (widget === 'text' || widget === 'number' || widget === 'textarea') {
       return (
@@ -379,45 +384,38 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
 
     return null;
   };
-  
-  const groupedFields = fieldGroups.reduce((acc: any, group: any) => {
-    group.fields.forEach((fieldName: string) => {
-      if (!acc[group.title]) {
-        acc[group.title] = [];
-      }
-      acc[group.title].push(fieldName);
-    });
-    return acc;
-  }, {});
 
-  const allGroupedFields = new Set(fieldGroups.flatMap((g:any) => g.fields));
+  // Get all field names from the UI Schema that are not internal config keys
+  const allFieldNames = Object.keys(uiSchema).filter(key => !key.startsWith('ui:'));
 
-  const ungroupedFields = Object.keys(uiSchema).filter(
-    fieldName => !fieldName.startsWith('ui:') && !allGroupedFields.has(fieldName) && !uiSchema[fieldName]['ui:fieldset'] && uiSchema[fieldName]['ui:widget'] !== 'custom'
-  );
+  // Create a sorted list of fields to render based on `fieldOrder`
+  const sortedFields = allFieldNames.sort((a, b) => {
+      const indexA = fieldOrder.indexOf(a);
+      const indexB = fieldOrder.indexOf(b);
+      if (indexA === -1 && indexB === -1) return 0; // both not in order, keep original
+      if (indexA === -1) return 1; // a is not in order, move to end
+      if (indexB === -1) return -1; // b is not in order, move to end
+      return indexA - indexB;
+  });
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto">
         <Card>
-            <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ungroupedFields.map(fieldName => renderField(fieldName, uiSchema[fieldName]))}
+            <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
+            <CardContent className="pt-0 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {renderField('name')}
+                {renderField('class')}
+                {renderField('level')}
+                {renderField('hp')}
+                {renderField('maxHp')}
             </CardContent>
         </Card>
-
-        {fieldGroups.map((group: any) => (
-            <Card key={group.title}>
-                <CardHeader><CardTitle>{group.title}</CardTitle></CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {group.fields.map((fieldName: string) => renderField(fieldName, uiSchema[fieldName]))}
-                </CardContent>
-            </Card>
-        ))}
         
-        {Object.keys(uiSchema)
-            .filter(fieldName => !fieldName.startsWith('ui:') && !allGroupedFields.has(fieldName) && (uiSchema[fieldName]['ui:fieldset'] || uiSchema[fieldName]['ui:widget'] === 'custom'))
-            .map(fieldName => renderField(fieldName, uiSchema[fieldName]))
-        }
+        {sortedFields.map(fieldName => {
+            if (['name', 'class', 'level', 'hp', 'maxHp'].includes(fieldName)) return null;
+            return renderField(fieldName);
+        })}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
           {isSaving ? (
