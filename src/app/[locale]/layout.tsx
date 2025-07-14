@@ -4,14 +4,9 @@ import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
 import { getTranslations, createT } from '@/lib/i18n';
 
-export const metadata: Metadata = {
-  title: 'KOTU: RPG Toolkit',
-  description: 'Create and manage custom RPG systems and characters.',
-};
-
 export default async function LocaleLayout({
   children,
-  params: { locale },
+  params: { locale }
 }: Readonly<{
   children: React.ReactNode;
   params: { locale: 'en' | 'fr' };
