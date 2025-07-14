@@ -3,15 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PlusCircle, User } from "lucide-react";
 import Link from "next/link";
 import { getTranslations, createT } from '@/lib/i18n';
-
-const mockCharacters = [
-  { id: 'elara', name: 'Elara', class: 'Wizard', level: 5, system: 'D20 Fantasy' },
-  { id: 'kain', name: 'Kain', class: 'Smuggler', level: 3, system: 'Cosmic Drift' },
-];
+import { listCharactersAction } from "@/app/actions";
 
 export default async function PlayerDashboard({ params: { locale } }: { params: { locale: 'en' | 'fr' }}) {
   const translations = await getTranslations(locale);
   const t = createT(translations);
+  const characters = await listCharactersAction();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -28,22 +25,24 @@ export default async function PlayerDashboard({ params: { locale } }: { params: 
         </Button>
       </div>
       
-      {mockCharacters.length > 0 ? (
+      {characters.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {mockCharacters.map(char => (
-            <Card key={char.id} className="flex flex-col">
+          {characters.map(char => (
+            <Card key={char.characterId} className="flex flex-col">
               <CardHeader>
                 <CardTitle className="font-headline flex items-center gap-2">
                   <User className="text-primary"/>
-                  {char.name}
+                  {char.data.name}
                 </CardTitle>
-                <CardDescription>{char.class} Level {char.level} ({char.system})</CardDescription>
+                <CardDescription>{char.data.class} - Level {char.data.level}</CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
                 {/* Future content like status or inventory snippets */}
               </CardContent>
                <div className="p-4 pt-0">
-                 <Button variant="secondary" className="w-full">{t('playerDashboard.viewSheetButton')}</Button>
+                 <Button asChild variant="secondary" className="w-full">
+                    <Link href={`/player/characters/${char.characterId}`}>{t('playerDashboard.viewSheetButton')}</Link>
+                </Button>
               </div>
             </Card>
           ))}
