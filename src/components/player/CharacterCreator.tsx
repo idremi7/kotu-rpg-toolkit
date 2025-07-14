@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -219,12 +220,12 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
         if (prop.type === 'object') {
           defaultValues[key] = {};
           Object.keys(prop.properties).forEach(subKey => {
-             defaultValues[key][subKey] = prop.properties[subKey].default || 0;
+             defaultValues[key][subKey] = prop.properties[subKey].default !== undefined ? prop.properties[subKey].default : 0;
           });
         } else if (prop.type === 'array') {
-           defaultValues[key] = prop.default || [];
+           defaultValues[key] = prop.default !== undefined ? prop.default : [];
         } else {
-          defaultValues[key] = prop.default || '';
+          defaultValues[key] = prop.default !== undefined ? prop.default : '';
         }
       });
       form.reset(defaultValues);
@@ -368,3 +369,4 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
     </>
   );
 }
+
