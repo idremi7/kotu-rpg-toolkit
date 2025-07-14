@@ -5,6 +5,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/BackButton';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Pencil } from 'lucide-react';
 
 export default async function SystemDetailsPage({ params }: { params: { systemId: string }}) {
   const system = await getSystemAction(params.systemId);
@@ -32,7 +35,12 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
             <h1 className="font-headline text-4xl font-bold">System Details</h1>
             <p className="text-muted-foreground">Configuration for the {systemName} system.</p>
         </div>
-        <div className="w-10"></div>
+        <Button asChild variant="outline">
+          <Link href={`/gm/systems/${params.systemId}/edit`}>
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit System
+          </Link>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">

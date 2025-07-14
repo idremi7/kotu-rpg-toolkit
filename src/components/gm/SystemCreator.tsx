@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown } from 'lucide-react';
 import { saveSystemAction, suggestSkillsAction } from '@/app/actions';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import {
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { GameSystem } from '@/lib/data-service';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -37,18 +38,28 @@ const systemSchema = z.object({
 
 type SystemFormData = z.infer<typeof systemSchema>;
 
+interface SystemCreatorProps {
+    initialData?: GameSystem;
+}
 
-export function SystemCreator() {
+export function SystemCreator({ initialData }: SystemCreatorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isSuggestingSkills, setIsSuggestingSkills] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const mounted = useMounted();
 
+  const isEditMode = !!initialData;
 
   const form = useForm<SystemFormData>({
     resolver: zodResolver(systemSchema),
-    defaultValues: {
+    defaultValues: isEditMode ? {
+        systemName: initialData.systemName,
+        attributes: initialData.attributes,
+        skills: initialData.skills,
+        feats: initialData.feats,
+        saves: initialData.saves,
+    } : {
       systemName: '',
       attributes: [{ name: 'Strength', description: 'Physical power' }],
       skills: [{ name: 'Athletics', baseAttribute: 'Strength' }],
@@ -56,6 +67,18 @@ export function SystemCreator() {
       saves: [{ name: 'Fortitude', baseAttribute: 'Constitution' }],
     },
   });
+
+  useEffect(() => {
+    if (initialData) {
+        form.reset({
+            systemName: initialData.systemName,
+            attributes: initialData.attributes,
+            skills: initialData.skills,
+            feats: initialData.feats,
+            saves: initialData.saves,
+        });
+    }
+  }, [initialData, form]);
 
   const { fields: attributeFields, append: appendAttribute, remove: removeAttribute } = useFieldArray({
     control: form.control,
@@ -85,22 +108,22 @@ export function SystemCreator() {
         const result = await saveSystemAction(data as any);
         if (result.success && result.systemId) {
             toast({
-            title: "System Saved!",
-            description: `${data.systemName} has been successfully saved.`,
+            title: `System ${isEditMode ? 'Updated' : 'Saved'}!`,
+            description: `${data.systemName} has been successfully ${isEditMode ? 'updated' : 'saved'}.`,
             });
             router.push(`/gm/systems/${result.systemId}`);
         } else {
             toast({
             variant: "destructive",
-            title: "Failed to save system",
-            description: result.error || "An unknown error occurred while saving the system.",
+            title: `Failed to ${isEditMode ? 'update' : 'save'} system`,
+            description: result.error || "An unknown error occurred.",
             });
         }
     } catch (error) {
         toast({
             variant: "destructive",
-            title: "Failed to save system",
-            description: "An unknown error occurred while saving the system.",
+            title: `Failed to ${isEditMode ? 'update' : 'save'} system`,
+            description: "An unknown error occurred.",
         });
     } finally {
       setIsSaving(false);
@@ -390,7 +413,7 @@ export function SystemCreator() {
           </Card>
           <Button type="submit" disabled={isSaving} className="w-full" size="lg">
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Save System
+            {isEditMode ? 'Update System' : 'Save System'}
           </Button>
         </form>
       </Form>
