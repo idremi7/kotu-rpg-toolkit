@@ -1,0 +1,66 @@
+{
+  "systemId": "test-system-for-creator",
+  "systemName": "Test System for Creator",
+  "description": "A system designed to test the character creator features, including vitals and custom feats.",
+  "usesD20StyleModifiers": true,
+  "attributes": [
+    {
+      "name": "Strength",
+      "description": "Physical might"
+    },
+    {
+      "name": "Dexterity",
+      "description": "Agility and reflexes"
+    },
+    {
+      "name": "Intelligence",
+      "description": "Mental acuity and knowledge"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Athletics",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Stealth",
+      "baseAttribute": "Dexterity"
+    },
+    {
+      "name": "Arcana",
+      "baseAttribute": "Intelligence"
+    }
+  ],
+  "feats": [
+    {
+      "name": "Toughness",
+      "description": "You are more durable than normal.",
+      "prerequisites": "None",
+      "effect": "+3 HP"
+    },
+    {
+      "name": "Great Fortitude",
+      "description": "You are resistant to poisons and diseases.",
+      "prerequisites": "None",
+      "effect": "+2 Fortitude"
+    }
+  ],
+  "saves": [
+    {
+      "name": "Fortitude",
+      "baseAttribute": "Strength"
+    },
+    {
+      "name": "Reflex",
+      "baseAttribute": "Dexterity"
+    },
+    {
+      "name": "Will",
+      "baseAttribute": "Intelligence"
+    }
+  ],
+  "schemas": {
+    "formSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"class\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"level\": {\n      \"type\": \"number\",\n      \"default\": 1\n    },\n    \"vitals\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"hp\": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"maxHp\": {\n          \"type\": \"number\",\n          \"default\": 10\n        }\n      }\n    },\n    \"attributes\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Strength\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Dexterity\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Intelligence\": {\n          \"type\": \"number\",\n          \"default\": 0\n        }\n      }\n    },\n    \"saves\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Fortitude\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Reflex\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Will\": {\n          \"type\": \"number\",\n          \"default\": 0\n        }\n      }\n    },\n    \"skills\": {\n      \"type\": \"array\",\n      \"default\": [],\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"value\": {\n            \"type\": \"number\",\n            \"default\": 0\n          }\n        }\n      }\n    },\n    \"feats\": {\n      \"type\": \"array\",\n      \"default\": [],\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"type\": \"string\",\n            \"default\": \"\"\n          },\n          \"effect\": {\n            \"type\": \"string\",\n            \"default\": \"\"\n          }\n        }\n      }\n    },\n    \"backstory\": {\n      \"type\": \"string\",\n      \"widget\": \"textarea\",\n      \"default\": \"\"\n    }\n  },\n  \"required\": [\n    \"name\",\n    \"class\",\n    \"level\"\n  ]\n}",
+    "uiSchema": "{\n  \"name\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Character Name\"\n  },\n  \"class\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Class\"\n  },\n  \"level\": {\n    \"ui:widget\": \"number\",\n    \"ui:label\": \"Level\"\n  },\n  \"vitals\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Vitals\",\n    \"fields\": {\n      \"hp\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Current HP\"\n      },\n      \"maxHp\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Maximum HP\"\n      }\n    }\n  },\n  \"attributes\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Attributes\",\n    \"fields\": {\n      \"Strength\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Strength\"\n      },\n      \"Dexterity\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Dexterity\"\n      },\n      \"Intelligence\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Intelligence\"\n      }\n    }\n  },\n  \"saves\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Saves\",\n    \"fields\": {\n      \"Fortitude\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Fortitude\"\n      },\n      \"Reflex\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Reflex\"\n      },\n      \"Will\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Will\"\n      }\n    }\n  },\n  \"skills\": {\n    \"ui:widget\": \"custom\",\n    \"ui:label\": \"Skills\"\n  },\n  \"feats\": {\n    \"ui:widget\": \"custom\",\n    \"ui:label\": \"Feats\"\n  },\n  \"backstory\": {\n    \"ui:widget\": \"textarea\",\n    \"ui:label\": \"Backstory\"\n  }\n}"
+  }
+}
