@@ -49,7 +49,7 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
         <CardHeader>
             <div className="flex justify-between items-start">
                 <div>
-                <CardTitle className="font-headline text-3xl text-primary">{data.name || 'Character Name'}</CardTitle>
+                <CardTitle className="font-headline text-3xl">{data.name || 'Character Name'}</CardTitle>
                 <CardDescription>
                     {data.class || 'Class'} - Level {data.level || 1}
                 </CardDescription>

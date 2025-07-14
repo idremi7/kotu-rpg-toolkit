@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <section className="text-center py-20 px-4 bg-card/50">
-        <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight text-primary">
+        <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight">
           KOTU: RPG Toolkit
         </h1>
         <p className="mt-4 text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto">

@@ -10,7 +10,7 @@
     --card-foreground: 24 15% 15%;
     --popover: 0 0% 100%;
     --popover-foreground: 24 15% 15%;
-    --primary: 41 100% 50%; /* #FFB300 warm amber */
+    --primary: 35 100% 50%; /* #FFB300 warm amber, slightly darker/more saturated */
     --primary-foreground: 24 15% 10%;
     --secondary: 41 30% 85%;
     --secondary-foreground: 24 15% 10%;
@@ -22,7 +22,7 @@
     --destructive-foreground: 0 0% 98%;
     --border: 60 20% 85%;
     --input: 60 20% 92%;
-    --ring: 41 100% 50%;
+    --ring: 35 100% 50%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
