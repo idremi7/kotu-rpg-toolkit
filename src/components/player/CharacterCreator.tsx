@@ -145,8 +145,8 @@ const NumberFieldRenderer = ({ control, name, label }: any) => (
     name={name}
     render={({ field }) => (
       <FormItem>
-        <div className="flex items-center justify-between gap-4">
-          <FormLabel>{label}</FormLabel>
+        <div className="flex items-center justify-start gap-2">
+          <FormLabel className="flex-1">{label}</FormLabel>
           <FormControl>
             <Input
               type="number"
@@ -162,7 +162,6 @@ const NumberFieldRenderer = ({ control, name, label }: any) => (
     )}
   />
 );
-
 
 const FormFieldRenderer = ({ control, name, fieldConfig, system }: any) => {
   const { 'ui:widget': widget, 'ui:label': label } = fieldConfig;
@@ -241,13 +240,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   });
   
   useEffect(() => {
-    let defaultValues: any = {
-        name: '',
-        class: '',
-        level: 1,
-        vitals: { hp: 10, maxHp: 10 },
-        backstory: '',
-    };
+    let defaultValues: any = {};
     if (system?.schemas?.formSchema) {
       const formSchema = JSON.parse(system.schemas.formSchema);
       Object.keys(formSchema.properties).forEach((key) => {
@@ -277,16 +270,14 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
             charData.skills = [];
         }
 
-        if (charData.hp !== undefined && !charData.vitals) {
-            charData.vitals = { hp: charData.hp, maxHp: charData.maxHp ?? charData.hp };
-            delete charData.hp;
-            delete charData.maxHp;
-        }
-
-
         defaultValues = { ...defaultValues, ...charData };
     }
     
+    // Always ensure vitals object exists for the form
+    if (!defaultValues.vitals) {
+        defaultValues.vitals = { hp: 10, maxHp: 10 };
+    }
+
     form.reset(defaultValues);
   }, [system, isEditMode, initialCharacter, form]);
 
@@ -337,18 +328,14 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   }
 
   const uiSchema = JSON.parse(system.schemas.uiSchema);
-  const formSchema = JSON.parse(system.schemas.formSchema);
 
+  const topLevelFields = ['name', 'class', 'level'];
   const fieldsets = Object.entries(uiSchema)
     .filter(([, config]: [string, any]) => config['ui:fieldset'])
     .map(([name, config]) => ({ name, config }));
-  
-  const topLevelFields = ['name', 'class', 'level'];
-  
   const customWidgets = Object.entries(uiSchema)
     .filter(([, config]: [string, any]) => config['ui:widget'] === 'custom')
     .map(([name, config]) => ({ name, config }));
-    
   const backstoryField = uiSchema.backstory ? { name: 'backstory', config: uiSchema.backstory } : null;
 
   return (
