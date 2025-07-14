@@ -68,7 +68,7 @@ export async function saveSystemAction(
   systemData.attributes.forEach((attr) => {
     formSchemaProperties.attributes.properties[attr.name] = {
       type: 'number',
-      default: 10,
+      default: 0,
     };
     uiSchema.attributes.fields[attr.name] = {
       'ui:widget': 'number',

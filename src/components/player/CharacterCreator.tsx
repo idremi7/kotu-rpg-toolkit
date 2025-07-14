@@ -309,14 +309,6 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
   const formSchema = JSON.parse(system.schemas.formSchema);
 
   return (
-    <>
-      <div className="relative mb-8 text-center">
-        <h1 className="font-headline text-4xl font-bold">Forge Your Hero</h1>
-        <p className="text-muted-foreground">
-        You are creating a character for the <span className="text-primary font-semibold">{systemName}</span>{' '}
-        system.
-        </p>
-      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto">
           {Object.entries(uiSchema).map(([fieldName, fieldConfig]: [string, any]) => {
@@ -401,6 +393,5 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
           </Button>
         </form>
       </Form>
-    </>
   );
 }
