@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Logo } from './Logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
+import { LayoutDashboard } from 'lucide-react';
 
 export function Header() {
   const pathname = usePathname();
@@ -31,7 +31,9 @@ export function Header() {
               href={link.href}
               className={cn(
                 'transition-colors hover:text-primary',
-                pathname.includes(link.href) ? 'text-primary' : 'text-foreground/60'
+                pathname.includes(link.href)
+                  ? 'text-primary'
+                  : 'text-foreground/60'
               )}
             >
               {link.label}
@@ -39,19 +41,9 @@ export function Header() {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end gap-2">
-           <Button variant="ghost" size="sm" asChild className='md:hidden'>
-             <Link href="/gm/dashboard"><LayoutDashboard/> <span className="sr-only">Dashboards</span></Link>
-           </Button>
-           <Button variant="outline" size="sm" asChild>
-            <Link href="/login">
-              <LogIn className="mr-2 h-4 w-4" />
-              Login
-            </Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/signup">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Sign Up
+          <Button variant="ghost" size="sm" asChild className="md:hidden">
+            <Link href="/gm/dashboard">
+              <LayoutDashboard /> <span className="sr-only">Dashboards</span>
             </Link>
           </Button>
         </div>
