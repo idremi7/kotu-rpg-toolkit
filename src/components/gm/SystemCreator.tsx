@@ -68,8 +68,7 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
         const lowercasedQuery = searchQuery.toLowerCase();
         return allSkills.filter(skill => 
             skill.name.toLowerCase().includes(lowercasedQuery) || 
-            skill.description.toLowerCase().includes(lowercasedQuery) ||
-            skill.category.toLowerCase().includes(lowercasedQuery)
+            skill.description.toLowerCase().includes(lowercasedQuery)
         );
     }, [searchQuery, allSkills]);
     
