@@ -202,18 +202,16 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   const watchedAttributes = form.watch('attributes');
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
-  const watchedSkills = form.watch('skills');
-
   const groupedSkills = useMemo(() => {
-    return watchedSkills.reduce((acc, skill, index) => {
-      const baseAttribute = skill.baseAttribute || 'Unassigned';
+    return skillFields.reduce((acc, skill, index) => {
+      const baseAttribute = form.getValues(`skills.${index}.baseAttribute`) || 'Unassigned';
       if (!acc[baseAttribute]) {
         acc[baseAttribute] = [];
       }
       acc[baseAttribute].push({ ...skill, originalIndex: index });
       return acc;
-    }, {} as Record<string, (typeof watchedSkills[0] & { originalIndex: number })[]>);
-  }, [watchedSkills]);
+    }, {} as Record<string, (typeof skillFields[0] & { originalIndex: number })[]>);
+  }, [skillFields, form]);
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
@@ -435,7 +433,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                               name={`skills.${skill.originalIndex}.baseAttribute`}
                               render={({ field }) => (
                                 <FormItem className="flex-1">
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                       <SelectTrigger>
                                         <SelectValue placeholder="Select an attribute" />
