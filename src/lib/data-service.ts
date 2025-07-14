@@ -23,18 +23,16 @@ export interface GameSystem {
     schemas: { formSchema: string; uiSchema: string };
 }
 
+const tempDir = path.join(process.cwd(), '.tmp');
+const dataDir = path.join(tempDir, 'data');
+const systemsDir = path.join(dataDir, 'systems');
+const charactersDir = path.join(dataDir, 'characters');
+
 async function initializeDataDirs() {
     try {
-        const tempDir = path.join(process.cwd(), '.tmp');
-        const dataDir = path.join(tempDir, 'data');
-        const systemsDir = path.join(dataDir, 'systems');
-        const charactersDir = path.join(dataDir, 'characters');
-
         await fs.mkdir(systemsDir, { recursive: true });
         await fs.mkdir(charactersDir, { recursive: true });
 
-        // This will always copy the default systems into the temp directory, overwriting any existing files.
-        // This ensures that any updates to the default systems are always reflected.
         const defaultSystemsDir = path.join(process.cwd(), 'data', 'systems');
         const defaultFiles = await fs.readdir(defaultSystemsDir);
         for (const file of defaultFiles) {
@@ -47,7 +45,6 @@ async function initializeDataDirs() {
     }
 }
 
-// Ensure data directories are ready before any database operation
 const dataReady = initializeDataDirs();
 
 
@@ -57,7 +54,6 @@ function migrateSystem(system: GameSystem): GameSystem {
     let wasMigrated = false;
     const newSystem = JSON.parse(JSON.stringify(system));
 
-    // Migration 1: Feats value -> effect
     newSystem.feats = newSystem.feats.map((feat: Feat) => {
         if (feat.value !== undefined && feat.effect === undefined) {
             feat.effect = feat.value >= 0 ? `+${feat.value}` : `${feat.value}`;
@@ -71,7 +67,6 @@ function migrateSystem(system: GameSystem): GameSystem {
     let formSchema = JSON.parse(newSystem.schemas.formSchema);
     let uiSchema = JSON.parse(newSystem.schemas.uiSchema);
 
-    // Migration 2: Saves from string array to object
     if (formSchema.properties.saves?.type === 'array') {
         formSchema.properties.saves = { type: 'object', properties: {} };
         uiSchema.saves = { 'ui:fieldset': true, 'ui:label': 'Saves', fields: {} };
@@ -83,7 +78,6 @@ function migrateSystem(system: GameSystem): GameSystem {
         wasMigrated = true;
     }
 
-    // Migration 3: Skills from string array to object array
     if (formSchema.properties.skills?.items?.type === 'string') {
         formSchema.properties.skills = {
             type: 'array',
@@ -127,7 +121,7 @@ export async function getSystem(systemId: string): Promise<GameSystem | null> {
         return migrateSystem(system);
     } catch (error) {
         if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-            return null; // File not found
+            return null;
         }
         console.error(`Failed to read system ${systemId}:`, error);
         return null;
@@ -136,7 +130,6 @@ export async function getSystem(systemId: string): Promise<GameSystem | null> {
 
 export async function listSystems(): Promise<{ id: string; name: string; description: string }[]> {
     await dataReady;
-    const systemsDir = path.join(process.cwd(), '.tmp', 'data', 'systems');
     try {
         const files = await fs.readdir(systemsDir);
         const systems = await Promise.all(
@@ -157,6 +150,10 @@ export async function listSystems(): Promise<{ id: string; name: string; descrip
         );
         return systems.filter((s): s is { id: string; name: string; description: string } => s !== null);
     } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            await initializeDataDirs();
+            return listSystems();
+        }
         console.error('Failed to list systems:', error);
         return [];
     }
@@ -168,7 +165,7 @@ export async function listSystems(): Promise<{ id: string; name: string; descrip
 export interface Character {
     characterId: string;
     systemId: string;
-    data: any; // The actual character sheet data
+    data: any;
 }
 
 export async function saveCharacter(characterData: Character): Promise<void> {
@@ -192,8 +189,7 @@ export async function getCharacter(characterId: string): Promise<Character | nul
 
 export async function listCharacters(): Promise<Character[]> {
     await dataReady;
-    const charactersDir = path.join(process.cwd(), '.tmp', 'data', 'characters');
-     try {
+    try {
         const files = await fs.readdir(charactersDir);
         const characters = await Promise.all(
             files.map(async (file) => {
@@ -206,6 +202,10 @@ export async function listCharacters(): Promise<Character[]> {
         );
         return characters.filter((c): c is Character => c !== null);
     } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+             await initializeDataDirs();
+             return listCharacters();
+        }
         console.error('Failed to list characters:', error);
         return [];
     }
