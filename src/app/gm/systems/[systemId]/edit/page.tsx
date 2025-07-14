@@ -1,4 +1,4 @@
-import { getSystemAction } from '@/app/actions';
+import { getSystemAction } from '@/actions';
 import { notFound } from 'next/navigation';
 import { SystemCreator } from '@/components/gm/SystemCreator';
 import { BackButton } from '@/components/BackButton';

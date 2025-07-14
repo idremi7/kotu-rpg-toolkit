@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, User } from "lucide-react";
 import Link from "next/link";
-import { listCharactersAction } from "@/app/actions";
+import { listCharactersAction } from "@/actions";
 
 export default async function PlayerDashboard() {
   const characters = await listCharactersAction();

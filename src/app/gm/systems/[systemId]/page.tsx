@@ -1,4 +1,4 @@
-import { getSystemAction } from '@/app/actions';
+import { getSystemAction } from '@/actions';
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';

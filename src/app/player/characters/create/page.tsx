@@ -1,4 +1,4 @@
-import { listSystemsAction } from "@/app/actions";
+import { listSystemsAction } from "@/actions";
 import { BackButton } from "@/components/BackButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Swords } from "lucide-react";

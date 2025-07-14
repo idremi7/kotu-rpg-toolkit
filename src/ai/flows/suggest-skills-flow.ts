@@ -68,6 +68,9 @@ const suggestSkillsFlow = ai.defineFlow(
     name: 'suggestSkillsFlow',
     inputSchema: SuggestSkillsInputSchema,
     outputSchema: SuggestSkillsOutputSchema,
+    config: {
+      timeout: 30000, // 30 seconds
+    }
   },
   async (input) => {
     const { output } = await prompt(input);

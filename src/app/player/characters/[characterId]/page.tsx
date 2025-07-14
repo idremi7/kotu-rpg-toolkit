@@ -1,4 +1,4 @@
-import { getCharacterAction, getSystemAction } from "@/app/actions";
+import { getCharacterAction, getSystemAction } from "@/actions";
 import { CharacterSheetPreview } from "@/components/player/CharacterSheetPreview";
 import { notFound } from "next/navigation";
 
