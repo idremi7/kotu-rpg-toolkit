@@ -46,8 +46,14 @@
       }
     ],
     "feats": [
-      "Maîtrise de l'esquive",
-      "Maîtrise de l'épée courte"
+      {
+        "name": "Maîtrise de l'esquive",
+        "effect": "+5"
+      },
+      {
+        "name": "Maîtrise de l'épée courte",
+        "effect": "+5"
+      }
     ],
     "backstory": ""
   }

@@ -40,6 +40,8 @@ function generateSchemas(system: Omit<GameSystem, 'schemas'> | GameSystem) {
       name: { type: 'string', default: '' },
       class: { type: 'string', default: '' },
       level: { type: 'number', default: 1 },
+      hp: { type: 'number', default: 10 },
+      maxHp: { type: 'number', default: 10 },
       attributes: { type: 'object', properties: {} },
       saves: { type: 'object', properties: {} },
       skills: { 
@@ -64,10 +66,18 @@ function generateSchemas(system: Omit<GameSystem, 'schemas'> | GameSystem) {
       name: { 'ui:widget': 'text', 'ui:label': 'Character Name' },
       class: { 'ui:widget': 'text', 'ui:label': 'Class' },
       level: { 'ui:widget': 'number', 'ui:label': 'Level' },
+      hp: { 'ui:widget': 'number', 'ui:label': 'Current HP' },
+      maxHp: { 'ui:widget': 'number', 'ui:label': 'Maximum HP' },
+      'ui:groups': [
+        {
+          title: 'Vitals',
+          fields: ['hp', 'maxHp']
+        }
+      ],
       attributes: { 'ui:fieldset': true, 'ui:label': 'Attributes', fields: {} },
       saves: { 'ui:fieldset': true, 'ui:label': 'Saves', fields: {} },
       skills: { 'ui:widget': 'custom', 'ui:label': 'Skills' },
-      feats: { 'ui:widget': 'checkboxes', 'ui:label': 'Feats' },
+      feats: { 'ui:widget': 'custom', 'ui:label': 'Feats' },
       backstory: { 'ui:widget': 'textarea', 'ui:label': 'Backstory' },
     };
     system.attributes.forEach((attr) => {

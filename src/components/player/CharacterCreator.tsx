@@ -211,51 +211,12 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, sys
           )}
         />
       );
-    case 'checkboxes':
-        if (name === 'feats') {
-            return <CustomFeatWidget control={control} name="feats" options={system.feats} />;
-        }
-      return (
-        <FormItem>
-          <FormLabel>{label}</FormLabel>
-          <div className="space-y-2">
-            {options.map((option: any) => (
-              <FormField
-                key={option.name}
-                control={control}
-                name={name}
-                render={({ field }) => {
-                  const currentValues = Array.isArray(field.value) ? field.value : [];
-                  return (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={currentValues.includes(option.name)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              field.onChange([...currentValues, option.name]);
-                            } else {
-                              field.onChange(currentValues.filter((value: string) => value !== option.name));
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="font-normal">{option.name}</FormLabel>
-                         <p className="text-sm text-muted-foreground">{option.description}</p>
-                         {option.effect && <p className="text-xs text-primary font-mono">{option.effect}</p>}
-                      </div>
-                    </FormItem>
-                  );
-                }}
-              />
-            ))}
-          </div>
-        </FormItem>
-      );
     case 'custom':
         if (name === 'skills') {
             return <CustomSkillWidget control={control} name="skills" options={system.skills} />;
+        }
+        if (name === 'feats') {
+            return <CustomFeatWidget control={control} name="feats" options={system.feats} />;
         }
         return <p>Unsupported custom field: {name}</p>
     default:
@@ -360,97 +321,115 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
 
   const { feats } = system;
   const uiSchema = JSON.parse(system.schemas.uiSchema);
+  const fieldGroups = uiSchema['ui:groups'] || [];
+
+  const renderField = (fieldName: string, fieldConfig: any) => {
+    // Render fieldsets (Attributes, Saves)
+    if (fieldConfig['ui:fieldset']) {
+      return (
+        <Card key={fieldName}>
+          <CardHeader>
+            <CardTitle>{fieldConfig['ui:label']}</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(fieldConfig.fields).map(([subFieldName, subFieldConfig]: [string, any]) => (
+              <NumberFieldRenderer
+                key={subFieldName}
+                control={form.control}
+                name={`${fieldName}.${subFieldName}`}
+                label={subFieldConfig['ui:label']}
+                widget={subFieldConfig['ui:widget']}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Render custom widgets (Skills, Feats)
+    if (fieldConfig['ui:widget'] === 'custom') {
+      return (
+        <Card key={fieldName}>
+          <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
+          <CardContent>
+            <FormFieldRenderer
+              control={form.control}
+              name={fieldName}
+              fieldConfig={fieldConfig}
+              system={system}
+            />
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Render standalone fields (Name, Class, Level, Backstory)
+    const { 'ui:widget': widget } = fieldConfig;
+    if (widget === 'text' || widget === 'number' || widget === 'textarea') {
+      return (
+        <FormFieldRenderer
+          key={fieldName}
+          control={form.control}
+          name={fieldName}
+          fieldConfig={fieldConfig}
+          system={system}
+        />
+      );
+    }
+
+    return null;
+  };
+  
+  const groupedFields = fieldGroups.reduce((acc: any, group: any) => {
+    group.fields.forEach((fieldName: string) => {
+      if (!acc[group.title]) {
+        acc[group.title] = [];
+      }
+      acc[group.title].push(fieldName);
+    });
+    return acc;
+  }, {});
+
+  const allGroupedFields = new Set(fieldGroups.flatMap((g:any) => g.fields));
+
+  const ungroupedFields = Object.keys(uiSchema).filter(
+    fieldName => !fieldName.startsWith('ui:') && !allGroupedFields.has(fieldName) && !uiSchema[fieldName]['ui:fieldset'] && uiSchema[fieldName]['ui:widget'] !== 'custom'
+  );
 
   return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto">
-          {Object.entries(uiSchema).map(([fieldName, fieldConfig]: [string, any]) => {
-            if (fieldConfig['ui:fieldset']) {
-              return (
-                <Card key={fieldName}>
-                  <CardHeader>
-                    <CardTitle>{fieldConfig['ui:label']}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(fieldConfig.fields).map(
-                      ([subFieldName, subFieldConfig]: [string, any]) => (
-                        <NumberFieldRenderer
-                          key={subFieldName}
-                          control={form.control}
-                          name={`${fieldName}.${subFieldName}`}
-                          label={subFieldConfig['ui:label']}
-                          widget={subFieldConfig['ui:widget']}
-                        />
-                      )
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            }
-             if (fieldName === 'feats') {
-              return (
-                <Card key={fieldName}>
-                  <CardHeader>
-                    <CardTitle>{fieldConfig['ui:label']}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <FormFieldRenderer
-                      control={form.control}
-                      name={fieldName}
-                      fieldConfig={fieldConfig}
-                      options={feats}
-                      system={system}
-                    />
-                  </CardContent>
-                </Card>
-              );
-            }
-             if (fieldName === 'skills' && fieldConfig['ui:widget'] === 'custom') {
-                 return (
-                    <Card key={fieldName}>
-                        <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
-                        <CardContent>
-                            <FormFieldRenderer
-                                control={form.control}
-                                name={fieldName}
-                                fieldConfig={fieldConfig}
-                                options={null} // Pass skills from system object
-                                system={system}
-                            />
-                        </CardContent>
-                    </Card>
-                 )
-             }
-            // Render standalone fields
-            const { 'ui:widget': widget } = fieldConfig;
-            if (widget === 'text' || widget === 'number' || widget === 'textarea') {
-              return (
-                <Card key={fieldName}>
-                  <CardContent className="pt-6">
-                    <FormFieldRenderer
-                      control={form.control}
-                      name={fieldName}
-                      fieldConfig={fieldConfig}
-                      system={system}
-                    />
-                  </CardContent>
-                </Card>
-              );
-            }
-            return null;
-          })}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto">
+        <Card>
+            <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {ungroupedFields.map(fieldName => renderField(fieldName, uiSchema[fieldName]))}
+            </CardContent>
+        </Card>
 
-          <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
-            {isSaving ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : isEditMode ? (
-              <Save className="mr-2 h-4 w-4" />
-            ) : (
-              <UserPlus className="mr-2 h-4 w-4" />
-            )}
-            {isEditMode ? 'Update Character' : 'Create Character'}
-          </Button>
-        </form>
-      </Form>
+        {fieldGroups.map((group: any) => (
+            <Card key={group.title}>
+                <CardHeader><CardTitle>{group.title}</CardTitle></CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {group.fields.map((fieldName: string) => renderField(fieldName, uiSchema[fieldName]))}
+                </CardContent>
+            </Card>
+        ))}
+        
+        {Object.keys(uiSchema)
+            .filter(fieldName => !fieldName.startsWith('ui:') && !allGroupedFields.has(fieldName) && (uiSchema[fieldName]['ui:fieldset'] || uiSchema[fieldName]['ui:widget'] === 'custom'))
+            .map(fieldName => renderField(fieldName, uiSchema[fieldName]))
+        }
+
+        <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
+          {isSaving ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : isEditMode ? (
+            <Save className="mr-2 h-4 w-4" />
+          ) : (
+            <UserPlus className="mr-2 h-4 w-4" />
+          )}
+          {isEditMode ? 'Update Character' : 'Create Character'}
+        </Button>
+      </form>
+    </Form>
   );
 }

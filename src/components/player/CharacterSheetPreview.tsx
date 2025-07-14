@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "../ui/badge";
-import { Printer, Pencil } from 'lucide-react';
+import { Printer, Pencil, Heart } from 'lucide-react';
 import { BackButton } from "../BackButton";
 import type { Character, GameSystem, Feat } from "@/lib/data-service";
 import { ExportCharacterButton } from "../ExportCharacterButton";
 import Link from "next/link";
+import { Progress } from "../ui/progress";
 
 interface CharacterSheetPreviewProps {
   character: Character;
@@ -34,6 +35,8 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
   const getFeatDetails = (featName: string): Feat | undefined => {
     return system.feats.find((f: any) => f.name === featName);
   };
+
+  const hpPercentage = data.maxHp > 0 ? (data.hp / data.maxHp) * 100 : 0;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -65,6 +68,15 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
                     System: {system.systemName}
                 </CardDescription>
                 </div>
+                {data.maxHp > 0 && (
+                    <div className="text-right w-1/3">
+                        <div className="flex items-center justify-end gap-2 text-lg font-bold text-red-500">
+                           <Heart className="h-5 w-5"/>
+                           <span>{data.hp ?? '??'} / {data.maxHp ?? '??'}</span>
+                        </div>
+                        <Progress value={hpPercentage} className="mt-1 h-2" indicatorClassName="bg-red-500"/>
+                    </div>
+                )}
             </div>
         </CardHeader>
         <CardContent className="space-y-6">
