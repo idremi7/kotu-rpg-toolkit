@@ -15,7 +15,6 @@ import { getSystemAction, saveCharacterAction } from '@/actions';
 import type { GameSystem } from '@/lib/data-service';
 import { useRouter } from 'next/navigation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { BackButton } from '../BackButton';
 
 const CustomSkillWidget = ({ control, name, options }: { control: any, name: string, options: any[] }) => {
   const { fields, append, remove } = useFieldArray({ control, name });
@@ -86,7 +85,7 @@ const NumberFieldRenderer = ({ control, name, label, widget }: any) => (
     name={name}
     render={({ field }) => (
       <FormItem>
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
           <FormLabel>{label}</FormLabel>
           <FormControl>
             <Input
@@ -116,7 +115,7 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, sys
           control={control}
           name={name}
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>{label}</FormLabel>
               <FormControl>
                 <Input
@@ -141,7 +140,7 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, sys
           control={control}
           name={name}
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-1">
               <FormLabel>{label}</FormLabel>
               <FormControl>
                 <Textarea {...field} value={field.value ?? ''} />
