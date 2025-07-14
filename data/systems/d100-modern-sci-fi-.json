@@ -1,0 +1,99 @@
+{
+  "systemId": "d100-modern-sci-fi-",
+  "systemName": "D100 modern sci-fi ",
+  "attributes": [
+    {
+      "name": "Force",
+      "description": ""
+    },
+    {
+      "name": "Dexterité ",
+      "description": ""
+    },
+    {
+      "name": "Constitution ",
+      "description": ""
+    },
+    {
+      "name": "Vitesse ",
+      "description": ""
+    },
+    {
+      "name": "Intelligence ",
+      "description": ""
+    },
+    {
+      "name": "Sagesse ",
+      "description": ""
+    },
+    {
+      "name": "Charisme ",
+      "description": ""
+    }
+  ],
+  "skills": [
+    {
+      "name": "Corps à corps ",
+      "baseAttribute": "Force"
+    },
+    {
+      "name": "Athlétisme",
+      "baseAttribute": "Force"
+    },
+    {
+      "name": "Informatique",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Esquive",
+      "baseAttribute": "Dexterité "
+    },
+    {
+      "name": "Marchandage",
+      "baseAttribute": "Charisme "
+    }
+  ],
+  "feats": [
+    {
+      "name": "Maîtrise de l'informatique",
+      "description": "Améliorer la compétence de l'informatique ",
+      "prerequisites": "",
+      "effect": "+10"
+    }
+  ],
+  "saves": [
+    {
+      "name": "Brute force",
+      "baseAttribute": "Force"
+    },
+    {
+      "name": "Équilibre ",
+      "baseAttribute": "Dexterité "
+    },
+    {
+      "name": "Vigueur ",
+      "baseAttribute": "Constitution "
+    },
+    {
+      "name": "Réflexe ",
+      "baseAttribute": "Vitesse "
+    },
+    {
+      "name": "Intuition",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Volonté",
+      "baseAttribute": "Sagesse "
+    },
+    {
+      "name": "Magnetisme",
+      "baseAttribute": "Charisme "
+    }
+  ],
+  "description": "A custom system with 7 attributes.",
+  "schemas": {
+    "formSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"class\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"level\": {\n      \"type\": \"number\",\n      \"default\": 1\n    },\n    \"attributes\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Force\": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Dexterité \": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Constitution \": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Vitesse \": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Intelligence \": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Sagesse \": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Charisme \": {\n          \"type\": \"number\",\n          \"default\": 10\n        }\n      }\n    },\n    \"saves\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Brute force\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Équilibre \": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Vigueur \": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Réflexe \": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Intuition\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Volonté\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Magnetisme\": {\n          \"type\": \"number\",\n          \"default\": 0\n        }\n      }\n    },\n    \"skills\": {\n      \"type\": \"array\",\n      \"default\": [],\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"value\": {\n            \"type\": \"number\",\n            \"default\": 0\n          }\n        }\n      }\n    },\n    \"feats\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"default\": []\n    },\n    \"backstory\": {\n      \"type\": \"string\",\n      \"widget\": \"textarea\",\n      \"default\": \"\"\n    }\n  },\n  \"required\": [\n    \"name\",\n    \"class\",\n    \"level\"\n  ]\n}",
+    "uiSchema": "{\n  \"name\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Character Name\"\n  },\n  \"class\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Class\"\n  },\n  \"level\": {\n    \"ui:widget\": \"number\",\n    \"ui:label\": \"Level\"\n  },\n  \"attributes\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Attributes\",\n    \"fields\": {\n      \"Force\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Force\"\n      },\n      \"Dexterité \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Dexterité \"\n      },\n      \"Constitution \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Constitution \"\n      },\n      \"Vitesse \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Vitesse \"\n      },\n      \"Intelligence \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Intelligence \"\n      },\n      \"Sagesse \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Sagesse \"\n      },\n      \"Charisme \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Charisme \"\n      }\n    }\n  },\n  \"saves\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Saves\",\n    \"fields\": {\n      \"Brute force\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Brute force\"\n      },\n      \"Équilibre \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Équilibre \"\n      },\n      \"Vigueur \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Vigueur \"\n      },\n      \"Réflexe \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Réflexe \"\n      },\n      \"Intuition\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Intuition\"\n      },\n      \"Volonté\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Volonté\"\n      },\n      \"Magnetisme\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Magnetisme\"\n      }\n    }\n  },\n  \"skills\": {\n    \"ui:widget\": \"custom\",\n    \"ui:label\": \"Skills\"\n  },\n  \"feats\": {\n    \"ui:widget\": \"checkboxes\",\n    \"ui:label\": \"Feats\"\n  },\n  \"backstory\": {\n    \"ui:widget\": \"textarea\",\n    \"ui:label\": \"Backstory\"\n  }\n}"
+  }
+}
