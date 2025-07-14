@@ -46,10 +46,10 @@ interface SystemCreatorProps {
     initialData?: GameSystem;
 }
 
-const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: string, baseAttribute: string, category: string}[]) => void }) => {
+const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: string, category: string}[]) => void }) => {
+    const { toast } = useToast();
     const [selectedSkills, setSelectedSkills] = useState<Record<string, {isSelected: boolean, category: string}>>({});
     const [isOpen, setIsOpen] = useState(false);
-    const { toast } = useToast();
     const [allSkills, setAllSkills] = useState<SkillFromLibrary[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -201,6 +201,19 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
 
   const watchedAttributes = form.watch('attributes');
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
+
+  const watchedSkills = form.watch('skills');
+
+  const groupedSkills = useMemo(() => {
+    return watchedSkills.reduce((acc, skill, index) => {
+      const baseAttribute = skill.baseAttribute || 'Unassigned';
+      if (!acc[baseAttribute]) {
+        acc[baseAttribute] = [];
+      }
+      acc[baseAttribute].push({ ...skill, originalIndex: index });
+      return acc;
+    }, {} as Record<string, (typeof watchedSkills[0] & { originalIndex: number })[]>);
+  }, [watchedSkills]);
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
@@ -392,47 +405,62 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               <CardDescription>Define character abilities. You can add them manually or use AI to get suggestions based on your attributes.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {skillFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                  <FormField
-                    control={form.control}
-                    name={`skills.${index}.name`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`skills.${index}.baseAttribute`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Base Attribute</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select an attribute" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {validAttributes.map(attr => (
-                                <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="button" variant="destructive" size="icon" onClick={() => removeSkill(index)}><Trash2 className="h-4 w-4" /></Button>
-                </div>
-              ))}
-              <div className="flex gap-2">
+              <Accordion type="multiple" className="w-full space-y-2">
+                {Object.entries(groupedSkills).map(([attribute, skills]) => (
+                  <AccordionItem key={attribute} value={attribute} className="border rounded-md px-3">
+                    <AccordionTrigger>
+                      <div className="flex items-center gap-2">
+                          {attribute}
+                          <span className="text-xs font-normal text-muted-foreground bg-muted h-5 w-5 flex items-center justify-center rounded-full">{skills.length}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-2">
+                      <div className="space-y-2">
+                        {skills.map(skill => (
+                          <div key={skill.id} className="flex gap-2 items-end">
+                            <FormField
+                              control={form.control}
+                              name={`skills.${skill.originalIndex}.name`}
+                              render={({ field }) => (
+                                <FormItem className="flex-1">
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name={`skills.${skill.originalIndex}.baseAttribute`}
+                              render={({ field }) => (
+                                <FormItem className="flex-1">
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select an attribute" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {validAttributes.map(attr => (
+                                        <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <Button type="button" variant="destructive" size="icon" onClick={() => removeSkill(skill.originalIndex)}><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+              
+              <div className="flex gap-2 pt-4">
                 <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
                 <SkillLibraryBrowser onAddSkills={handleAddSkillsFromLibrary} />
                  <DropdownMenu>
