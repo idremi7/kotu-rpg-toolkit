@@ -7,6 +7,7 @@ import {
   saveCharacter,
   getCharacter as getCharacterFromDb,
   listCharacters as listCharactersFromDb,
+  listSkillsFromLibrary as listSkillsFromLibraryFromDb,
 } from '@/lib/data-service';
 import type { GameSystem, Feat } from '@/lib/data-service';
 import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
@@ -158,4 +159,8 @@ export async function suggestSkillsAction(input: SuggestSkillsInput) {
     console.error('AI failed to suggest skills:', error);
     return { success: false, error: 'AI failed to suggest skills.' };
   }
+}
+
+export async function listSkillsFromLibraryAction() {
+    return await listSkillsFromLibraryFromDb();
 }

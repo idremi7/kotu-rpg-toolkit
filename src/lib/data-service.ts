@@ -23,6 +23,12 @@ export interface GameSystem {
     schemas: { formSchema: string; uiSchema: string };
 }
 
+export interface SkillFromLibrary {
+    name: string;
+    category: string;
+    description: string;
+}
+
 const dataDir = path.join(process.cwd(), 'data');
 const systemsDir = path.join(dataDir, 'systems');
 const charactersDir = path.join(dataDir, 'characters');
@@ -199,6 +205,24 @@ export async function listCharacters(): Promise<Character[]> {
              return listCharacters();
         }
         console.error('Failed to list characters:', error);
+        return [];
+    }
+}
+
+// =========== Skill Library API ===========
+
+export async function listSkillsFromLibrary(): Promise<SkillFromLibrary[]> {
+    await dataReady;
+    const filePath = path.join(dataDir, 'skill-library.json');
+    try {
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(fileContent) as SkillFromLibrary[];
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            console.warn('skill-library.json not found. Returning empty list.');
+            return [];
+        }
+        console.error('Failed to read skill library:', error);
         return [];
     }
 }

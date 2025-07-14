@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown } from 'lucide-react';
-import { saveSystemAction, suggestSkillsAction } from '@/actions';
+import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
+import { listSkillsFromLibraryAction, saveSystemAction, suggestSkillsAction } from '@/actions';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { GameSystem } from '@/lib/data-service';
+import type { GameSystem, SkillFromLibrary } from '@/lib/data-service';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
+import { ScrollArea } from '../ui/scroll-area';
+import { Checkbox } from '../ui/checkbox';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -40,6 +44,94 @@ type SystemFormData = z.infer<typeof systemSchema>;
 
 interface SystemCreatorProps {
     initialData?: GameSystem;
+}
+
+const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: string, baseAttribute: string}[]) => void }) => {
+    const [library, setLibrary] = useState<Record<string, SkillFromLibrary[]>>({});
+    const [selectedSkills, setSelectedSkills] = useState<Record<string, boolean>>({});
+    const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        if (isOpen && Object.keys(library).length === 0) {
+            listSkillsFromLibraryAction().then(skills => {
+                const grouped = skills.reduce((acc, skill) => {
+                    const { category } = skill;
+                    if (!acc[category]) {
+                        acc[category] = [];
+                    }
+                    acc[category].push(skill);
+                    return acc;
+                }, {} as Record<string, SkillFromLibrary[]>);
+                setLibrary(grouped);
+            });
+        }
+    }, [isOpen, library]);
+    
+    const handleSelectSkill = (skillName: string, isSelected: boolean) => {
+        setSelectedSkills(prev => ({...prev, [skillName]: isSelected}));
+    }
+
+    const handleAdd = () => {
+        const skillsToAdd = Object.entries(selectedSkills)
+            .filter(([,isSelected]) => isSelected)
+            .map(([name]) => ({ name, baseAttribute: ''}));
+        
+        onAddSkills(skillsToAdd);
+        toast({
+            title: "Skills Added",
+            description: `${skillsToAdd.length} skills added from the library. Please assign a base attribute for each.`
+        });
+        setSelectedSkills({});
+        setIsOpen(false);
+    }
+
+    return (
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+                <Button type="button" variant="secondary"><BookOpen className="mr-2"/>Piocher dans la bibliothèque</Button>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-lg">
+                <SheetHeader>
+                    <SheetTitle>Bibliothèque de compétences</SheetTitle>
+                    <SheetDescription>
+                        Parcourez et sélectionnez des compétences communes à ajouter à votre système.
+                    </SheetDescription>
+                </SheetHeader>
+                <div className="py-4 h-[calc(100%-120px)] flex flex-col">
+                    <ScrollArea className="flex-grow pr-4">
+                        <Accordion type="multiple" className="w-full">
+                        {Object.entries(library).map(([category, skills]) => (
+                            <AccordionItem value={category} key={category}>
+                                <AccordionTrigger>{category}</AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="space-y-2">
+                                        {skills.map(skill => (
+                                            <div key={skill.name} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
+                                                <Checkbox 
+                                                    id={skill.name} 
+                                                    checked={!!selectedSkills[skill.name]}
+                                                    onCheckedChange={(checked) => handleSelectSkill(skill.name, !!checked)}
+                                                />
+                                                <label htmlFor={skill.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                                    {skill.name}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                        </Accordion>
+                    </ScrollArea>
+                    <div className="pt-4 border-t mt-auto">
+                        <Button onClick={handleAdd} className="w-full" disabled={Object.values(selectedSkills).every(v => !v)}>
+                            Ajouter les compétences sélectionnées
+                        </Button>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+    )
 }
 
 export function SystemCreator({ initialData }: SystemCreatorProps) {
@@ -325,6 +417,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               ))}
               <div className="flex gap-2">
                 <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
+                <SkillLibraryBrowser onAddSkills={(skills) => appendSkill(skills)} />
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button type="button" variant="secondary" disabled={isSuggestingSkills}>
