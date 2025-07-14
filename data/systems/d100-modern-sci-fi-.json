@@ -1,4 +1,3 @@
-
 {
   "systemId": "d100-modern-sci-fi-",
   "systemName": "D100 modern sci-fi ",
@@ -56,6 +55,10 @@
     },
     {
       "name": "Épée courte",
+      "baseAttribute": "Force"
+    },
+    {
+      "name": "Acrobatics",
       "baseAttribute": "Force"
     }
   ],
