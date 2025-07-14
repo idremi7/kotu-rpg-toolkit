@@ -211,14 +211,14 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
                     />
                     <ScrollArea className="flex-grow pr-4">
                        <div className="space-y-2">
-                            {filteredFeats.map(feat => (
-                                <div key={feat.name} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
+                            {filteredFeats.map((feat, index) => (
+                                <div key={`${feat.name}-${index}`} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
                                     <Checkbox 
-                                        id={`lib-feat-${feat.name}`}
+                                        id={`lib-feat-${feat.name}-${index}`}
                                         checked={!!selectedFeats[feat.name]?.isSelected}
                                         onCheckedChange={(checked) => handleSelectFeat(feat, !!checked)}
                                     />
-                                    <label htmlFor={`lib-feat-${feat.name}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
+                                    <label htmlFor={`lib-feat-${feat.name}-${index}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
                                         <div className="flex justify-between">
                                           <span>{feat.name}</span>
                                           <span className="text-xs text-muted-foreground">{feat.prerequisites}</span>

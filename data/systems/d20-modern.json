@@ -136,8 +136,14 @@
     {
       "name": "Power Attack",
       "description": "Trade accuracy for damage",
-      "prerequisites": "Strength 13",
+      "prerequisites": "",
       "effect": "-5 Hit, +5 Dmg"
+    },
+    {
+      "name": "Acrobatic mastery",
+      "description": "You gain a +5 bonus on Acrobatics checks.",
+      "prerequisites": "",
+      "effect": "+5 Acrobatics"
     }
   ],
   "saves": [
