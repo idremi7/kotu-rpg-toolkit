@@ -145,8 +145,8 @@ const NumberFieldRenderer = ({ control, name, label }: any) => (
     name={name}
     render={({ field }) => (
       <FormItem>
-        <div className="flex items-center justify-start gap-4">
-          <FormLabel>{label}</FormLabel>
+        <div className="flex items-center gap-4">
+          <FormLabel className="w-32 flex-none">{label}</FormLabel>
           <FormControl>
             <Input
               type="number"
@@ -280,7 +280,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         let charData = JSON.parse(JSON.stringify(initialCharacter.data));
 
         // Retro-compatibility for vitals
-        if (charData.hp !== undefined && charData.maxHp !== undefined && !charData.vitals) {
+        if (charData.hp !== undefined && !charData.vitals) {
             charData.vitals = { hp: charData.hp, maxHp: charData.maxHp };
         }
 
