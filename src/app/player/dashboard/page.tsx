@@ -14,12 +14,14 @@ export default async function PlayerDashboard() {
             <h1 className="font-headline text-4xl font-bold">Player Dashboard</h1>
             <p className="text-muted-foreground mt-1">Manage your heroes and embark on new adventures.</p>
         </div>
+        {characters.length > 0 && (
          <Button asChild size="lg">
           <Link href="/player/characters/create">
             <PlusCircle className="mr-2 h-5 w-5" />
             Create New Character
           </Link>
         </Button>
+        )}
       </div>
       
       {characters.length > 0 ? (
