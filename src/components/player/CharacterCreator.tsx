@@ -91,12 +91,12 @@ const CustomFeatWidget = ({ control, name, options }: { control: any; name: stri
       </datalist>
       <div className="space-y-2">
         {fields.map((field, index) => (
-          <div key={field.id} className="flex gap-2 items-end">
+          <div key={field.id} className="flex flex-col sm:flex-row gap-2 items-start sm:items-end">
             <FormField
               control={control}
               name={`${name}.${index}.name`}
               render={({ field }) => (
-                <FormItem className="flex-1">
+                <FormItem className="flex-1 w-full">
                   <FormLabel>Feat Name</FormLabel>
                   <FormControl>
                     <Input
@@ -113,7 +113,7 @@ const CustomFeatWidget = ({ control, name, options }: { control: any; name: stri
               control={control}
               name={`${name}.${index}.effect`}
               render={({ field }) => (
-                <FormItem className="flex-1">
+                <FormItem className="flex-1 w-full">
                     <FormLabel>Effect</FormLabel>
                     <FormControl>
                         <Input
@@ -139,7 +139,7 @@ const CustomFeatWidget = ({ control, name, options }: { control: any; name: stri
   );
 };
 
-const NumberFieldRenderer = ({ control, name, label, widget }: any) => (
+const NumberFieldRenderer = ({ control, name, label }: any) => (
   <FormField
     control={control}
     name={name}
@@ -149,7 +149,7 @@ const NumberFieldRenderer = ({ control, name, label, widget }: any) => (
           <FormLabel>{label}</FormLabel>
           <FormControl>
             <Input
-              type={widget}
+              type="number"
               className="w-24"
               {...field}
               value={field.value ?? 0}
@@ -164,7 +164,7 @@ const NumberFieldRenderer = ({ control, name, label, widget }: any) => (
 );
 
 
-const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, system }: any) => {
+const FormFieldRenderer = ({ control, name, fieldConfig, system }: any) => {
   const { 'ui:widget': widget, 'ui:label': label } = fieldConfig;
 
   switch (widget) {
@@ -263,7 +263,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         // Ensure feats is an array of objects
         if (charData.feats && Array.isArray(charData.feats)) {
             charData.feats = charData.feats.map((feat: any) => 
-                typeof feat === 'string' ? { name: feat, effect: '' } : feat
+                typeof feat === 'string' ? { name: feat, effect: '' } : (feat || { name: '', effect: ''})
             );
         } else {
             charData.feats = [];
@@ -327,13 +327,12 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   }
 
   const uiSchema = JSON.parse(system.schemas.uiSchema);
-  const allFieldNames = Object.keys(uiSchema).filter(key => !key.startsWith('ui:'));
 
-  const renderField = (fieldName: string) => {
+  const renderSection = (fieldName: string) => {
     const fieldConfig = uiSchema[fieldName];
     if (!fieldConfig) return null;
 
-    // Render fieldsets
+    // Render fieldsets (Attributes, Saves)
     if (fieldConfig['ui:fieldset']) {
       return (
         <Card key={fieldName}>
@@ -345,7 +344,6 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
                 control={form.control}
                 name={`${fieldName}.${subFieldName}`}
                 label={subFieldConfig['ui:label']}
-                widget={subFieldConfig['ui:widget']}
               />
             ))}
           </CardContent>
@@ -353,63 +351,63 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
       );
     }
 
-    // Render single fields inside a Card for grouping
-    const fieldContent = (
-      <FormFieldRenderer
-        control={form.control}
-        name={fieldName}
-        fieldConfig={fieldConfig}
-        system={system}
-      />
-    );
-
-    if (fieldContent) {
-      return (
-        <Card key={fieldName}>
-          <CardHeader>
-            <CardTitle>{fieldConfig['ui:label'] || fieldName}</CardTitle>
-          </CardHeader>
-          <CardContent>{fieldContent}</CardContent>
-        </Card>
-      );
-    }
-    
-    return null;
-  };
-
-  const renderGroupedFields = (group: any) => {
+    // Render custom widgets (Skills, Feats) and others
     return (
-      <Card key={group.title}>
-        <CardHeader><CardTitle>{group.title}</CardTitle></CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {group.fields.map((fieldName: string) => {
-            const fieldConfig = uiSchema[fieldName];
-            return fieldConfig ? (
-              <FormFieldRenderer
-                key={fieldName}
+      <Card key={fieldName}>
+        <CardHeader>
+          <CardTitle>{fieldConfig['ui:label'] || fieldName}</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <FormFieldRenderer
                 control={form.control}
                 name={fieldName}
                 fieldConfig={fieldConfig}
                 system={system}
-              />
-            ) : null;
-          })}
+            />
         </CardContent>
       </Card>
     );
   };
-  
-  const mainGroups = uiSchema['ui:groups'] || [];
-  const groupedFieldNames = mainGroups.flatMap((g: any) => g.fields);
-  const ungroupedFieldNames = allFieldNames.filter(name => !groupedFieldNames.includes(name));
 
+  const basicInfoFields = ['name', 'class', 'level'];
+  const vitalsFields = ['hp', 'maxHp'];
+  const mainSections = ['attributes', 'saves', 'skills', 'feats', 'backstory'];
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-4xl mx-auto">
         
-        {mainGroups.map(renderGroupedFields)}
+        <Card>
+            <CardHeader><CardTitle>Character Details</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {basicInfoFields.map(fieldName => uiSchema[fieldName] && (
+                    <FormFieldRenderer
+                        key={fieldName}
+                        control={form.control}
+                        name={fieldName}
+                        fieldConfig={uiSchema[fieldName]}
+                        system={system}
+                    />
+                ))}
+            </CardContent>
+        </Card>
 
-        {ungroupedFieldNames.map(renderField)}
+        <Card>
+            <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {vitalsFields.map(fieldName => uiSchema[fieldName] && (
+                    <FormFieldRenderer
+                        key={fieldName}
+                        control={form.control}
+                        name={fieldName}
+                        fieldConfig={uiSchema[fieldName]}
+                        system={system}
+                    />
+                ))}
+            </CardContent>
+        </Card>
+
+        {mainSections.map(fieldName => renderSection(fieldName))}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
           {isSaving ? (
