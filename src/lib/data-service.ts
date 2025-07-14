@@ -1,10 +1,17 @@
 // This file should only be used on the server.
 import 'server-only';
 import { db } from './firebase-admin';
-import dnd35 from '@/data/systems/dnd-3-5.json';
-import customHome from '@/data/systems/custom-home-ttrpg.json';
+import path from 'path';
+import fs from 'fs/promises';
 
-// =========== Systems API ===========
+// Define the structure for a "feat" (don)
+export interface Feat {
+    name: string;
+    description: string;
+    prerequisites: string;
+    effect?: string; // Flexible effect as a string
+    value?: number; // Legacy numeric value, for migration
+}
 
 export interface GameSystem {
     systemId: string;
@@ -12,64 +19,148 @@ export interface GameSystem {
     description: string;
     attributes: { name: string; description: string }[];
     skills: { name: string; baseAttribute: string }[];
-    feats: { name: string; description: string; prerequisites: string }[];
+    feats: Feat[];
     saves: { name: string; baseAttribute: string }[];
     schemas: { formSchema: string; uiSchema: string };
 }
 
-let defaultSystemsSeeded = false;
+async function initializeDataDirs() {
+    try {
+        const tempDir = path.join(process.cwd(), '.tmp');
+        const dataDir = path.join(tempDir, 'data');
+        const systemsDir = path.join(dataDir, 'systems');
+        const charactersDir = path.join(dataDir, 'characters');
 
-async function seedDefaultSystems() {
-    if (defaultSystemsSeeded) return;
+        await fs.mkdir(systemsDir, { recursive: true });
+        await fs.mkdir(charactersDir, { recursive: true });
 
-    const systemsCollection = db.collection('systems');
-    const snapshot = await systemsCollection.limit(2).get();
-
-    if (snapshot.empty) {
-        console.log("Seeding default systems into Firestore...");
-        const batch = db.batch();
-
-        const dndRef = systemsCollection.doc(dnd35.systemId);
-        batch.set(dndRef, dnd35);
-        
-        const customHomeRef = systemsCollection.doc(customHome.systemId);
-        batch.set(customHomeRef, customHome);
-        
-        await batch.commit();
-        console.log("Default systems seeded.");
+        // This will always copy the default systems into the temp directory, overwriting any existing files.
+        // This ensures that any updates to the default systems are always reflected.
+        const defaultSystemsDir = path.join(process.cwd(), 'data', 'systems');
+        const defaultFiles = await fs.readdir(defaultSystemsDir);
+        for (const file of defaultFiles) {
+            const sourcePath = path.join(defaultSystemsDir, file);
+            const destPath = path.join(systemsDir, file);
+            await fs.copyFile(sourcePath, destPath);
+        }
+    } catch (error) {
+        console.error("Failed to initialize data directories:", error);
     }
-    defaultSystemsSeeded = true;
+}
+
+// Ensure data directories are ready before any database operation
+const dataReady = initializeDataDirs();
+
+
+// =========== Systems API ===========
+
+function migrateSystem(system: GameSystem): GameSystem {
+    let wasMigrated = false;
+    const newSystem = JSON.parse(JSON.stringify(system));
+
+    // Migration 1: Feats value -> effect
+    newSystem.feats = newSystem.feats.map((feat: Feat) => {
+        if (feat.value !== undefined && feat.effect === undefined) {
+            feat.effect = feat.value >= 0 ? `+${feat.value}` : `${feat.value}`;
+            if (feat.value === 0) feat.effect = '';
+            delete feat.value;
+            wasMigrated = true;
+        }
+        return feat;
+    });
+
+    let formSchema = JSON.parse(newSystem.schemas.formSchema);
+    let uiSchema = JSON.parse(newSystem.schemas.uiSchema);
+
+    // Migration 2: Saves from string array to object
+    if (formSchema.properties.saves?.type === 'array') {
+        formSchema.properties.saves = { type: 'object', properties: {} };
+        uiSchema.saves = { 'ui:fieldset': true, 'ui:label': 'Saves', fields: {} };
+        
+        system.saves.forEach(save => {
+            formSchema.properties.saves.properties[save.name] = { type: 'number', default: 0 };
+            uiSchema.saves.fields[save.name] = { 'ui:widget': 'number', 'ui:label': save.name };
+        });
+        wasMigrated = true;
+    }
+
+    // Migration 3: Skills from string array to object array
+    if (formSchema.properties.skills?.items?.type === 'string') {
+        formSchema.properties.skills = {
+            type: 'array',
+            default: [],
+            items: {
+                type: 'object',
+                properties: {
+                    name: { type: 'string' },
+                    value: { type: 'number', default: 0 }
+                }
+            }
+        };
+        uiSchema.skills = { 'ui:widget': 'custom', 'ui:label': 'Skills' };
+        wasMigrated = true;
+    }
+    
+    if (wasMigrated) {
+        newSystem.schemas.formSchema = JSON.stringify(formSchema, null, 2);
+        newSystem.schemas.uiSchema = JSON.stringify(uiSchema, null, 2);
+    }
+    
+    return newSystem;
 }
 
 
+async function getFilePath(collection: string, id: string) {
+    await dataReady;
+    return path.join(process.cwd(), '.tmp', 'data', collection, `${id}.json`);
+}
+
 export async function saveSystem(systemData: GameSystem): Promise<void> {
-    const systemsCollection = db.collection('systems');
-    await systemsCollection.doc(systemData.systemId).set(systemData);
+    const filePath = await getFilePath('systems', systemData.systemId);
+    await fs.writeFile(filePath, JSON.stringify(systemData, null, 2), 'utf-8');
 }
 
 export async function getSystem(systemId: string): Promise<GameSystem | null> {
-    await seedDefaultSystems();
-    const doc = await db.collection('systems').doc(systemId).get();
-    if (!doc.exists) {
+    const filePath = await getFilePath('systems', systemId);
+    try {
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        const system = JSON.parse(fileContent) as GameSystem;
+        return migrateSystem(system);
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            return null; // File not found
+        }
+        console.error(`Failed to read system ${systemId}:`, error);
         return null;
     }
-    return doc.data() as GameSystem;
 }
 
 export async function listSystems(): Promise<{ id: string; name: string; description: string }[]> {
-    await seedDefaultSystems();
-    const snapshot = await db.collection('systems').get();
-    if (snapshot.empty) {
+    await dataReady;
+    const systemsDir = path.join(process.cwd(), '.tmp', 'data', 'systems');
+    try {
+        const files = await fs.readdir(systemsDir);
+        const systems = await Promise.all(
+            files.map(async (file) => {
+                if (file.endsWith('.json')) {
+                    const systemId = file.replace('.json', '');
+                    const system = await getSystem(systemId);
+                    if (system) {
+                        return {
+                            id: system.systemId,
+                            name: system.systemName,
+                            description: system.description,
+                        };
+                    }
+                }
+                return null;
+            })
+        );
+        return systems.filter((s): s is { id: string; name: string; description: string } => s !== null);
+    } catch (error) {
+        console.error('Failed to list systems:', error);
         return [];
     }
-    return snapshot.docs.map(doc => {
-        const data = doc.data() as GameSystem;
-        return {
-            id: data.systemId,
-            name: data.systemName,
-            description: data.description,
-        };
-    });
 }
 
 
@@ -82,21 +173,41 @@ export interface Character {
 }
 
 export async function saveCharacter(characterData: Character): Promise<void> {
-    await db.collection('characters').doc(characterData.characterId).set(characterData);
+    const filePath = await getFilePath('characters', characterData.characterId);
+    await fs.writeFile(filePath, JSON.stringify(characterData, null, 2), 'utf-8');
 }
 
 export async function getCharacter(characterId: string): Promise<Character | null> {
-    const doc = await db.collection('characters').doc(characterId).get();
-    if (!doc.exists) {
+    const filePath = await getFilePath('characters', characterId);
+    try {
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(fileContent) as Character;
+    } catch (error) {
+       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            return null;
+        }
+        console.error(`Failed to read character ${characterId}:`, error);
         return null;
     }
-    return doc.data() as Character;
 }
 
 export async function listCharacters(): Promise<Character[]> {
-    const snapshot = await db.collection('characters').get();
-    if (snapshot.empty) {
+    await dataReady;
+    const charactersDir = path.join(process.cwd(), '.tmp', 'data', 'characters');
+     try {
+        const files = await fs.readdir(charactersDir);
+        const characters = await Promise.all(
+            files.map(async (file) => {
+                if (file.endsWith('.json')) {
+                    const charId = file.replace('.json', '');
+                    return await getCharacter(charId);
+                }
+                return null;
+            })
+        );
+        return characters.filter((c): c is Character => c !== null);
+    } catch (error) {
+        console.error('Failed to list characters:', error);
         return [];
     }
-    return snapshot.docs.map(doc => doc.data() as Character);
 }

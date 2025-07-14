@@ -8,10 +8,11 @@ import {
   getCharacter as getCharacterFromDb,
   listCharacters as listCharactersFromDb,
 } from '@/lib/data-service';
-import type { GameSystem } from '@/lib/data-service';
+import type { GameSystem, Feat } from '@/lib/data-service';
 import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
 import type { SuggestSkillsInput } from '@/ai/flows/suggest-skills-flow';
 import { db } from '@/lib/firebase-admin';
+
 
 export async function saveSystemAction(
   systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'>
@@ -26,9 +27,22 @@ export async function saveSystemAction(
       type: 'object',
       properties: {},
     },
-    saves: { type: 'array', items: { type: 'string' } },
-    skills: { type: 'array', items: { type: 'string' } },
-    feats: { type: 'array', items: { type: 'string' } },
+    saves: { 
+        type: 'object',
+        properties: {},
+    },
+    skills: { 
+      type: 'array', 
+      default: [],
+      items: {
+        type: 'object',
+        properties: {
+            name: { type: 'string' },
+            value: { type: 'number', default: 0 }
+        }
+      }
+    },
+    feats: { type: 'array', items: { type: 'string' }, default: [] },
     backstory: { type: 'string', widget: 'textarea', default: '' },
   };
 
@@ -41,8 +55,12 @@ export async function saveSystemAction(
       'ui:label': 'Attributes',
       fields: {},
     },
-    saves: { 'ui:widget': 'checkboxes', 'ui:label': 'Saves' },
-    skills: { 'ui:widget': 'checkboxes', 'ui:label': 'Skills' },
+    saves: { 
+      'ui:fieldset': true,
+      'ui:label': 'Saves',
+      fields: {},
+    },
+    skills: { 'ui:widget': 'custom', 'ui:label': 'Skills' },
     feats: { 'ui:widget': 'checkboxes', 'ui:label': 'Feats' },
     backstory: { 'ui:widget': 'textarea', 'ui:label': 'Backstory' },
   };
@@ -55,6 +73,17 @@ export async function saveSystemAction(
     uiSchema.attributes.fields[attr.name] = {
       'ui:widget': 'number',
       'ui:label': attr.name,
+    };
+  });
+  
+  systemData.saves.forEach((save) => {
+    formSchemaProperties.saves.properties[save.name] = {
+        type: 'number',
+        default: 0,
+    };
+    uiSchema.saves.fields[save.name] = {
+        'ui:widget': 'number',
+        'ui:label': save.name,
     };
   });
 
@@ -96,9 +125,7 @@ export async function listSystemsAction() {
 }
 
 export async function saveCharacterAction(systemId: string, characterData: any) {
-  // Generate a new document reference with a unique ID
-  const characterRef = db.collection('characters').doc();
-  const characterId = characterRef.id;
+  const characterId = db.collection('characters').doc().id;
 
   const character = {
     characterId,
@@ -107,7 +134,6 @@ export async function saveCharacterAction(systemId: string, characterData: any) 
   };
 
   try {
-    // Use the generated ID to save the document
     await saveCharacter(character);
     return { success: true, characterId };
   } catch (error) {

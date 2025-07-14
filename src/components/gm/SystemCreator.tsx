@@ -21,10 +21,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { getTranslations, createT } from '@/lib/i18n';
 import { useMounted } from '@/hooks/use-mounted';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
-const featSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string(), prerequisites: z.string() });
+const featSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string(), prerequisites: z.string(), effect: z.string().optional() });
 const saveSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
 
 const systemSchema = z.object({
@@ -61,7 +62,7 @@ export function SystemCreator() {
       systemName: '',
       attributes: [{ name: 'Strength', description: 'Physical power' }],
       skills: [{ name: 'Athletics', baseAttribute: 'Strength' }],
-      feats: [{ name: 'Power Attack', description: 'Trade accuracy for damage', prerequisites: 'Strength 13' }],
+      feats: [{ name: 'Power Attack', description: 'Trade accuracy for damage', prerequisites: 'Strength 13', effect: '-5 Hit, +5 Dmg' }],
       saves: [{ name: 'Fortitude', baseAttribute: 'Constitution' }],
     },
   });
@@ -86,6 +87,7 @@ export function SystemCreator() {
     name: 'saves',
   });
 
+  const watchedAttributes = form.watch('attributes');
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
@@ -239,9 +241,18 @@ export function SystemCreator() {
                     render={({ field }) => (
                       <FormItem className="flex-1">
                         <FormLabel>Base Attribute</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
+                         <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an attribute" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {watchedAttributes.map(attr => (
+                                <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -280,9 +291,18 @@ export function SystemCreator() {
                     render={({ field }) => (
                       <FormItem className="flex-1">
                         <FormLabel>Base Attribute</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an attribute" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {watchedAttributes.map(attr => (
+                                <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -317,12 +337,12 @@ export function SystemCreator() {
             </CardHeader>
             <CardContent className="space-y-4">
               {featFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
+                <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-end p-3 border rounded-md">
                   <FormField
                     control={form.control}
                     name={`feats.${index}.name`}
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem className="md:col-span-1">
                         <FormLabel>Name</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -335,7 +355,7 @@ export function SystemCreator() {
                     control={form.control}
                     name={`feats.${index}.description`}
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem className="md:col-span-1">
                         <FormLabel>Description</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -348,7 +368,7 @@ export function SystemCreator() {
                     control={form.control}
                     name={`feats.${index}.prerequisites`}
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem className="md:col-span-1">
                         <FormLabel>Prerequisites</FormLabel>
                         <FormControl>
                           <Input {...field} />
@@ -357,10 +377,25 @@ export function SystemCreator() {
                       </FormItem>
                     )}
                   />
-                  <Button type="button" variant="destructive" size="icon" onClick={() => removeFeat(index)}><Trash2 className="h-4 w-4" /></Button>
+                   <FormField
+                    control={form.control}
+                    name={`feats.${index}.effect`}
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-1">
+                        <FormLabel>Effect</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+2, -10%, etc." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="md:col-span-4 flex justify-end">
+                    <Button type="button" variant="destructive" size="icon" onClick={() => removeFeat(index)}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
+              <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: '', effect: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
             </CardContent>
           </Card>
           <Button type="submit" disabled={isSaving} className="w-full" size="lg">
