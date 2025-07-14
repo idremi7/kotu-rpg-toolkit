@@ -12,7 +12,7 @@ export default function SignupPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">Create an Account</CardTitle>
-          <CardDescription>Join V.E.R.S.A. to start your next adventure.</CardDescription>
+          <CardDescription>Join VERSA to start your next adventure.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid gap-2">

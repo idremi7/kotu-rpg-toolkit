@@ -22,7 +22,7 @@ export function Header() {
         <Link href="/" className="mr-8 flex items-center gap-2">
           <Logo className="h-8 w-8 text-primary" />
           <span className="font-headline text-xl font-bold hidden sm:inline-block">
-            V.E.R.S.A.
+            VERSA
           </span>
         </Link>
         

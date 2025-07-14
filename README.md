@@ -1,6 +1,6 @@
-# V.E.R.S.A.: RPG Toolkit
+# VERSA: RPG Toolkit
 
-V.E.R.S.A. (Versatile Encyclopedic RPG System Assistant) is a web-based application designed to empower both Game Masters (GMs) and players in the world of tabletop role-playing games (TTRPGs). It provides a flexible platform for creating custom game systems and managing characters within those systems.
+VERSA (Versatile Encyclopedic RPG System Assistant) is a web-based application designed to empower both Game Masters (GMs) and players in the world of tabletop role-playing games (TTRPGs). It provides a flexible platform for creating custom game systems and managing characters within those systems.
 
 ## Features
 

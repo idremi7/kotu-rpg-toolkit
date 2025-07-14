@@ -13,7 +13,7 @@ const alegreya = Alegreya({
 });
 
 export const metadata: Metadata = {
-  title: 'V.E.R.S.A.: RPG Toolkit',
+  title: 'VERSA: RPG Toolkit',
   description: 'Create and manage custom RPG systems and characters.',
 };
 
