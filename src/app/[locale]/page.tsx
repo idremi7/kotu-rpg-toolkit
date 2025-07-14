@@ -1,9 +1,9 @@
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Shield, Swords, Users, FileText, Wand2, UserPlus } from 'lucide-react';
+import { Users, FileText, UserPlus, Swords } from 'lucide-react';
 import Link from 'next/link';
 import { getTranslations, createT } from '@/lib/i18n';
-import Image from 'next/image';
 
 export default async function Home({ params: { locale } }: { params: { locale: 'en' | 'fr' } }) {
   const translations = await getTranslations(locale);
@@ -11,25 +11,19 @@ export default async function Home({ params: { locale } }: { params: { locale: '
 
   const steps = [
     {
-      icon: <Users className="w-10 h-10 mb-4 text-primary" />,
+      icon: <Users className="w-24 h-24 text-primary" />,
       title: t('home.howItWorks.gm.title'),
       description: t('home.howItWorks.gm.description'),
-      image: "https://placehold.co/1024x768.png",
-      aiHint: "fantasy map"
     },
     {
-      icon: <FileText className="w-10 h-10 mb-4 text-primary" />,
+      icon: <FileText className="w-24 h-24 text-primary" />,
       title: t('home.howItWorks.form.title'),
       description: t('home.howItWorks.form.description'),
-      image: "https://placehold.co/1024x768.png",
-      aiHint: "character sheet form"
     },
     {
-      icon: <UserPlus className="w-10 h-10 mb-4 text-primary" />,
+      icon: <UserPlus className="w-24 h-24 text-primary" />,
       title: t('home.howItWorks.player.title'),
       description: t('home.howItWorks.player.description'),
-      image: "https://placehold.co/1024x768.png",
-      aiHint: "dungeons dragons players"
     }
   ];
 
@@ -65,23 +59,16 @@ export default async function Home({ params: { locale } }: { params: { locale: '
               {steps.map((step, index) => (
                 <div key={index} className={`flex flex-col md:flex-row items-center gap-12 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
                     <div className="md:w-1/2 text-center md:text-left">
-                        <div className="flex justify-center md:justify-start">
-                            {step.icon}
+                        <div className="flex justify-center md:justify-start mb-4">
+                            {React.cloneElement(step.icon, { className: 'w-10 h-10 text-primary'})}
                         </div>
                         <h3 className="text-3xl font-bold font-headline mb-4">{step.title}</h3>
                         <p className="text-lg text-muted-foreground">{step.description}</p>
                     </div>
                     <div className="md:w-1/2">
-                        <Card className="overflow-hidden shadow-2xl">
+                        <Card className="shadow-xl bg-card/50 aspect-square flex items-center justify-center p-8">
                           <CardContent className="p-0">
-                            <Image 
-                              src={step.image} 
-                              alt={step.title}
-                              width={1024}
-                              height={768}
-                              data-ai-hint={step.aiHint}
-                              className="object-cover w-full h-full" 
-                            />
+                            {React.cloneElement(step.icon, { className: 'w-32 h-32 text-primary/80'})}
                           </CardContent>
                         </Card>
                     </div>
