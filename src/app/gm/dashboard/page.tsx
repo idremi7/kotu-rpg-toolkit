@@ -15,15 +15,17 @@ export default async function GMDashboard() {
           <h1 className="font-headline text-4xl font-bold">GM Dashboard</h1>
           <p className="text-muted-foreground mt-1">Manage your game systems and campaigns.</p>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
-            <ImportSystemButton className="flex-grow sm:flex-grow-0" />
-            <Button asChild size="lg" className="flex-grow sm:flex-grow-0">
-            <Link href="/gm/systems/create">
-                <PlusCircle className="mr-2 h-5 w-5" />
-                Create New System
-            </Link>
-            </Button>
-        </div>
+        {systems.length > 0 && (
+          <div className="flex gap-2 w-full sm:w-auto">
+              <ImportSystemButton className="flex-grow sm:flex-grow-0" />
+              <Button asChild size="lg" className="flex-grow sm:flex-grow-0">
+              <Link href="/gm/systems/create">
+                  <PlusCircle className="mr-2 h-5 w-5" />
+                  Create New System
+              </Link>
+              </Button>
+          </div>
+        )}
       </div>
       
       {systems.length > 0 ? (

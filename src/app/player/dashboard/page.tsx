@@ -15,15 +15,17 @@ export default async function PlayerDashboard() {
             <h1 className="font-headline text-4xl font-bold">Player Dashboard</h1>
             <p className="text-muted-foreground mt-1">Manage your heroes and embark on new adventures.</p>
         </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-            <ImportCharacterButton className="flex-grow sm:flex-grow-0" />
-            <Button asChild size="lg" className="flex-grow sm:flex-grow-0">
-                <Link href="/player/characters/create">
-                    <PlusCircle className="mr-2 h-5 w-5" />
-                    Create New Character
-                </Link>
-            </Button>
-        </div>
+        {characters.length > 0 && (
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+              <ImportCharacterButton className="flex-grow sm:flex-grow-0" />
+              <Button asChild size="lg" className="flex-grow sm:flex-grow-0">
+                  <Link href="/player/characters/create">
+                      <PlusCircle className="mr-2 h-5 w-5" />
+                      Create New Character
+                  </Link>
+              </Button>
+          </div>
+        )}
       </div>
       
       {characters.length > 0 ? (
