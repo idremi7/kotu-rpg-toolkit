@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, User } from "lucide-react";
@@ -16,9 +17,9 @@ export default async function PlayerDashboard() {
             <p className="text-muted-foreground mt-1">Manage your heroes and embark on new adventures.</p>
         </div>
         {characters.length > 0 && (
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-              <ImportCharacterButton className="flex-grow sm:flex-grow-0" />
-              <Button asChild size="lg" className="flex-grow sm:flex-grow-0">
+          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+              <ImportCharacterButton className="w-full sm:w-auto" />
+              <Button asChild size="lg" className="w-full sm:w-auto">
                   <Link href="/player/characters/create">
                       <PlusCircle className="mr-2 h-5 w-5" />
                       Create New Character
