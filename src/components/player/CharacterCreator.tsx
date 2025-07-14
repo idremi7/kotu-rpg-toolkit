@@ -79,6 +79,50 @@ const CustomSkillWidget = ({ control, name, options }: { control: any, name: str
   );
 };
 
+const CustomFeatWidget = ({ control, name, options }: { control: any; name: string; options: any[] }) => {
+  const { fields, append, remove } = useFieldArray({ control, name });
+  const datalistId = 'feat-suggestions';
+
+  return (
+    <div className="space-y-4">
+      <datalist id={datalistId}>
+        {options.map((opt: any) => (
+          <option key={opt.name} value={opt.name} />
+        ))}
+      </datalist>
+      <div className="grid grid-cols-1 gap-2">
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex gap-2 items-center">
+            <FormField
+              control={control}
+              name={`${name}.${index}`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
+                      placeholder="Type or select a feat"
+                      list={datalistId}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+      <Button type="button" variant="outline" onClick={() => append('')}>
+        <PlusCircle className="mr-2 h-4 w-4" />
+        Add Feat
+      </Button>
+    </div>
+  );
+};
+
 const NumberFieldRenderer = ({ control, name, label, widget }: any) => (
   <FormField
     control={control}
@@ -151,6 +195,9 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, sys
         />
       );
     case 'checkboxes':
+        if (name === 'feats') {
+            return <CustomFeatWidget control={control} name="feats" options={system.feats} />;
+        }
       return (
         <FormItem>
           <FormLabel>{label}</FormLabel>
@@ -218,7 +265,12 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   
   useEffect(() => {
     if (isEditMode && initialCharacter) {
-        form.reset(initialCharacter.data);
+        // When editing, transform feats back to simple strings if they are not already
+        const charData = { ...initialCharacter.data };
+        if (charData.feats && Array.isArray(charData.feats) && charData.feats.length > 0 && typeof charData.feats[0] === 'object') {
+             charData.feats = charData.feats.map((feat: any) => feat.name || '');
+        }
+        form.reset(charData);
     } else if (system) {
       const defaultValues: any = {};
       const formSchema = JSON.parse(system.schemas.formSchema);
@@ -250,11 +302,17 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   const onSubmit = async (data: any) => {
     setIsSaving(true);
     
+    // Ensure feats are saved as an array of strings, filtering out any empty ones
+    const processedData = {
+        ...data,
+        feats: Array.isArray(data.feats) ? data.feats.filter(feat => typeof feat === 'string' && feat.trim() !== '') : [],
+    };
+
     const characterToSave: Character = {
         characterId: isEditMode ? initialCharacter.characterId : `char_${Date.now()}`,
         systemId,
-        data,
-    }
+        data: processedData,
+    };
 
     const result = await saveCharacterAction(characterToSave);
     

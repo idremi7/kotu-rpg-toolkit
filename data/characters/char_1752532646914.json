@@ -2,38 +2,52 @@
   "characterId": "char_1752532646914",
   "systemId": "d100-modern-sci-fi-",
   "data": {
-    "name": "",
-    "class": "",
+    "name": "Armand forgeron",
+    "class": "Rodeur",
     "level": 1,
     "attributes": {
       "Force": 0,
-      "Dexterité": 0,
-      "Constitution": 0,
-      "Vitesse": 0,
-      "Intelligence": 0,
-      "Sagesse": 0,
+      "Dexterité": 2,
+      "Constitution": 1,
+      "Vitesse": 1,
+      "Intelligence": 2,
+      "Sagesse": 4,
       "Charisme": 0
     },
     "saves": {
       "Brute force": 0,
-      "Équilibre": 0,
-      "Vigueur": 0,
-      "Réflexe": 0,
-      "Intuition": 0,
-      "Volonté": 0,
+      "Équilibre": 2,
+      "Vigueur": 5,
+      "Réflexe": 5,
+      "Intuition": 3,
+      "Volonté": 5,
       "Magnetisme": 0
     },
     "skills": [
       {
-        "name": "Informatique",
-        "value": 15
+        "name": "Lancer du javelot",
+        "value": 1
       },
       {
-        "name": "Lancer du javelot",
-        "value": 8
+        "name": "Stealth",
+        "value": 3
+      },
+      {
+        "name": "Épée courte",
+        "value": 3
+      },
+      {
+        "name": "Esquive",
+        "value": 3
+      },
+      {
+        "name": "Course",
+        "value": 2
       }
     ],
-    "feats": [],
+    "feats": [
+      "Maîtrise de l'esquive"
+    ],
     "backstory": ""
   }
 }

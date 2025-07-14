@@ -115,16 +115,16 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
                 <h3 className="font-headline text-lg mb-2">Feats</h3>
                 <div className="space-y-2">
                 {(data.feats && data.feats.length > 0) ? data.feats.map((featName: string) => {
-                    const feat = getFeatDetails(featName);
-                    return feat ? (
-                        <div key={feat.name} className="flex items-baseline justify-between">
+                    const featDetails = getFeatDetails(featName);
+                    return (
+                        <div key={featName} className="flex items-baseline justify-between">
                             <div>
-                                <span className="font-semibold">{feat.name}</span>
-                                <p className="text-sm text-muted-foreground">{feat.description}</p>
+                                <span className="font-semibold">{featName}</span>
+                                {featDetails && <p className="text-sm text-muted-foreground">{featDetails.description}</p>}
                             </div>
-                           {feat.effect && <Badge variant="secondary">{feat.effect}</Badge>}
+                           {featDetails?.effect && <Badge variant="secondary">{featDetails.effect}</Badge>}
                         </div>
-                    ) : null;
+                    );
                 }) : <p className="text-sm text-muted-foreground">No feats selected.</p>}
                 </div>
             </div>
