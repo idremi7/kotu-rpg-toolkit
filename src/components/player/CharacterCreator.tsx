@@ -80,6 +80,30 @@ const CustomSkillWidget = ({ control, name, options }: { control: any, name: str
   );
 };
 
+const NumberFieldRenderer = ({ control, name, label, widget }: any) => (
+  <FormField
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <FormItem>
+        <div className="flex items-center justify-between">
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <Input
+              type={widget}
+              className="w-24"
+              {...field}
+              value={field.value ?? 0}
+              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+            />
+          </FormControl>
+        </div>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+);
+
 
 const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, system }: any) => {
   const { 'ui:widget': widget, 'ui:label': label } = fieldConfig;
@@ -278,16 +302,12 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
 
   return (
     <>
-      <div className="flex items-center gap-4 mb-8">
-        <BackButton />
-        <div className="text-center flex-grow">
-            <h1 className="font-headline text-4xl font-bold">Forge Your Hero</h1>
-            <p className="text-muted-foreground">
-            You are creating a character for the <span className="text-primary font-semibold">{systemName}</span>{' '}
-            system.
-            </p>
-        </div>
-        <div className="w-10"></div>
+      <div className="text-center mb-8">
+        <h1 className="font-headline text-4xl font-bold">Forge Your Hero</h1>
+        <p className="text-muted-foreground">
+        You are creating a character for the <span className="text-primary font-semibold">{systemName}</span>{' '}
+        system.
+        </p>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto">
@@ -301,12 +321,12 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(fieldConfig.fields).map(
                       ([subFieldName, subFieldConfig]: [string, any]) => (
-                        <FormFieldRenderer
+                        <NumberFieldRenderer
                           key={subFieldName}
                           control={form.control}
                           name={`${fieldName}.${subFieldName}`}
-                          fieldConfig={subFieldConfig}
-                          system={system}
+                          label={subFieldConfig['ui:label']}
+                          widget={subFieldConfig['ui:widget']}
                         />
                       )
                     )}
