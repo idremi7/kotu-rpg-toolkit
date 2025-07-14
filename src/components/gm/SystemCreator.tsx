@@ -100,8 +100,8 @@ const SkillLibraryBrowser = ({ onAddSkills, systemAttributes }: { onAddSkills: (
         
         onAddSkills(skillsToAdd);
         toast({
-            title: "Skills Added",
-            description: `${skillsToAdd.length} skills added from the library. Please assign a base attribute where needed.`
+            title: "Compétences ajoutées",
+            description: `${skillsToAdd.length} compétences ont été ajoutées depuis la bibliothèque. Veuillez leur assigner un attribut de base si nécessaire.`
         });
         setSelectedSkills({});
         setIsOpen(false);
