@@ -126,6 +126,10 @@
     {
       "name": "Concentration",
       "baseAttribute": "Constitution "
+    },
+    {
+      "name": "Athletics",
+      "baseAttribute": "Force"
     }
   ],
   "feats": [
