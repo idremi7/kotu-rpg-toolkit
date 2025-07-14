@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,6 +33,9 @@ export default function Home() {
         <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight">
           KOTU: RPG Toolkit
         </h1>
+        <p className="mt-6 text-2xl md:text-3xl text-foreground max-w-4xl mx-auto font-semibold">
+          The Universal Toolkit for Your Tabletop RPG Adventures.
+        </p>
         <p className="mt-4 text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto">
           Your digital companion for crafting and embarking on epic tabletop
           adventures. Create bespoke game systems as a Game Master, or bring
