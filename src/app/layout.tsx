@@ -4,7 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { AppLayout } from '@/components/AppLayout';
+import { Header } from '@/components/Header';
 
 const alegreya = Alegreya({
   subsets: ['latin'],
@@ -36,9 +36,10 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AppLayout>
+          <Header />
+          <main className="flex-grow">
             {children}
-          </AppLayout>
+          </main>
           <Toaster />
         </ThemeProvider>
       </body>
