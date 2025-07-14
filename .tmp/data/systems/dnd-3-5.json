@@ -89,22 +89,26 @@
     {
       "name": "Power Attack",
       "description": "Trade attack bonus for damage.",
-      "prerequisites": "Strength 13"
+      "prerequisites": "Strength 13",
+      "effect": "-5 Hit, +5 Dmg"
     },
     {
       "name": "Dodge",
       "description": "Gain a dodge bonus to AC against one target.",
-      "prerequisites": "Dexterity 13"
+      "prerequisites": "Dexterity 13",
+      "effect": "+1 AC"
     },
     {
       "name": "Iron Will",
       "description": "Gain a bonus on Will saving throws.",
-      "prerequisites": "None"
+      "prerequisites": "None",
+      "effect": "+2"
     },
     {
       "name": "Spell Focus",
       "description": "Increase the DC for saving throws against your spells of a chosen school.",
-      "prerequisites": "None"
+      "prerequisites": "None",
+      "effect": "+1 DC"
     }
   ],
   "schemas": {
