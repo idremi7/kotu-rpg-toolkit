@@ -15,16 +15,19 @@ export default async function PlayerDashboard({ params: { locale } }: { params: 
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="text-center mb-8">
         <h1 className="font-headline text-4xl font-bold">{t('playerDashboard.title')}</h1>
-        <Button asChild>
+        <p className="text-muted-foreground mt-2">{t('playerDashboard.description')}</p>
+      </div>
+
+      <div className="flex justify-center mb-8">
+         <Button asChild size="lg">
           <Link href="/player/characters/create">
-            <PlusCircle className="mr-2 h-4 w-4" />
+            <PlusCircle className="mr-2 h-5 w-5" />
             {t('playerDashboard.newCharacterButton')}
           </Link>
         </Button>
       </div>
-      <p className="text-muted-foreground mb-8">{t('playerDashboard.description')}</p>
       
       {mockCharacters.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -47,7 +50,7 @@ export default async function PlayerDashboard({ params: { locale } }: { params: 
           ))}
         </div>
       ) : (
-         <div className="text-center py-16 border-2 border-dashed rounded-lg">
+         <div className="text-center py-16 border-2 border-dashed rounded-lg mt-12">
           <h2 className="text-2xl font-semibold mb-2">{t('playerDashboard.noCharactersTitle')}</h2>
           <p className="text-muted-foreground mb-4">{t('playerDashboard.noCharactersDescription')}</p>
           <Button asChild size="lg">
