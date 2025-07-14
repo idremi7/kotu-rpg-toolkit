@@ -4,17 +4,17 @@
 
 @layer base {
   :root {
-    --background: 60 56% 95%; /* #F5F5DC light beige */
+    --background: 60 33% 98%; /* Lighter beige for card-like background */
     --foreground: 24 15% 15%; /* Dark brown for text */
-    --card: 60 33% 98%;
+    --card: 0 0% 100%; /* White for cards to stand out */
     --card-foreground: 24 15% 15%;
-    --popover: 60 33% 98%;
+    --popover: 0 0% 100%;
     --popover-foreground: 24 15% 15%;
     --primary: 41 100% 50%; /* #FFB300 warm amber */
     --primary-foreground: 24 15% 10%;
     --secondary: 41 30% 85%;
     --secondary-foreground: 24 15% 10%;
-    --muted: 60 20% 90%;
+    --muted: 60 20% 92%; /* Slightly darker muted color */
     --muted-foreground: 24 15% 40%;
     --accent: 16 100% 63%; /* #FF7043 burnt orange */
     --accent-foreground: 0 0% 100%;
