@@ -35,6 +35,9 @@ export function ThemeToggle() {
         <DropdownMenuItem onClick={() => setTheme('synthwave')}>
           Synthwave
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('gothic')}>
+          Gothic
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('system')}>
           System
         </DropdownMenuItem>
