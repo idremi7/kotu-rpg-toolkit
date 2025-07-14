@@ -24,8 +24,7 @@ This project is built with a modern, component-based architecture:
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
 - **Generative AI**: [Google Gemini](https://deepmind.google/technologies/gemini/) via [Genkit](https://firebase.google.com/docs/genkit)
-- **Internationalization (i18n)**: Built-in support for English and French.
-- **Deployment**: Configured for [Firebase App Hosting](https://firebase.google.com/docs/app-hosting).
+- **Data Storage**: Local JSON files (no database required).
 
 ## Getting Started
 
@@ -43,14 +42,18 @@ This will start the Next.js application, typically on `http://localhost:9002`.
 
 ### First-Time Git Setup (Important)
 
-If you get an error from GitHub about large files, you need to clean your Git cache. Run the following commands **once**:
+If you get an error from GitHub about large files, it means large files (like `node_modules` or `.firebase`) were accidentally committed in the past. You need to clean your Git history. Run the following commands **once**:
 
 1.  Make the setup script executable:
     ```bash
     chmod +x init.sh
     ```
-2.  Run the script:
+2.  Run the script to rewrite history:
     ```bash
     ./init.sh
     ```
-This will remove large, ignored files (like `node_modules`) from your Git history. You can now push your code to GitHub without issues.
+3.  Force push the cleaned history to GitHub:
+    ```bash
+    git push --force
+    ```
+This will permanently remove the large files from your Git history. You can now push your code to GitHub without issues.

@@ -1,25 +1,41 @@
 #!/bin/bash
-# This script cleans the Git cache to ensure that files and folders
-# listed in .gitignore are correctly ignored, even if they were
-# accidentally committed in the past.
+# This script cleans the Git history to completely remove large, unwanted
+# directories like `.firebase`, `.next`, and `node_modules`. This is necessary
+# when these files were accidentally committed in the past.
 
-# Run this script once from the root of your project.
+# --- WARNING ---
+# This script REWRITES your Git history.
+# This is a safe operation if you are the only one working on the repo,
+# but be cautious if you are collaborating with others.
 
-echo "Cleaning the Git cache..."
+echo "Starting deep clean of Git history..."
 
-# Remove all files from the Git cache
-git rm -r --cached .
+# Ensure we have the latest .gitignore rules applied
+git add .gitignore
+git commit -m "chore: Update .gitignore before history cleanup" --no-verify || echo "No changes to .gitignore."
 
-echo "Cache cleaned."
+# Step 1: Remove the large directories from all of your Git history.
+# This command goes through every commit and removes the specified folders.
+git filter-branch --force --index-filter \
+  "git rm -r --cached --ignore-unmatch .firebase .next node_modules" \
+  --prune-empty --tag-name-filter cat -- --all
 
-# Re-add all files, respecting the .gitignore rules
-git add .
+echo "History rewritten. Large directories have been removed."
 
-echo "Files re-indexed, respecting .gitignore."
+# Step 2: Clean up Git's internal references
+git for-each-ref --format='delete %(refname)' refs/original | git update-ref --stdin
+git reflog expire --expire=now --all
+git gc --prune=now
 
-# Create a new commit to save the cleanup
-git commit -m "chore: Clean git history and apply .gitignore"
-
-echo "Done. You can now 'git push' without the large files."
-echo "Remember to make this script executable with: chmod +x init.sh"
-echo "Then run it with: ./init.sh"
+echo "Git cleanup complete."
+echo ""
+echo "-------------------"
+echo "  NEXT STEPS (VERY IMPORTANT)"
+echo "-------------------"
+echo "1. The history of your local branch has been changed."
+echo "2. You MUST now 'force push' to update the remote repository on GitHub."
+echo ""
+echo "   Run this command now:"
+echo "   git push --force"
+echo ""
+echo "After this, your push issues will be resolved."
