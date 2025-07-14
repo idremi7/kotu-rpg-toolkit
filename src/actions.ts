@@ -1,3 +1,4 @@
+
 'use server';
 
 import {
@@ -26,7 +27,7 @@ const GameSystemSchemaForImport = z.object({
   skills: z.array(z.object({ name: z.string(), baseAttribute: z.string() })),
   feats: z.array(z.object({ name: z.string(), description: z.string(), prerequisites: z.string(), effect: z.string().optional() })),
   saves: z.array(z.object({ name: z.string(), baseAttribute: z.string() })),
-  schemas: z.object({ formSchema: z.string(), uiSchema: z.string() }),
+  schemas: z.object({ formSchema: z.string(), uiSchema: z.string() }).optional(),
 });
 
 const CharacterSchemaForImport = z.object({
@@ -35,23 +36,7 @@ const CharacterSchemaForImport = z.object({
   data: z.any(),
 });
 
-
-export async function saveSystemAction(
-  systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'> | GameSystem,
-  isImport: boolean = false
-) {
-  let fullSystemData: GameSystem;
-
-  if (isImport) {
-    const parseResult = GameSystemSchemaForImport.safeParse(systemData);
-    if (!parseResult.success) {
-      console.error('Invalid system data for import:', parseResult.error);
-      return { success: false, error: 'Invalid system file format.' };
-    }
-    fullSystemData = parseResult.data;
-  } else {
-    const creationData = systemData as Omit<GameSystem, 'systemId' | 'schemas' | 'description'>;
-    const systemId = creationData.systemName.toLowerCase().replace(/\s+/g, '-');
+function generateSchemas(system: Omit<GameSystem, 'schemas'> | GameSystem) {
     const formSchemaProperties: any = {
       name: { type: 'string', default: '' },
       class: { type: 'string', default: '' },
@@ -79,18 +64,46 @@ export async function saveSystemAction(
       feats: { 'ui:widget': 'checkboxes', 'ui:label': 'Feats' },
       backstory: { 'ui:widget': 'textarea', 'ui:label': 'Backstory' },
     };
-    creationData.attributes.forEach((attr) => {
+    system.attributes.forEach((attr) => {
       formSchemaProperties.attributes.properties[attr.name] = { type: 'number', default: 0 };
       uiSchema.attributes.fields[attr.name] = { 'ui:widget': 'number', 'ui:label': attr.name };
     });
-    creationData.saves.forEach((save) => {
+    system.saves.forEach((save) => {
       formSchemaProperties.saves.properties[save.name] = { type: 'number', default: 0 };
       uiSchema.saves.fields[save.name] = { 'ui:widget': 'number', 'ui:label': save.name };
     });
-    const schemas = {
+    return {
       formSchema: JSON.stringify({ type: 'object', properties: formSchemaProperties, required: ['name', 'class', 'level'] }, null, 2),
       uiSchema: JSON.stringify(uiSchema, null, 2),
     };
+}
+
+export async function saveSystemAction(
+  systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'> | GameSystem,
+  isImport: boolean = false
+) {
+  let fullSystemData: GameSystem;
+
+  if (isImport) {
+    const parseResult = GameSystemSchemaForImport.safeParse(systemData);
+    if (!parseResult.success) {
+      console.error('Invalid system data for import:', parseResult.error);
+      return { success: false, error: 'Invalid system file format.' };
+    }
+    const importedData = parseResult.data;
+    if (!importedData.schemas) {
+        const generatedSchemas = generateSchemas(importedData);
+        fullSystemData = {
+            ...importedData,
+            schemas: generatedSchemas
+        };
+    } else {
+        fullSystemData = importedData as GameSystem;
+    }
+  } else {
+    const creationData = systemData as Omit<GameSystem, 'systemId' | 'schemas' | 'description'>;
+    const systemId = creationData.systemName.toLowerCase().replace(/\s+/g, '-');
+    const schemas = generateSchemas(creationData);
     fullSystemData = {
       ...creationData,
       systemId,
