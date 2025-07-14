@@ -90,14 +90,15 @@ const CustomFeatWidget = ({ control, name, options }: { control: any; name: stri
           <option key={opt.name} value={opt.name} />
         ))}
       </datalist>
-      <div className="grid grid-cols-1 gap-2">
+      <div className="space-y-2">
         {fields.map((field, index) => (
-          <div key={field.id} className="flex gap-2 items-center">
+          <div key={field.id} className="flex gap-2 items-end">
             <FormField
               control={control}
-              name={`${name}.${index}`}
+              name={`${name}.${index}.name`}
               render={({ field }) => (
                 <FormItem className="flex-1">
+                  <FormLabel>Feat Name</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Type or select a feat"
@@ -109,13 +110,29 @@ const CustomFeatWidget = ({ control, name, options }: { control: any; name: stri
                 </FormItem>
               )}
             />
+             <FormField
+              control={control}
+              name={`${name}.${index}.effect`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                    <FormLabel>Effect</FormLabel>
+                    <FormControl>
+                        <Input
+                        placeholder="e.g., +2 damage, reroll save, etc."
+                        {...field}
+                        />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         ))}
       </div>
-      <Button type="button" variant="outline" onClick={() => append('')}>
+      <Button type="button" variant="outline" onClick={() => append({ name: '', effect: '' })}>
         <PlusCircle className="mr-2 h-4 w-4" />
         Add Feat
       </Button>
@@ -265,12 +282,19 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   
   useEffect(() => {
     if (isEditMode && initialCharacter) {
-        // When editing, transform feats back to simple strings if they are not already
-        const charData = { ...initialCharacter.data };
-        if (charData.feats && Array.isArray(charData.feats) && charData.feats.length > 0 && typeof charData.feats[0] === 'object') {
-             charData.feats = charData.feats.map((feat: any) => feat.name || '');
-        }
-        form.reset(charData);
+      const charData = { ...initialCharacter.data };
+
+      // Ensure feats are in object format {name, effect} for the form.
+      if (charData.feats && Array.isArray(charData.feats)) {
+          charData.feats = charData.feats.map((feat: any) => {
+              if (typeof feat === 'string') {
+                  return { name: feat, effect: '' };
+              }
+              return feat;
+          });
+      }
+      form.reset(charData);
+
     } else if (system) {
       const defaultValues: any = {};
       const formSchema = JSON.parse(system.schemas.formSchema);
@@ -302,10 +326,12 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   const onSubmit = async (data: any) => {
     setIsSaving(true);
     
-    // Ensure feats are saved as an array of strings, filtering out any empty ones
+    // Ensure feats are saved correctly, filtering out any empty ones
     const processedData = {
         ...data,
-        feats: Array.isArray(data.feats) ? data.feats.filter(feat => typeof feat === 'string' && feat.trim() !== '') : [],
+        feats: Array.isArray(data.feats) 
+            ? data.feats.filter(feat => typeof feat === 'object' && feat.name && feat.name.trim() !== '')
+            : [],
     };
 
     const characterToSave: Character = {

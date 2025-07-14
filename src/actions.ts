@@ -50,7 +50,14 @@ function generateSchemas(system: Omit<GameSystem, 'schemas'> | GameSystem) {
           properties: { name: { type: 'string' }, value: { type: 'number', default: 0 } }
         }
       },
-      feats: { type: 'array', items: { type: 'string' }, default: [] },
+      feats: { 
+        type: 'array', 
+        default: [],
+        items: {
+            type: 'object',
+            properties: { name: { type: 'string' }, effect: { type: 'string' } }
+        }
+      },
       backstory: { type: 'string', widget: 'textarea', default: '' },
     };
     const uiSchema: any = {

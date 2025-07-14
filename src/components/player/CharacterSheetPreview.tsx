@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "../ui/badge";
 import { Printer, Pencil } from 'lucide-react';
 import { BackButton } from "../BackButton";
-import type { Character, GameSystem } from "@/lib/data-service";
+import type { Character, GameSystem, Feat } from "@/lib/data-service";
 import { ExportCharacterButton } from "../ExportCharacterButton";
 import Link from "next/link";
 
@@ -31,7 +31,7 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
     window.print();
   };
 
-  const getFeatDetails = (featName: string) => {
+  const getFeatDetails = (featName: string): Feat | undefined => {
     return system.feats.find((f: any) => f.name === featName);
   };
 
@@ -112,21 +112,35 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
             <Separator />
 
             <div>
-                <h3 className="font-headline text-lg mb-2">Feats</h3>
-                <div className="space-y-2">
-                {(data.feats && data.feats.length > 0) ? data.feats.map((featName: string) => {
-                    const featDetails = getFeatDetails(featName);
+              <h3 className="font-headline text-lg mb-2">Feats</h3>
+              <div className="space-y-3">
+                {(data.feats && data.feats.length > 0) ? data.feats.map((feat: any, index: number) => {
+                  const featDetails = getFeatDetails(feat.name);
+                  if (featDetails) {
+                    // It's a feat from the system library
                     return (
-                        <div key={featName} className="flex items-baseline justify-between">
-                            <div>
-                                <span className="font-semibold">{featName}</span>
-                                {featDetails && <p className="text-sm text-muted-foreground">{featDetails.description}</p>}
-                            </div>
-                           {featDetails?.effect && <Badge variant="secondary">{featDetails.effect}</Badge>}
+                      <div key={`${feat.name}-${index}`}>
+                        <div className="flex items-baseline justify-between">
+                          <span className="font-semibold">{feat.name}</span>
+                          {featDetails.effect && <Badge variant="secondary">{featDetails.effect}</Badge>}
                         </div>
+                        <p className="text-sm text-muted-foreground">{featDetails.description}</p>
+                      </div>
                     );
+                  } else {
+                    // It's a custom feat entered by the player
+                    return (
+                      <div key={`${feat.name}-${index}`}>
+                        <div className="flex items-baseline justify-between">
+                            <span className="font-semibold">{feat.name}</span>
+                            {feat.effect && <Badge variant="secondary">{feat.effect}</Badge>}
+                        </div>
+                         {feat.effect && <p className="text-sm text-muted-foreground italic">Player-defined effect.</p>}
+                      </div>
+                    );
+                  }
                 }) : <p className="text-sm text-muted-foreground">No feats selected.</p>}
-                </div>
+              </div>
             </div>
 
 
