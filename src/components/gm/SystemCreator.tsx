@@ -211,7 +211,26 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       acc[baseAttribute].push({ ...skill, originalIndex: index });
       return acc;
     }, {} as Record<string, (typeof skillFields[0] & { originalIndex: number })[]>);
-  }, [skillFields, form]);
+  }, [skillFields, form.watch('skills')]);
+
+  const orderedSkillGroups = useMemo(() => {
+    const attributeOrder = validAttributes.map(attr => attr.name);
+    const orderedGroups = attributeOrder
+        .filter(attrName => groupedSkills[attrName])
+        .map(attrName => ({
+            attribute: attrName,
+            skills: groupedSkills[attrName],
+        }));
+
+    if (groupedSkills['Unassigned']) {
+        orderedGroups.push({
+            attribute: 'Unassigned',
+            skills: groupedSkills['Unassigned'],
+        });
+    }
+    return orderedGroups;
+  }, [groupedSkills, validAttributes]);
+
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
@@ -404,7 +423,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <Accordion type="multiple" className="w-full space-y-2">
-                {Object.entries(groupedSkills).map(([attribute, skills]) => (
+                {orderedSkillGroups.map(({ attribute, skills }) => (
                   <AccordionItem key={attribute} value={attribute} className="border rounded-md px-3">
                     <AccordionTrigger>
                       <div className="flex items-center gap-2">
