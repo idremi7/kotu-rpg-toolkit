@@ -1,0 +1,50 @@
+{
+  "characterId": "char_1752530425755",
+  "systemId": "d100-modern-sci-fi-",
+  "data": {
+    "name": "Testy",
+    "class": "Canard guerrier",
+    "level": 5,
+    "attributes": {
+      "Force": 10,
+      "Dexterité": 10,
+      "Constitution": 10,
+      "Vitesse": 10,
+      "Intelligence": 10,
+      "Sagesse": 10,
+      "Charisme": 10
+    },
+    "saves": {
+      "Brute force": 5,
+      "Équilibre": 5,
+      "Vigueur": 5,
+      "Réflexe": 5,
+      "Intuition": 5,
+      "Volonté": 5,
+      "Magnetisme": 5
+    },
+    "skills": [
+      {
+        "name": "Corps à corps ",
+        "value": 18
+      },
+      {
+        "name": "Athlétisme",
+        "value": 18
+      },
+      {
+        "name": "Esquive",
+        "value": 18
+      },
+      {
+        "name": "Informatique",
+        "value": 18
+      }
+    ],
+    "feats": [
+      "Maîtrise de l'esquive",
+      "Maîtrise de l'informatique"
+    ],
+    "backstory": "C'est un canard intelligent qui décide de devenir guerrier."
+  }
+}

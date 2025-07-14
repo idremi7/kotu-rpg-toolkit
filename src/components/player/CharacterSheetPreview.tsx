@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "../ui/badge";
-import { FileDown, Printer, User, ShieldCheck, Swords, BrainCircuit, Heart, Star } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import { BackButton } from "../BackButton";
 import type { Character, GameSystem } from "@/lib/data-service";
 import { ExportCharacterButton } from "../ExportCharacterButton";
@@ -25,6 +25,8 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
   if (!character || !system) return null;
 
   const { data } = character;
+  
+  const isD20System = system.systemId.includes('d20') || system.systemId.includes('dnd');
 
   const handlePrint = () => {
     window.print();
@@ -65,10 +67,10 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
                 <h3 className="font-headline text-lg mb-2">Attributes</h3>
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 text-center">
                     {data.attributes && Object.entries(data.attributes).map(([key, value]) => (
-                        <div key={key} className="bg-muted/50 rounded-md p-2">
+                        <div key={key} className="bg-muted/50 rounded-md p-2 flex flex-col justify-center">
                             <div className="text-xs uppercase text-muted-foreground">{key}</div>
-                            <div className="font-bold text-lg">{getModifier(value as number)}</div>
-                            <div className="text-sm text-foreground/80">{value as number}</div>
+                            <div className="font-bold text-lg">{isD20System ? getModifier(value as number) : (value as number)}</div>
+                            {isD20System && <div className="text-sm text-foreground/80">{value as number}</div>}
                         </div>
                     ))}
                 </div>
