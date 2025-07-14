@@ -241,7 +241,13 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   });
   
   useEffect(() => {
-    let defaultValues: any = {};
+    let defaultValues: any = {
+        name: '',
+        class: '',
+        level: 1,
+        vitals: { hp: 10, maxHp: 10 },
+        backstory: '',
+    };
     if (system?.schemas?.formSchema) {
       const formSchema = JSON.parse(system.schemas.formSchema);
       Object.keys(formSchema.properties).forEach((key) => {
@@ -260,7 +266,6 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     if (isEditMode && initialCharacter?.data) {
         let charData = JSON.parse(JSON.stringify(initialCharacter.data));
 
-        // Backward compatibility for feats
         if (charData.feats && Array.isArray(charData.feats)) {
             charData.feats = charData.feats.map((feat: any) => 
                 typeof feat === 'string' ? { name: feat, effect: '' } : (feat || { name: '', effect: ''})
@@ -272,9 +277,8 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
             charData.skills = [];
         }
 
-        // Backward compatibility for vitals
-        if (charData.hp !== undefined && charData.maxHp !== undefined && !charData.vitals) {
-            charData.vitals = { hp: charData.hp, maxHp: charData.maxHp };
+        if (charData.hp !== undefined && !charData.vitals) {
+            charData.vitals = { hp: charData.hp, maxHp: charData.maxHp ?? charData.hp };
             delete charData.hp;
             delete charData.maxHp;
         }
@@ -335,40 +339,17 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   const uiSchema = JSON.parse(system.schemas.uiSchema);
   const formSchema = JSON.parse(system.schemas.formSchema);
 
-  const renderFieldset = (fieldName: string, fieldConfig: any) => (
-    <Card key={fieldName}>
-      <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.entries(fieldConfig.fields).map(([subFieldName, subFieldConfig]: [string, any]) => (
-          <NumberFieldRenderer
-            key={subFieldName}
-            control={form.control}
-            name={`${fieldName}.${subFieldName}`}
-            label={subFieldConfig['ui:label']}
-          />
-        ))}
-      </CardContent>
-    </Card>
-  );
-
-  const renderRegularField = (fieldName: string, fieldConfig: any) => (
-      <Card key={fieldName}>
-        <CardHeader>
-          <CardTitle>{fieldConfig['ui:label'] || fieldName}</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <FormFieldRenderer
-                control={form.control}
-                name={fieldName}
-                fieldConfig={fieldConfig}
-                system={system}
-            />
-        </CardContent>
-      </Card>
-  );
-
-  const basicInfoFields = ['name', 'class', 'level'];
-  const allOtherFields = Object.keys(formSchema.properties).filter(f => !basicInfoFields.includes(f));
+  const fieldsets = Object.entries(uiSchema)
+    .filter(([, config]: [string, any]) => config['ui:fieldset'])
+    .map(([name, config]) => ({ name, config }));
+  
+  const topLevelFields = ['name', 'class', 'level'];
+  
+  const customWidgets = Object.entries(uiSchema)
+    .filter(([, config]: [string, any]) => config['ui:widget'] === 'custom')
+    .map(([name, config]) => ({ name, config }));
+    
+  const backstoryField = uiSchema.backstory ? { name: 'backstory', config: uiSchema.backstory } : null;
 
   return (
     <Form {...form}>
@@ -377,7 +358,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         <Card>
             <CardHeader><CardTitle>Character Details</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {basicInfoFields.map(fieldName => uiSchema[fieldName] && (
+                {topLevelFields.map(fieldName => uiSchema[fieldName] && (
                     <FormFieldRenderer
                         key={fieldName}
                         control={form.control}
@@ -389,15 +370,47 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
             </CardContent>
         </Card>
 
-        {allOtherFields.map(fieldName => {
-            const fieldConfig = uiSchema[fieldName];
-            if (!fieldConfig) return null;
+        <Card>
+            <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <NumberFieldRenderer control={form.control} name="vitals.hp" label="Current HP" />
+                <NumberFieldRenderer control={form.control} name="vitals.maxHp" label="Maximum HP" />
+            </CardContent>
+        </Card>
 
-            if (fieldConfig['ui:fieldset']) {
-                return renderFieldset(fieldName, fieldConfig);
-            }
-            return renderRegularField(fieldName, fieldConfig);
-        })}
+        {fieldsets.map(({ name, config }) => (
+          <Card key={name}>
+            <CardHeader><CardTitle>{config['ui:label']}</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.entries(config.fields).map(([subFieldName, subFieldConfig]: [string, any]) => (
+                <NumberFieldRenderer
+                  key={subFieldName}
+                  control={form.control}
+                  name={`${name}.${subFieldName}`}
+                  label={subFieldConfig['ui:label']}
+                />
+              ))}
+            </CardContent>
+          </Card>
+        ))}
+
+        {customWidgets.map(({ name, config }) => (
+            <Card key={name}>
+                <CardHeader><CardTitle>{config['ui:label']}</CardTitle></CardHeader>
+                <CardContent>
+                    <FormFieldRenderer control={form.control} name={name} fieldConfig={config} system={system} />
+                </CardContent>
+            </Card>
+        ))}
+
+        {backstoryField && (
+            <Card>
+                <CardHeader><CardTitle>{backstoryField.config['ui:label']}</CardTitle></CardHeader>
+                <CardContent>
+                    <FormFieldRenderer control={form.control} name={backstoryField.name} fieldConfig={backstoryField.config} system={system} />
+                </CardContent>
+            </Card>
+        )}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
           {isSaving ? (
