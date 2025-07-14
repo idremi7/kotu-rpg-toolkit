@@ -46,8 +46,7 @@ interface SystemCreatorProps {
     initialData?: GameSystem;
 }
 
-const SkillLibraryBrowser = ({ onAddSkills, systemAttributes }: { onAddSkills: (skills: {name: string, baseAttribute: string, category: string}[]) => void, systemAttributes: {name: string}[] }) => {
-    const [library, setLibrary] = useState<Record<string, SkillFromLibrary[]>>({});
+const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: string, baseAttribute: string, category: string}[]) => void }) => {
     const [selectedSkills, setSelectedSkills] = useState<Record<string, {isSelected: boolean, category: string}>>({});
     const [isOpen, setIsOpen] = useState(false);
     const { toast } = useToast();
@@ -58,36 +57,21 @@ const SkillLibraryBrowser = ({ onAddSkills, systemAttributes }: { onAddSkills: (
         if (isOpen && allSkills.length === 0) {
             listSkillsFromLibraryAction().then(skills => {
                 setAllSkills(skills);
-                const grouped = skills.reduce((acc, skill) => {
-                    const { category } = skill;
-                    if (!acc[category]) {
-                        acc[category] = [];
-                    }
-                    acc[category].push(skill);
-                    return acc;
-                }, {} as Record<string, SkillFromLibrary[]>);
-                setLibrary(grouped);
             });
         }
     }, [isOpen, allSkills]);
 
-    const filteredLibrary = useMemo(() => {
+    const filteredSkills = useMemo(() => {
         if (!searchQuery) {
-            return library;
+            return allSkills;
         }
         const lowercasedQuery = searchQuery.toLowerCase();
-        const filtered = Object.entries(library).reduce((acc, [category, skills]) => {
-            const filteredSkills = skills.filter(skill => 
-                skill.name.toLowerCase().includes(lowercasedQuery) || 
-                skill.description.toLowerCase().includes(lowercasedQuery)
-            );
-            if (filteredSkills.length > 0) {
-                acc[category] = filteredSkills;
-            }
-            return acc;
-        }, {} as Record<string, SkillFromLibrary[]>);
-        return filtered;
-    }, [searchQuery, library]);
+        return allSkills.filter(skill => 
+            skill.name.toLowerCase().includes(lowercasedQuery) || 
+            skill.description.toLowerCase().includes(lowercasedQuery) ||
+            skill.category.toLowerCase().includes(lowercasedQuery)
+        );
+    }, [searchQuery, allSkills]);
     
     const handleSelectSkill = (skillName: string, category: string, isSelected: boolean) => {
         setSelectedSkills(prev => ({...prev, [skillName]: { isSelected, category }}));
@@ -128,29 +112,23 @@ const SkillLibraryBrowser = ({ onAddSkills, systemAttributes }: { onAddSkills: (
                         className="mb-4"
                     />
                     <ScrollArea className="flex-grow pr-4">
-                        <Accordion type="multiple" className="w-full">
-                        {Object.entries(filteredLibrary).map(([category, skills]) => (
-                            <AccordionItem value={category} key={category}>
-                                <AccordionTrigger>{category}</AccordionTrigger>
-                                <AccordionContent>
-                                    <div className="space-y-2">
-                                        {skills.map(skill => (
-                                            <div key={skill.name} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
-                                                <Checkbox 
-                                                    id={skill.name} 
-                                                    checked={!!selectedSkills[skill.name]?.isSelected}
-                                                    onCheckedChange={(checked) => handleSelectSkill(skill.name, skill.category, !!checked)}
-                                                />
-                                                <label htmlFor={skill.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                    {skill.name}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                        ))}
-                        </Accordion>
+                       <div className="space-y-2">
+                            {filteredSkills.map(skill => (
+                                <div key={skill.name} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
+                                    <Checkbox 
+                                        id={`lib-${skill.name}`}
+                                        checked={!!selectedSkills[skill.name]?.isSelected}
+                                        onCheckedChange={(checked) => handleSelectSkill(skill.name, skill.category, !!checked)}
+                                    />
+                                    <label htmlFor={`lib-${skill.name}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
+                                        <div className="flex justify-between">
+                                          <span>{skill.name}</span>
+                                          <span className="text-xs text-muted-foreground">{skill.category}</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
                     </ScrollArea>
                     <div className="pt-4 border-t mt-auto">
                         <Button onClick={handleAdd} className="w-full" disabled={Object.values(selectedSkills).every(v => !v.isSelected)}>
@@ -456,7 +434,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               ))}
               <div className="flex gap-2">
                 <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
-                <SkillLibraryBrowser onAddSkills={handleAddSkillsFromLibrary} systemAttributes={validAttributes} />
+                <SkillLibraryBrowser onAddSkills={handleAddSkillsFromLibrary} />
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button type="button" variant="secondary" disabled={isSuggestingSkills}>
