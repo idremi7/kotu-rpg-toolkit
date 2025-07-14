@@ -19,7 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getTranslations, createT } from '@/lib/i18n';
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -38,15 +37,6 @@ const systemSchema = z.object({
 
 type SystemFormData = z.infer<typeof systemSchema>;
 
-// Mock translations for client-side component
-const t = (key: string) => {
-  const translations: { [key: string]: string } = {
-    'createSystem.suggestOneSkill': 'Suggest 1 Skill',
-    'createSystem.suggestTenSkills': 'Suggest 10 Skills',
-    'createSystem.suggestTwentySkills': 'Suggest 20 Skills'
-  };
-  return translations[key] || key;
-};
 
 export function SystemCreator() {
   const [isSaving, setIsSaving] = useState(false);
@@ -321,9 +311,9 @@ export function SystemCreator() {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => handleSuggestSkills(1)}>{t('createSystem.suggestOneSkill')}</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleSuggestSkills(10)}>{t('createSystem.suggestTenSkills')}</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleSuggestSkills(20)}>{t('createSystem.suggestTwentySkills')}</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSuggestSkills(1)}>Suggest 1 Skill</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSuggestSkills(10)}>Suggest 10 Skills</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSuggestSkills(20)}>Suggest 20 Skills</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
               </div>

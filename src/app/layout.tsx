@@ -3,7 +3,6 @@ import { Alegreya } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/Header';
-import { getTranslations } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 const alegreya = Alegreya({
@@ -19,29 +18,18 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-  params: { locale: 'en' | 'fr' };
-}>) {
-  const translations = await getTranslations(params.locale || 'en');
-  const headerTranslations = {
-    gmDashboard: translations.header.gmDashboard,
-    playerDashboard: translations.header.playerDashboard,
-    login: translations.header.login,
-    signUp: translations.header.signUp,
-    toggleLanguage: translations.header.toggleLanguage,
-  };
-
+}) {
   return (
-    <html lang={params.locale || 'en'} className="dark">
+    <html lang="en" className="dark">
       <body
         className={cn(
           'min-h-screen bg-background font-body antialiased flex flex-col',
           alegreya.variable
         )}
       >
-        <Header translations={headerTranslations} />
+        <Header />
         <main className="flex-grow">{children}</main>
         <Toaster />
       </body>

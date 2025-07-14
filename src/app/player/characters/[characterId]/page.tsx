@@ -2,7 +2,7 @@ import { getCharacterAction, getSystemAction } from "@/app/actions";
 import { CharacterSheetPreview } from "@/components/player/CharacterSheetPreview";
 import { notFound } from "next/navigation";
 
-export default async function CharacterSheetPage({ params }: { params: { characterId: string, locale: string }}) {
+export default async function CharacterSheetPage({ params }: { params: { characterId: string }}) {
   
   const character = await getCharacterAction(params.characterId);
   

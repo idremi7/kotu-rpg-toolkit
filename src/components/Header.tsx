@@ -5,39 +5,14 @@ import { Button } from './ui/button';
 import { Logo } from './Logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, LogIn, UserPlus, Languages } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
 
-type HeaderTranslations = {
-  gmDashboard: string;
-  playerDashboard: string;
-  login: string;
-  signUp: string;
-  toggleLanguage: string;
-};
-
-interface HeaderProps {
-  translations: HeaderTranslations;
-}
-
-export function Header({ translations }: HeaderProps) {
+export function Header() {
   const pathname = usePathname();
 
-  const changeLocale = (locale: 'en' | 'fr') => {
-    const segments = pathname.split('/');
-    segments[1] = locale;
-    const newPath = segments.join('/');
-    window.location.href = newPath;
-  };
-
   const navLinks = [
-    { href: '/gm/dashboard', label: translations.gmDashboard },
-    { href: '/player/dashboard', label: translations.playerDashboard },
+    { href: '/gm/dashboard', label: 'GM Dashboard' },
+    { href: '/player/dashboard', label: 'Player Dashboard' },
   ];
 
   return (
@@ -64,36 +39,19 @@ export function Header({ translations }: HeaderProps) {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end gap-2">
-           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Languages className="h-[1.2rem] w-[1.2rem]" />
-                <span className="sr-only">{translations.toggleLanguage}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => changeLocale('en')}>
-                English
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => changeLocale('fr')}>
-                Français
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
            <Button variant="ghost" size="sm" asChild className='md:hidden'>
              <Link href="/gm/dashboard"><LayoutDashboard/> <span className="sr-only">Dashboards</span></Link>
            </Button>
            <Button variant="outline" size="sm" asChild>
             <Link href="/login">
               <LogIn className="mr-2 h-4 w-4" />
-              {translations.login}
+              Login
             </Link>
           </Button>
           <Button size="sm" asChild>
             <Link href="/signup">
               <UserPlus className="mr-2 h-4 w-4" />
-              {translations.signUp}
+              Sign Up
             </Link>
           </Button>
         </div>

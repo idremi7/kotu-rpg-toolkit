@@ -1,10 +1,10 @@
 'use server';
 /**
- * @fileOverview Un agent IA qui suggère des compétences pour un système de jeu de rôle.
+ * @fileOverview An AI agent that suggests skills for a role-playing game system.
  *
- * - suggestSkills - Une fonction qui gère la suggestion de compétences.
- * - SuggestSkillsInput - Le type d'entrée pour la fonction suggestSkills.
- * - SuggestSkillsOutput - Le type de retour pour la fonction suggestSkills.
+ * - suggestSkills - A function that handles skill suggestion.
+ * - SuggestSkillsInput - The input type for the suggestSkills function.
+ * - SuggestSkillsOutput - The return type for the suggestSkills function.
  */
 
 import { ai } from '@/ai/genkit';
@@ -16,16 +16,16 @@ const AttributeSchema = z.object({
 });
 
 const SuggestSkillsInputSchema = z.object({
-  systemName: z.string().describe("Le nom du système de JDR pour lequel suggérer des compétences."),
-  attributes: z.array(AttributeSchema).describe("La liste des attributs du système de jeu."),
-  existingSkills: z.array(z.string()).optional().describe("Une liste de compétences déjà existantes à ne pas suggérer à nouveau."),
-  count: z.number().optional().default(10).describe("Le nombre de compétences à suggérer."),
+  systemName: z.string().describe("The name of the TTRPG system to suggest skills for."),
+  attributes: z.array(AttributeSchema).describe("The list of attributes in the game system."),
+  existingSkills: z.array(z.string()).optional().describe("A list of already existing skills not to be suggested again."),
+  count: z.number().optional().default(10).describe("The number of skills to suggest."),
 });
 export type SuggestSkillsInput = z.infer<typeof SuggestSkillsInputSchema>;
 
 const SkillSuggestionSchema = z.object({
-    name: z.string().describe("Le nom de la compétence suggérée."),
-    baseAttribute: z.string().describe("L'attribut de base pour cette compétence, doit être l'un des noms d'attributs fournis."),
+    name: z.string().describe("The name of the suggested skill."),
+    baseAttribute: z.string().describe("The base attribute for this skill, must be one of the provided attribute names."),
 });
 
 const SuggestSkillsOutputSchema = z.object({
@@ -42,24 +42,24 @@ const prompt = ai.definePrompt({
   name: 'suggestSkillsPrompt',
   input: { schema: SuggestSkillsInputSchema },
   output: { schema: SuggestSkillsOutputSchema },
-  prompt: `Vous êtes un concepteur de jeux de rôle expert avec des décennies d'expérience dans la création de systèmes de jeu de table (JDR).
-Votre tâche est de suggérer une liste de {{count}} compétences pour un nouveau système de JDR appelé "{{systemName}}".
+  prompt: `You are an expert RPG game designer with decades of experience creating tabletop role-playing game (TTRPG) systems.
+Your task is to suggest a list of {{count}} skills for a new TTRPG system called "{{systemName}}".
 
-Voici les attributs de base pour ce système :
+These are the core attributes for this system:
 {{#each attributes}}
 - {{name}}: {{description}}
 {{/each}}
 
 {{#if existingSkills}}
-Voici les compétences qui existent déjà. Veuillez ne pas suggérer de doublons ou de variations très similaires.
+These are skills that already exist. Please do not suggest duplicates or very similar variations.
 {{#each existingSkills}}
 - {{this}}
 {{/each}}
 {{/if}}
 
-Veuillez suggérer une liste de {{count}} nouvelles compétences qui seraient appropriées pour un système avec ces attributs. Inspirez-vous de systèmes populaires comme Dungeons & Dragons, Pathfinder, ou World of Darkness, mais assurez-vous que les compétences sont logiques dans le contexte des attributs fournis.
+Please suggest a list of {{count}} new skills that would be appropriate for a system with these attributes. Draw inspiration from popular systems like Dungeons & Dragons, Pathfinder, or World of Darkness, but ensure the skills are logical within the context of the provided attributes.
 
-Pour chaque compétence que vous suggérez, vous devez spécifier son "baseAttribute". Cet attribut de base DOIT correspondre EXACTEMENT à l'un des noms d'attributs fournis dans la liste ci-dessus. Ne créez pas de nouveaux attributs.
+For each skill you suggest, you must specify its "baseAttribute". This base attribute MUST be an EXACT match to one of the attribute names provided in the list above. Do not create new attributes.
 `,
 });
 

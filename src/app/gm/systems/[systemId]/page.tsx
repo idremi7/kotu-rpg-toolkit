@@ -1,4 +1,3 @@
-import { getTranslations, createT } from '@/lib/i18n';
 import { getSystemAction } from '@/app/actions';
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,10 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/BackButton';
 
-export default async function SystemDetailsPage({ params }: { params: { systemId: string, locale: string }}) {
-  const translations = await getTranslations(params.locale as 'en' | 'fr');
-  const t = createT(translations);
-
+export default async function SystemDetailsPage({ params }: { params: { systemId: string }}) {
   const system = await getSystemAction(params.systemId);
 
   if (!system) {
@@ -33,15 +29,15 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
       <div className="flex items-center mb-8 gap-4">
         <BackButton />
         <div className="text-center flex-grow">
-            <h1 className="font-headline text-4xl font-bold">{t('systemDetails.title')}</h1>
-            <p className="text-muted-foreground">{t('systemDetails.description').replace('{systemName}', systemName)}</p>
+            <h1 className="font-headline text-4xl font-bold">System Details</h1>
+            <p className="text-muted-foreground">Configuration for the {systemName} system.</p>
         </div>
         <div className="w-10"></div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
         <Card>
-            <CardHeader><CardTitle>{t('systemDetails.attributes')}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Attributes</CardTitle></CardHeader>
             <CardContent className="space-y-2">
                 {attributes.map((attr: any) => (
                     <div key={attr.name}>
@@ -53,7 +49,7 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
         </Card>
         
         <Card>
-            <CardHeader><CardTitle>{t('systemDetails.saves')}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Saves</CardTitle></CardHeader>
             <CardContent className="space-y-2">
                 {saves.map((save: any) => (
                     <div key={save.name}>
@@ -65,7 +61,7 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
         
         <Card className="lg:row-span-2 flex flex-col">
             <CardHeader>
-                <CardTitle>{t('systemDetails.skills')}</CardTitle>
+                <CardTitle>Skills</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow min-h-0">
                 <ScrollArea className="h-full">
@@ -90,7 +86,7 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
         </Card>
 
         <Card className="lg:col-span-2">
-            <CardHeader><CardTitle>{t('systemDetails.feats')}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
              <CardContent className="space-y-4">
                 {feats.map((feat: any) => (
                     <div key={feat.name}>
