@@ -19,7 +19,7 @@ export default async function CharacterSheetPage({ params }: { params: { charact
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <CharacterSheetPreview data={character.data} system={system} />
+      <CharacterSheetPreview character={character} system={system} />
     </div>
   );
 }

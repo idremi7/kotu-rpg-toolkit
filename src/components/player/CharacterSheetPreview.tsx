@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "../ui/badge";
-import { FileDown, User, ShieldCheck, Swords, BrainCircuit, Heart, Star } from 'lucide-react';
+import { FileDown, Printer, User, ShieldCheck, Swords, BrainCircuit, Heart, Star } from 'lucide-react';
 import { BackButton } from "../BackButton";
+import type { Character, GameSystem } from "@/lib/data-service";
+import { ExportCharacterButton } from "../ExportCharacterButton";
 
 interface CharacterSheetPreviewProps {
-  data: any;
-  system: any;
+  character: Character;
+  system: GameSystem;
 }
 
 const getModifier = (score: number) => {
@@ -18,8 +20,10 @@ const getModifier = (score: number) => {
   return mod >= 0 ? `+${mod}` : mod;
 };
 
-export function CharacterSheetPreview({ data, system }: CharacterSheetPreviewProps) {
-  if (!data || !system) return null;
+export function CharacterSheetPreview({ character, system }: CharacterSheetPreviewProps) {
+  if (!character || !system) return null;
+
+  const { data } = character;
 
   const handlePrint = () => {
     window.print();
@@ -33,10 +37,13 @@ export function CharacterSheetPreview({ data, system }: CharacterSheetPreviewPro
     <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-4 no-print">
             <BackButton />
-            <Button onClick={handlePrint} variant="outline" size="sm">
-                <FileDown className="mr-2 h-4 w-4" />
-                Export PDF
-            </Button>
+            <div className="flex items-center gap-2">
+              <ExportCharacterButton character={character} />
+              <Button onClick={handlePrint} variant="outline" size="sm">
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print
+              </Button>
+            </div>
         </div>
         <Card className="shadow-lg" id="character-sheet-preview">
         <CardHeader>
