@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import { Alegreya } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { Header } from '@/components/Header';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { AppLayout } from '@/components/AppLayout';
 
 const alegreya = Alegreya({
   subsets: ['latin'],
@@ -36,8 +36,9 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main className="flex-grow">{children}</main>
+          <AppLayout>
+            {children}
+          </AppLayout>
           <Toaster />
         </ThemeProvider>
       </body>
