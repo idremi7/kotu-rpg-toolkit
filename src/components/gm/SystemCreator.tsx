@@ -46,15 +46,17 @@ interface SystemCreatorProps {
     initialData?: GameSystem;
 }
 
-const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: string, baseAttribute: string}[]) => void }) => {
+const SkillLibraryBrowser = ({ onAddSkills, systemAttributes }: { onAddSkills: (skills: {name: string, baseAttribute: string}[]) => void, systemAttributes: {name: string}[] }) => {
     const [library, setLibrary] = useState<Record<string, SkillFromLibrary[]>>({});
-    const [selectedSkills, setSelectedSkills] = useState<Record<string, boolean>>({});
+    const [selectedSkills, setSelectedSkills] = useState<Record<string, {isSelected: boolean, category: string}>>({});
     const [isOpen, setIsOpen] = useState(false);
     const { toast } = useToast();
+    const [allSkills, setAllSkills] = useState<SkillFromLibrary[]>([]);
 
     useEffect(() => {
-        if (isOpen && Object.keys(library).length === 0) {
+        if (isOpen && allSkills.length === 0) {
             listSkillsFromLibraryAction().then(skills => {
+                setAllSkills(skills);
                 const grouped = skills.reduce((acc, skill) => {
                     const { category } = skill;
                     if (!acc[category]) {
@@ -66,21 +68,26 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
                 setLibrary(grouped);
             });
         }
-    }, [isOpen, library]);
+    }, [isOpen, allSkills]);
     
-    const handleSelectSkill = (skillName: string, isSelected: boolean) => {
-        setSelectedSkills(prev => ({...prev, [skillName]: isSelected}));
+    const handleSelectSkill = (skillName: string, category: string, isSelected: boolean) => {
+        setSelectedSkills(prev => ({...prev, [skillName]: { isSelected, category }}));
     }
 
     const handleAdd = () => {
+        const attributeNames = systemAttributes.map(attr => attr.name.toLowerCase());
+
         const skillsToAdd = Object.entries(selectedSkills)
-            .filter(([,isSelected]) => isSelected)
-            .map(([name]) => ({ name, baseAttribute: ''}));
+            .filter(([,val]) => val.isSelected)
+            .map(([name, { category }]) => {
+                const matchedAttribute = systemAttributes.find(attr => attr.name.toLowerCase() === category.toLowerCase());
+                return { name, baseAttribute: matchedAttribute?.name || '' };
+            });
         
         onAddSkills(skillsToAdd);
         toast({
             title: "Skills Added",
-            description: `${skillsToAdd.length} skills added from the library. Please assign a base attribute for each.`
+            description: `${skillsToAdd.length} skills added from the library. Please assign a base attribute where needed.`
         });
         setSelectedSkills({});
         setIsOpen(false);
@@ -110,8 +117,8 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
                                             <div key={skill.name} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
                                                 <Checkbox 
                                                     id={skill.name} 
-                                                    checked={!!selectedSkills[skill.name]}
-                                                    onCheckedChange={(checked) => handleSelectSkill(skill.name, !!checked)}
+                                                    checked={!!selectedSkills[skill.name]?.isSelected}
+                                                    onCheckedChange={(checked) => handleSelectSkill(skill.name, skill.category, !!checked)}
                                                 />
                                                 <label htmlFor={skill.name} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                                     {skill.name}
@@ -125,7 +132,7 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
                         </Accordion>
                     </ScrollArea>
                     <div className="pt-4 border-t mt-auto">
-                        <Button onClick={handleAdd} className="w-full" disabled={Object.values(selectedSkills).every(v => !v)}>
+                        <Button onClick={handleAdd} className="w-full" disabled={Object.values(selectedSkills).every(v => !v.isSelected)}>
                             Ajouter les compétences sélectionnées
                         </Button>
                     </div>
@@ -419,7 +426,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               ))}
               <div className="flex gap-2">
                 <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
-                <SkillLibraryBrowser onAddSkills={(skills) => appendSkill(skills)} />
+                <SkillLibraryBrowser onAddSkills={(skills) => appendSkill(skills)} systemAttributes={validAttributes} />
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button type="button" variant="secondary" disabled={isSuggestingSkills}>

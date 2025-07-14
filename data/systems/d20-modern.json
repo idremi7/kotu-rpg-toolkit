@@ -1,0 +1,163 @@
+{
+  "systemName": "D20 modern",
+  "attributes": [
+    {
+      "name": "Force",
+      "description": "Physical power"
+    },
+    {
+      "name": "Dexterité ",
+      "description": "Habiletés"
+    },
+    {
+      "name": "Constitution ",
+      "description": "Corpulence"
+    },
+    {
+      "name": "Vitesse ",
+      "description": "Speed of the character"
+    },
+    {
+      "name": "Intelligence ",
+      "description": "knowledge and mental skills"
+    },
+    {
+      "name": "Sagesse ",
+      "description": "natural feeling and perception"
+    },
+    {
+      "name": "Charisme",
+      "description": "Social and communication"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Athletics",
+      "baseAttribute": "Force"
+    },
+    {
+      "name": "Intimidation",
+      "baseAttribute": "Charisme"
+    },
+    {
+      "name": "Ride",
+      "baseAttribute": "Dexterité "
+    },
+    {
+      "name": "Sleight of Hand",
+      "baseAttribute": "Dexterité "
+    },
+    {
+      "name": "Stealth",
+      "baseAttribute": "Dexterité "
+    },
+    {
+      "name": "Animal Handling",
+      "baseAttribute": "Sagesse "
+    },
+    {
+      "name": "Heal",
+      "baseAttribute": "Sagesse "
+    },
+    {
+      "name": "Medicine",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Nature",
+      "baseAttribute": "Sagesse "
+    },
+    {
+      "name": "Perception",
+      "baseAttribute": "Sagesse "
+    },
+    {
+      "name": "Survival",
+      "baseAttribute": "Sagesse "
+    },
+    {
+      "name": "Arcana",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Investigation",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Knowledge (Dungeoneering)",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Knowledge (Nature)",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Knowledge (Geography)",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Linguistics",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Technology",
+      "baseAttribute": "Intelligence "
+    },
+    {
+      "name": "Swim",
+      "baseAttribute": "Force"
+    },
+    {
+      "name": "Bluff",
+      "baseAttribute": "Charisme"
+    },
+    {
+      "name": "Diplomacy",
+      "baseAttribute": "Charisme"
+    },
+    {
+      "name": "Persuasion",
+      "baseAttribute": "Charisme"
+    },
+    {
+      "name": "Performance",
+      "baseAttribute": "Charisme"
+    },
+    {
+      "name": "Concentration",
+      "baseAttribute": "Constitution "
+    }
+  ],
+  "feats": [
+    {
+      "name": "Power Attack",
+      "description": "Trade accuracy for damage",
+      "prerequisites": "Strength 13",
+      "effect": "-5 Hit, +5 Dmg"
+    }
+  ],
+  "saves": [
+    {
+      "name": "Équilibre",
+      "baseAttribute": "Dexterité "
+    },
+    {
+      "name": "Vigueur",
+      "baseAttribute": "Constitution "
+    },
+    {
+      "name": "Reflexe",
+      "baseAttribute": "Vitesse "
+    },
+    {
+      "name": "Volonté",
+      "baseAttribute": "Sagesse "
+    }
+  ],
+  "systemId": "d20-modern",
+  "description": "A custom system with 7 attributes.",
+  "schemas": {
+    "formSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"class\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"level\": {\n      \"type\": \"number\",\n      \"default\": 1\n    },\n    \"attributes\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Force\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Dexterité \": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Constitution \": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Vitesse \": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Intelligence \": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Sagesse \": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Charisme\": {\n          \"type\": \"number\",\n          \"default\": 0\n        }\n      }\n    },\n    \"saves\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Équilibre\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Vigueur\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Reflexe\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Volonté\": {\n          \"type\": \"number\",\n          \"default\": 0\n        }\n      }\n    },\n    \"skills\": {\n      \"type\": \"array\",\n      \"default\": [],\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"value\": {\n            \"type\": \"number\",\n            \"default\": 0\n          }\n        }\n      }\n    },\n    \"feats\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"default\": []\n    },\n    \"backstory\": {\n      \"type\": \"string\",\n      \"widget\": \"textarea\",\n      \"default\": \"\"\n    }\n  },\n  \"required\": [\n    \"name\",\n    \"class\",\n    \"level\"\n  ]\n}",
+    "uiSchema": "{\n  \"name\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Character Name\"\n  },\n  \"class\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Class\"\n  },\n  \"level\": {\n    \"ui:widget\": \"number\",\n    \"ui:label\": \"Level\"\n  },\n  \"attributes\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Attributes\",\n    \"fields\": {\n      \"Force\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Force\"\n      },\n      \"Dexterité \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Dexterité \"\n      },\n      \"Constitution \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Constitution \"\n      },\n      \"Vitesse \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Vitesse \"\n      },\n      \"Intelligence \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Intelligence \"\n      },\n      \"Sagesse \": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Sagesse \"\n      },\n      \"Charisme\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Charisme\"\n      }\n    }\n  },\n  \"saves\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Saves\",\n    \"fields\": {\n      \"Équilibre\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Équilibre\"\n      },\n      \"Vigueur\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Vigueur\"\n      },\n      \"Reflexe\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Reflexe\"\n      },\n      \"Volonté\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Volonté\"\n      }\n    }\n  },\n  \"skills\": {\n    \"ui:widget\": \"custom\",\n    \"ui:label\": \"Skills\"\n  },\n  \"feats\": {\n    \"ui:widget\": \"checkboxes\",\n    \"ui:label\": \"Feats\"\n  },\n  \"backstory\": {\n    \"ui:widget\": \"textarea\",\n    \"ui:label\": \"Backstory\"\n  }\n}"
+  }
+}
