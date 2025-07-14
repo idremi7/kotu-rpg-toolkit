@@ -145,7 +145,7 @@ const NumberFieldRenderer = ({ control, name, label }: any) => (
     name={name}
     render={({ field }) => (
       <FormItem>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-4">
           <FormLabel>{label}</FormLabel>
           <FormControl>
             <Input
@@ -260,7 +260,6 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     if (isEditMode && initialCharacter?.data) {
         let charData = JSON.parse(JSON.stringify(initialCharacter.data));
 
-        // Ensure feats is an array of objects
         if (charData.feats && Array.isArray(charData.feats)) {
             charData.feats = charData.feats.map((feat: any) => 
                 typeof feat === 'string' ? { name: feat, effect: '' } : (feat || { name: '', effect: ''})
@@ -268,8 +267,6 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         } else {
             charData.feats = [];
         }
-
-        // Ensure skills is an array of objects
         if (!charData.skills || !Array.isArray(charData.skills)) {
             charData.skills = [];
         }
@@ -327,8 +324,11 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   }
 
   const uiSchema = JSON.parse(system.schemas.uiSchema);
+  
+  const formSchema = JSON.parse(system.schemas.formSchema);
+  const orderedFields = Object.keys(formSchema.properties);
 
-  const renderSection = (fieldName: string) => {
+  const renderField = (fieldName: string) => {
     const fieldConfig = uiSchema[fieldName];
     if (!fieldConfig) return null;
 
@@ -350,7 +350,6 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
       );
     }
     
-    // For non-fieldset sections like skills, feats, backstory
     return (
       <Card key={fieldName}>
         <CardHeader>
@@ -369,9 +368,10 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   };
 
   const basicInfoFields = ['name', 'class', 'level'];
-  const vitalsFields = ['hp', 'maxHp'];
-  const mainSections = ['attributes', 'saves', 'skills', 'feats', 'backstory'];
-  
+  const fieldsetSections = orderedFields.filter(f => uiSchema[f]?.['ui:fieldset']);
+  const customSections = ['skills', 'feats'];
+  const otherSections = orderedFields.filter(f => !basicInfoFields.includes(f) && !fieldsetSections.includes(f) && !customSections.includes(f) && !uiSchema[f]?.['ui:fieldset']);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-4xl mx-auto">
@@ -391,22 +391,12 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
             </CardContent>
         </Card>
 
-        <Card>
-            <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {vitalsFields.map(fieldName => uiSchema[fieldName] && (
-                    <FormFieldRenderer
-                        key={fieldName}
-                        control={form.control}
-                        name={fieldName}
-                        fieldConfig={uiSchema[fieldName]}
-                        system={system}
-                    />
-                ))}
-            </CardContent>
-        </Card>
+        {fieldsetSections.map(fieldName => renderField(fieldName))}
 
-        {mainSections.map(fieldName => renderSection(fieldName))}
+        {customSections.map(fieldName => uiSchema[fieldName] && renderField(fieldName))}
+
+        {otherSections.map(fieldName => uiSchema[fieldName] && renderField(fieldName))}
+
 
         <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
           {isSaving ? (

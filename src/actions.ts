@@ -65,32 +65,48 @@ function generateSchemas(system: Omit<GameSystem, 'schemas'> | GameSystem) {
       },
       backstory: { type: 'string', widget: 'textarea', default: '' },
     };
+    
     const uiSchema: any = {
       name: { 'ui:widget': 'text', 'ui:label': 'Character Name' },
       class: { 'ui:widget': 'text', 'ui:label': 'Class' },
       level: { 'ui:widget': 'number', 'ui:label': 'Level' },
-      hp: { 'ui:widget': 'number', 'ui:label': 'Current HP' },
-      maxHp: { 'ui:widget': 'number', 'ui:label': 'Maximum HP' },
-      'ui:groups': [
-        {
-          title: 'Vitals',
-          fields: ['hp', 'maxHp']
+      vitals: {
+        'ui:fieldset': true,
+        'ui:label': 'Vitals',
+        fields: {
+            hp: { 'ui:widget': 'number', 'ui:label': 'Current HP' },
+            maxHp: { 'ui:widget': 'number', 'ui:label': 'Maximum HP' },
         }
-      ],
+      },
       attributes: { 'ui:fieldset': true, 'ui:label': 'Attributes', fields: {} },
       saves: { 'ui:fieldset': true, 'ui:label': 'Saves', fields: {} },
       skills: { 'ui:widget': 'custom', 'ui:label': 'Skills' },
       feats: { 'ui:widget': 'custom', 'ui:label': 'Feats' },
       backstory: { 'ui:widget': 'textarea', 'ui:label': 'Backstory' },
     };
+
+    // Remove individual hp/maxHp from uiSchema as they are now in a fieldset
+    delete formSchemaProperties.hp;
+    delete formSchemaProperties.maxHp;
+    formSchemaProperties.vitals = { 
+        type: 'object', 
+        properties: {
+            hp: { type: 'number', default: 10 },
+            maxHp: { type: 'number', default: 10 }
+        }
+    };
+    
+
     system.attributes.forEach((attr) => {
       formSchemaProperties.attributes.properties[attr.name] = { type: 'number', default: 0 };
       uiSchema.attributes.fields[attr.name] = { 'ui:widget': 'number', 'ui:label': attr.name };
     });
+    
     system.saves.forEach((save) => {
       formSchemaProperties.saves.properties[save.name] = { type: 'number', default: 0 };
       uiSchema.saves.fields[save.name] = { 'ui:widget': 'number', 'ui:label': save.name };
     });
+
     return {
       formSchema: JSON.stringify({ type: 'object', properties: formSchemaProperties, required: ['name', 'class', 'level'] }, null, 2),
       uiSchema: JSON.stringify(uiSchema, null, 2),

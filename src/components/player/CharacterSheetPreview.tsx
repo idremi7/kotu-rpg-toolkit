@@ -36,7 +36,9 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
     return system.feats.find((f: any) => f.name === featName);
   };
 
-  const hpPercentage = data.maxHp > 0 ? (data.hp / data.maxHp) * 100 : 0;
+  const hp = data.vitals?.hp ?? data.hp ?? 0;
+  const maxHp = data.vitals?.maxHp ?? data.maxHp ?? 0;
+  const hpPercentage = maxHp > 0 ? (hp / maxHp) * 100 : 0;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -68,11 +70,11 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
                     System: {system.systemName}
                 </CardDescription>
                 </div>
-                {data.maxHp > 0 && (
+                {maxHp > 0 && (
                     <div className="text-right w-1/3">
                         <div className="flex items-center justify-end gap-2 text-lg font-bold text-red-500">
                            <Heart className="h-5 w-5"/>
-                           <span>{data.hp ?? '??'} / {data.maxHp ?? '??'}</span>
+                           <span>{hp ?? '??'} / {maxHp ?? '??'}</span>
                         </div>
                         <Progress value={hpPercentage} className="mt-1 h-2" indicatorClassName="bg-red-500"/>
                     </div>
