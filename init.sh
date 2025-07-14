@@ -1,25 +1,25 @@
 #!/bin/bash
-# Ce script nettoie le cache de Git pour s'assurer que les fichiers et dossiers
-# listés dans .gitignore sont correctement ignorés, même s'ils ont été
-# accidentellement ajoutés à l'historique de Git auparavant.
+# This script cleans the Git cache to ensure that files and folders
+# listed in .gitignore are correctly ignored, even if they were
+# accidentally committed in the past.
 
-# À exécuter une seule fois à la racine de votre projet.
+# Run this script once from the root of your project.
 
-echo "Nettoyage du cache de Git..."
+echo "Cleaning the Git cache..."
 
-# Supprime tous les fichiers du cache de Git
+# Remove all files from the Git cache
 git rm -r --cached .
 
-echo "Cache nettoyé."
+echo "Cache cleaned."
 
-# Rajoute tous les fichiers en respectant les règles du .gitignore
+# Re-add all files, respecting the .gitignore rules
 git add .
 
-echo "Fichiers ré-indexés en respectant .gitignore."
+echo "Files re-indexed, respecting .gitignore."
 
-# Crée un nouveau commit pour enregistrer le nettoyage
-git commit -m "chore: Nettoyage de l'historique Git et application de .gitignore"
+# Create a new commit to save the cleanup
+git commit -m "chore: Clean git history and apply .gitignore"
 
-echo "Terminé. Vous pouvez maintenant 'git push' sans les fichiers volumineux."
-echo "N'oubliez pas de rendre ce script exécutable avec : chmod +x init.sh"
-echo "Puis exécutez-le avec : ./init.sh"
+echo "Done. You can now 'git push' without the large files."
+echo "Remember to make this script executable with: chmod +x init.sh"
+echo "Then run it with: ./init.sh"
