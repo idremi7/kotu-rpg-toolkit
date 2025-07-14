@@ -127,19 +127,20 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
               <h3 className="font-headline text-lg mb-2">Feats</h3>
               <div className="space-y-3">
                 {(data.feats && data.feats.length > 0) ? data.feats.map((feat: any, index: number) => {
-                  const featDetails = getFeatDetails(feat.name);
+                  const featName = typeof feat === 'string' ? feat : feat.name;
+                  const featDetails = getFeatDetails(featName);
                   if (featDetails) {
                     // It's a feat from the system library
                     return (
-                      <div key={`${feat.name}-${index}`}>
+                      <div key={`${featName}-${index}`}>
                         <div className="flex items-baseline justify-between">
-                          <span className="font-semibold">{feat.name}</span>
+                          <span className="font-semibold">{featName}</span>
                           {featDetails.effect && <Badge variant="secondary">{featDetails.effect}</Badge>}
                         </div>
                         <p className="text-sm text-muted-foreground">{featDetails.description}</p>
                       </div>
                     );
-                  } else {
+                  } else if (typeof feat === 'object' && feat.name) {
                     // It's a custom feat entered by the player
                     return (
                       <div key={`${feat.name}-${index}`}>
@@ -147,10 +148,20 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
                             <span className="font-semibold">{feat.name}</span>
                             {feat.effect && <Badge variant="secondary">{feat.effect}</Badge>}
                         </div>
-                         {feat.effect && <p className="text-sm text-muted-foreground italic">Player-defined effect.</p>}
+                         {feat.effect && <p className="text-sm text-muted-foreground italic">{feat.effect}</p>}
+                      </div>
+                    );
+                  } else if (typeof feat === 'string') {
+                    // It's an old format custom feat (just a string)
+                     return (
+                      <div key={`${feat}-${index}`}>
+                        <div className="flex items-baseline justify-between">
+                            <span className="font-semibold">{feat}</span>
+                        </div>
                       </div>
                     );
                   }
+                  return null;
                 }) : <p className="text-sm text-muted-foreground">No feats selected.</p>}
               </div>
             </div>

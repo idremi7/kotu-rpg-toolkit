@@ -57,7 +57,10 @@ function generateSchemas(system: Omit<GameSystem, 'schemas'> | GameSystem) {
         default: [],
         items: {
             type: 'object',
-            properties: { name: { type: 'string' }, effect: { type: 'string' } }
+            properties: { 
+                name: { type: 'string', default: '' }, 
+                effect: { type: 'string', default: '' } 
+            }
         }
       },
       backstory: { type: 'string', widget: 'textarea', default: '' },
