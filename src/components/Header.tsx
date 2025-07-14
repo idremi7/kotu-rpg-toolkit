@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from './ui/button';
 import { Logo } from './Logo';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard } from 'lucide-react';
+import { Button } from './ui/button';
+import { ThemeToggle } from './ThemeToggle';
 
 export function Header() {
   const pathname = usePathname();
@@ -24,28 +25,31 @@ export function Header() {
             KOTU
           </span>
         </Link>
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                'transition-colors hover:text-primary',
-                pathname.includes(link.href)
-                  ? 'text-primary'
-                  : 'text-foreground/60'
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex flex-1 items-center justify-end gap-2">
+        
+        <div className="flex flex-1 items-center justify-end gap-4">
+           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  'transition-colors hover:text-primary',
+                  pathname.includes(link.href)
+                    ? 'text-primary'
+                    : 'text-foreground/60'
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
           <Button variant="ghost" size="sm" asChild className="md:hidden">
             <Link href="/gm/dashboard">
               <LayoutDashboard /> <span className="sr-only">Dashboards</span>
             </Link>
           </Button>
+
+          <ThemeToggle />
         </div>
       </div>
     </header>
