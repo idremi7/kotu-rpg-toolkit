@@ -5,8 +5,13 @@ import { Button } from './ui/button';
 import { Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { saveCharacterAction } from '@/actions';
+import { cn } from '@/lib/utils';
 
-export function ImportCharacterButton() {
+interface ImportCharacterButtonProps {
+    className?: string;
+}
+
+export function ImportCharacterButton({ className }: ImportCharacterButtonProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,7 +78,7 @@ export function ImportCharacterButton() {
         accept=".json"
         className="hidden"
       />
-      <Button onClick={handleButtonClick} variant="outline" size="lg">
+      <Button onClick={handleButtonClick} variant="outline" size="lg" className={cn(className)}>
         <Upload className="mr-2 h-5 w-5" />
         Import Character
       </Button>

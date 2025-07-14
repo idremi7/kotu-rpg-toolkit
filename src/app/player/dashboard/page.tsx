@@ -10,14 +10,14 @@ export default async function PlayerDashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
         <div>
             <h1 className="font-headline text-4xl font-bold">Player Dashboard</h1>
             <p className="text-muted-foreground mt-1">Manage your heroes and embark on new adventures.</p>
         </div>
-        <div className="flex items-center gap-2">
-            <ImportCharacterButton />
-            <Button asChild size="lg">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+            <ImportCharacterButton className="flex-grow sm:flex-grow-0" />
+            <Button asChild size="lg" className="flex-grow sm:flex-grow-0">
                 <Link href="/player/characters/create">
                     <PlusCircle className="mr-2 h-5 w-5" />
                     Create New Character
@@ -52,9 +52,9 @@ export default async function PlayerDashboard() {
          <div className="text-center py-16 border-2 border-dashed rounded-lg mt-12">
           <h2 className="text-2xl font-semibold mb-2">No Characters Found</h2>
           <p className="text-muted-foreground mb-4">It looks like you haven't created any characters yet.</p>
-          <div className="flex justify-center gap-4">
-            <ImportCharacterButton />
-            <Button asChild size="lg">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 px-4">
+            <ImportCharacterButton className="w-full" />
+            <Button asChild size="lg" className="w-full">
                 <Link href="/player/characters/create">
                 <PlusCircle className="mr-2 h-5 w-5" />
                 Create Your First Character
