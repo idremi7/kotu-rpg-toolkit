@@ -54,6 +54,7 @@ const CustomSkillWidget = ({ control, name, options }: { control: any, name: str
                     type="number" 
                     className="w-24" 
                     {...field}
+                    value={field.value ?? 0}
                     onChange={e => field.onChange(parseInt(e.target.value) || 0)}
                   />
                 </FormControl>
@@ -96,6 +97,7 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, sys
                 <Input
                   type={widget}
                   {...field}
+                  value={field.value ?? (widget === 'number' ? 0 : '')}
                   onChange={(e) =>
                     field.onChange(
                       widget === 'number' ? parseInt(e.target.value) || 0 : e.target.value
@@ -117,7 +119,7 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, sys
             <FormItem>
               <FormLabel>{label}</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea {...field} value={field.value ?? ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -369,4 +371,3 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
     </>
   );
 }
-
