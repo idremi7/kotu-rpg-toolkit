@@ -50,6 +50,7 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
     const [library, setLibrary] = useState<Record<string, SkillFromLibrary[]>>({});
     const [selectedSkills, setSelectedSkills] = useState<Record<string, boolean>>({});
     const [isOpen, setIsOpen] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         if (isOpen && Object.keys(library).length === 0) {
