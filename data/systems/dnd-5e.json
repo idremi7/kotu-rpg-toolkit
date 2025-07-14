@@ -1,0 +1,56 @@
+
+{
+  "systemId": "dnd-5e",
+  "systemName": "Dungeons & Dragons 5e",
+  "description": "The fifth edition of the world's most popular tabletop role-playing game.",
+  "usesD20StyleModifiers": true,
+  "attributes": [
+    { "name": "Strength", "description": "Measures bodily power, athletic training, and the extent to which you can exert raw physical force." },
+    { "name": "Dexterity", "description": "Measures agility, reflexes, and balance." },
+    { "name": "Constitution", "description": "Measures health, stamina, and vital force." },
+    { "name": "Intelligence", "description": "Measures mental acuity, accuracy of recall, and the ability to reason." },
+    { "name": "Wisdom", "description": "Measures your attunement to the world, perceptiveness, and intuition." },
+    { "name": "Charisma", "description": "Measures your ability to interact effectively with others, force of personality, and social influence." }
+  ],
+  "saves": [
+    { "name": "Strength Save", "baseAttribute": "Strength" },
+    { "name": "Dexterity Save", "baseAttribute": "Dexterity" },
+    { "name": "Constitution Save", "baseAttribute": "Constitution" },
+    { "name": "Intelligence Save", "baseAttribute": "Intelligence" },
+    { "name": "Wisdom Save", "baseAttribute": "Wisdom" },
+    { "name": "Charisma Save", "baseAttribute": "Charisma" }
+  ],
+  "skills": [
+    { "name": "Acrobatics", "baseAttribute": "Dexterity" },
+    { "name": "Animal Handling", "baseAttribute": "Wisdom" },
+    { "name": "Arcana", "baseAttribute": "Intelligence" },
+    { "name": "Athletics", "baseAttribute": "Strength" },
+    { "name": "Deception", "baseAttribute": "Charisma" },
+    { "name": "History", "baseAttribute": "Intelligence" },
+    { "name": "Insight", "baseAttribute": "Wisdom" },
+    { "name": "Intimidation", "baseAttribute": "Charisma" },
+    { "name": "Investigation", "baseAttribute": "Intelligence" },
+    { "name": "Medicine", "baseAttribute": "Wisdom" },
+    { "name": "Nature", "baseAttribute": "Intelligence" },
+    { "name": "Perception", "baseAttribute": "Wisdom" },
+    { "name": "Performance", "baseAttribute": "Charisma" },
+    { "name": "Persuasion", "baseAttribute": "Charisma" },
+    { "name": "Religion", "baseAttribute": "Intelligence" },
+    { "name": "Sleight of Hand", "baseAttribute": "Dexterity" },
+    { "name": "Stealth", "baseAttribute": "Dexterity" },
+    { "name": "Survival", "baseAttribute": "Wisdom" }
+  ],
+  "feats": [
+    { "name": "Alert", "description": "You gain a +5 bonus to initiative. You can't be surprised while you are conscious. Other creatures don't gain advantage on attack rolls against you as a result of being unseen by you.", "prerequisites": "", "effect": "+5 Initiative" },
+    { "name": "Great Weapon Master", "description": "Before you make a melee attack with a heavy weapon that you are proficient with, you can choose to take a -5 penalty to the attack roll. If the attack hits, you add +10 to the attack's damage.", "prerequisites": "Proficiency with a heavy weapon", "effect": "-5 Hit, +10 Dmg" },
+    { "name": "Lucky", "description": "You have 3 luck points. Whenever you make an attack roll, an ability check, or a saving throw, you can spend one luck point to roll an additional d20.", "prerequisites": "", "effect": "3 Luck Points" },
+    { "name": "Sharpshooter", "description": "Attacking at long range doesn't impose disadvantage on your ranged weapon attack rolls. Your ranged weapon attacks ignore half cover and three-quarters cover. Before you make an attack with a ranged weapon that you are proficient with, you can choose to take a -5 penalty to the attack roll. If the attack hits, you add +10 to the attack's damage.", "prerequisites": "Proficiency with a ranged weapon", "effect": "-5 Hit, +10 Dmg (Ranged)" },
+    { "name": "Tough", "description": "Your hit point maximum increases by an amount equal to twice your level when you gain this feat. Whenever you gain a level thereafter, your hit point maximum increases by an additional 2 hit points.", "prerequisites": "", "effect": "+2 HP per level" }
+  ],
+  "schemas": {
+    "formSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"class\": {\n      \"type\": \"string\",\n      \"default\": \"\"\n    },\n    \"level\": {\n      \"type\": \"number\",\n      \"default\": 1\n    },\n    \"attributes\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Strength\": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Dexterity\": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Constitution\": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Intelligence\": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Wisdom\": {\n          \"type\": \"number\",\n          \"default\": 10\n        },\n        \"Charisma\": {\n          \"type\": \"number\",\n          \"default\": 10\n        }\n      }\n    },\n    \"saves\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"Strength Save\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Dexterity Save\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Constitution Save\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Intelligence Save\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Wisdom Save\": {\n          \"type\": \"number\",\n          \"default\": 0\n        },\n        \"Charisma Save\": {\n          \"type\": \"number\",\n          \"default\": 0\n        }\n      }\n    },\n    \"skills\": {\n      \"type\": \"array\",\n      \"default\": [],\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"value\": {\n            \"type\": \"number\",\n            \"default\": 0\n          }\n        }\n      }\n    },\n    \"feats\": {\n      \"type\": \"array\",\n      \"default\": [],\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"name\": {\n            \"type\": \"string\",\n            \"default\": \"\"\n          },\n          \"effect\": {\n            \"type\": \"string\",\n            \"default\": \"\"\n          }\n        }\n      }\n    },\n    \"backstory\": {\n      \"type\": \"string\",\n      \"widget\": \"textarea\",\n      \"default\": \"\"\n    }\n  },\n  \"required\": [\n    \"name\",\n    \"class\",\n    \"level\"\n  ]\n}",
+    "uiSchema": "{\n  \"name\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Character Name\"\n  },\n  \"class\": {\n    \"ui:widget\": \"text\",\n    \"ui:label\": \"Class\"\n  },\n  \"level\": {\n    \"ui:widget\": \"number\",\n    \"ui:label\": \"Level\"\n  },\n  \"attributes\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Attributes\",\n    \"fields\": {\n      \"Strength\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Strength\"\n      },\n      \"Dexterity\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Dexterity\"\n      },\n      \"Constitution\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Constitution\"\n      },\n      \"Intelligence\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Intelligence\"\n      },\n      \"Wisdom\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Wisdom\"\n      },\n      \"Charisma\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Charisma\"\n      }\n    }\n  },\n  \"saves\": {\n    \"ui:fieldset\": true,\n    \"ui:label\": \"Saves\",\n    \"fields\": {\n      \"Strength Save\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Strength Save\"\n      },\n      \"Dexterity Save\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Dexterity Save\"\n      },\n      \"Constitution Save\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Constitution Save\"\n      },\n      \"Intelligence Save\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Intelligence Save\"\n      },\n      \"Wisdom Save\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Wisdom Save\"\n      },\n      \"Charisma Save\": {\n        \"ui:widget\": \"number\",\n        \"ui:label\": \"Charisma Save\"\n      }\n    }\n  },\n  \"skills\": {\n    \"ui:widget\": \"custom\",\n    \"ui:label\": \"Skills\"\n  },\n  \"feats\": {\n    \"ui:widget\": \"custom\",\n    \"ui:label\": \"Feats\"\n  },\n  \"backstory\": {\n    \"ui:widget\": \"textarea\",\n    \"ui:label\": \"Backstory\"\n  }\n}"
+  }
+}
+
+    
