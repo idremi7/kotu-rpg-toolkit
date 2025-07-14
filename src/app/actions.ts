@@ -11,8 +11,8 @@ import {
 import type { GameSystem, Feat } from '@/lib/data-service';
 import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
 import type { SuggestSkillsInput } from '@/ai/flows/suggest-skills-flow';
-import { db } from '@/lib/firebase-admin';
 
+let characterIdCounter = Date.now();
 
 export async function saveSystemAction(
   systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'>
@@ -125,7 +125,7 @@ export async function listSystemsAction() {
 }
 
 export async function saveCharacterAction(systemId: string, characterData: any) {
-  const characterId = db.collection('characters').doc().id;
+  const characterId = `char_${characterIdCounter++}`;
 
   const character = {
     characterId,

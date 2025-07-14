@@ -1,6 +1,5 @@
 // This file should only be used on the server.
 import 'server-only';
-import { db } from './firebase-admin';
 import path from 'path';
 import fs from 'fs/promises';
 
