@@ -15,12 +15,11 @@ export default async function PlayerDashboard({ params: { locale } }: { params: 
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h1 className="font-headline text-4xl font-bold">{t('playerDashboard.title')}</h1>
-        <p className="text-muted-foreground mt-2">{t('playerDashboard.description')}</p>
-      </div>
-
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-between items-center mb-4">
+        <div>
+            <h1 className="font-headline text-4xl font-bold">{t('playerDashboard.title')}</h1>
+            <p className="text-muted-foreground mt-1">{t('playerDashboard.description')}</p>
+        </div>
          <Button asChild size="lg">
           <Link href="/player/characters/create">
             <PlusCircle className="mr-2 h-5 w-5" />
@@ -30,7 +29,7 @@ export default async function PlayerDashboard({ params: { locale } }: { params: 
       </div>
       
       {mockCharacters.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {mockCharacters.map(char => (
             <Card key={char.id} className="flex flex-col">
               <CardHeader>
