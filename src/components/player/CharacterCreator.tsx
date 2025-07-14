@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
@@ -219,7 +219,7 @@ const FormFieldRenderer = ({ control, name, fieldConfig, options, fieldType, sys
         }
         return <p>Unsupported custom field: {name}</p>
     default:
-      return <p>Unsupported field type: {widget}</p>;
+      return null;
   }
 };
 
@@ -328,80 +328,88 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
 
   const uiSchema = JSON.parse(system.schemas.uiSchema);
   const allFieldNames = Object.keys(uiSchema).filter(key => !key.startsWith('ui:'));
-  
-  const basicInfoFields = ['name', 'class', 'level'];
-  const vitalFields = uiSchema['ui:groups']?.find((g:any) => g.title === 'Vitals')?.fields || ['hp', 'maxHp'];
-  const mainFieldNames = allFieldNames.filter(name => !basicInfoFields.includes(name) && !vitalFields.includes(name));
 
-  const renderFieldset = (fieldName: string, fieldConfig: any) => (
-    <Card key={fieldName}>
-        <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  const renderField = (fieldName: string) => {
+    const fieldConfig = uiSchema[fieldName];
+    if (!fieldConfig) return null;
+
+    // Render fieldsets
+    if (fieldConfig['ui:fieldset']) {
+      return (
+        <Card key={fieldName}>
+          <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(fieldConfig.fields).map(([subFieldName, subFieldConfig]: [string, any]) => (
-            <NumberFieldRenderer
+              <NumberFieldRenderer
                 key={subFieldName}
                 control={form.control}
                 name={`${fieldName}.${subFieldName}`}
                 label={subFieldConfig['ui:label']}
                 widget={subFieldConfig['ui:widget']}
-            />
+              />
             ))}
-        </CardContent>
-    </Card>
-  );
+          </CardContent>
+        </Card>
+      );
+    }
 
-  const renderCustomWidget = (fieldName: string, fieldConfig: any) => (
-    <Card key={fieldName}>
-        <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
-        <CardContent>
-            <FormFieldRenderer
+    // Render single fields inside a Card for grouping
+    const fieldContent = (
+      <FormFieldRenderer
+        control={form.control}
+        name={fieldName}
+        fieldConfig={fieldConfig}
+        system={system}
+      />
+    );
+
+    if (fieldContent) {
+      return (
+        <Card key={fieldName}>
+          <CardHeader>
+            <CardTitle>{fieldConfig['ui:label'] || fieldName}</CardTitle>
+          </CardHeader>
+          <CardContent>{fieldContent}</CardContent>
+        </Card>
+      );
+    }
+    
+    return null;
+  };
+
+  const renderGroupedFields = (group: any) => {
+    return (
+      <Card key={group.title}>
+        <CardHeader><CardTitle>{group.title}</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {group.fields.map((fieldName: string) => {
+            const fieldConfig = uiSchema[fieldName];
+            return fieldConfig ? (
+              <FormFieldRenderer
+                key={fieldName}
                 control={form.control}
                 name={fieldName}
                 fieldConfig={fieldConfig}
                 system={system}
-            />
+              />
+            ) : null;
+          })}
         </CardContent>
-    </Card>
-  );
+      </Card>
+    );
+  };
   
+  const mainGroups = uiSchema['ui:groups'] || [];
+  const groupedFieldNames = mainGroups.flatMap((g: any) => g.fields);
+  const ungroupedFieldNames = allFieldNames.filter(name => !groupedFieldNames.includes(name));
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto">
-        <Card>
-            <CardHeader><CardTitle>Basic Information</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {basicInfoFields.map(fieldName => {
-                    const fieldConfig = uiSchema[fieldName];
-                    return fieldConfig ? <FormFieldRenderer key={fieldName} control={form.control} name={fieldName} fieldConfig={fieldConfig} system={system} /> : null;
-                })}
-            </CardContent>
-        </Card>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-4xl mx-auto">
         
-        <Card>
-            <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {vitalFields.map((fieldName: string) => {
-                    const fieldConfig = uiSchema[fieldName];
-                    return fieldConfig ? <FormFieldRenderer key={fieldName} control={form.control} name={fieldName} fieldConfig={fieldConfig} system={system} /> : null;
-                })}
-            </CardContent>
-        </Card>
-        
-        {mainFieldNames.map(fieldName => {
-            const fieldConfig = uiSchema[fieldName];
-            if (!fieldConfig) return null;
-            if (fieldConfig['ui:fieldset']) return renderFieldset(fieldName, fieldConfig);
-            if (fieldConfig['ui:widget'] === 'custom') return renderCustomWidget(fieldName, fieldConfig);
-            if (fieldConfig['ui:widget'] === 'textarea') return (
-                <Card key={fieldName}>
-                    <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
-                    <CardContent>
-                        <FormFieldRenderer control={form.control} name={fieldName} fieldConfig={fieldConfig} system={system} />
-                    </CardContent>
-                </Card>
-            );
-            return null;
-        })}
+        {mainGroups.map(renderGroupedFields)}
+
+        {ungroupedFieldNames.map(renderField)}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
           {isSaving ? (
