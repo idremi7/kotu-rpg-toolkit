@@ -23,8 +23,7 @@ export interface GameSystem {
     schemas: { formSchema: string; uiSchema: string };
 }
 
-const tempDir = path.join(process.cwd(), '.tmp');
-const dataDir = path.join(tempDir, 'data');
+const dataDir = path.join(process.cwd(), 'data');
 const systemsDir = path.join(dataDir, 'systems');
 const charactersDir = path.join(dataDir, 'characters');
 
@@ -32,14 +31,6 @@ async function initializeDataDirs() {
     try {
         await fs.mkdir(systemsDir, { recursive: true });
         await fs.mkdir(charactersDir, { recursive: true });
-
-        const defaultSystemsDir = path.join(process.cwd(), 'data', 'systems');
-        const defaultFiles = await fs.readdir(defaultSystemsDir);
-        for (const file of defaultFiles) {
-            const sourcePath = path.join(defaultSystemsDir, file);
-            const destPath = path.join(systemsDir, file);
-            await fs.copyFile(sourcePath, destPath);
-        }
     } catch (error) {
         console.error("Failed to initialize data directories:", error);
     }
@@ -105,7 +96,8 @@ function migrateSystem(system: GameSystem): GameSystem {
 
 async function getFilePath(collection: string, id: string) {
     await dataReady;
-    return path.join(process.cwd(), '.tmp', 'data', collection, `${id}.json`);
+    const dir = collection === 'systems' ? systemsDir : charactersDir;
+    return path.join(dir, `${id}.json`);
 }
 
 export async function saveSystem(systemData: GameSystem): Promise<void> {
