@@ -8,6 +8,7 @@ import {
   getCharacter as getCharacterFromDb,
   listCharacters as listCharactersFromDb,
   listSkillsFromLibrary as listSkillsFromLibraryFromDb,
+  listFeatsFromLibrary as listFeatsFromLibraryFromDb,
 } from '@/lib/data-service';
 import type { GameSystem, Feat } from '@/lib/data-service';
 import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
@@ -163,4 +164,8 @@ export async function suggestSkillsAction(input: SuggestSkillsInput) {
 
 export async function listSkillsFromLibraryAction() {
     return await listSkillsFromLibraryFromDb();
+}
+
+export async function listFeatsFromLibraryAction() {
+    return await listFeatsFromLibraryFromDb();
 }

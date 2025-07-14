@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
-import { listSkillsFromLibraryAction, saveSystemAction, suggestSkillsAction } from '@/actions';
+import { listFeatsFromLibraryAction, listSkillsFromLibraryAction, saveSystemAction, suggestSkillsAction } from '@/actions';
 import { useEffect, useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { GameSystem, SkillFromLibrary } from '@/lib/data-service';
+import type { GameSystem, SkillFromLibrary, FeatFromLibrary } from '@/lib/data-service';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
@@ -59,7 +59,7 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
                 setAllSkills(skills);
             });
         }
-    }, [isOpen, allSkills]);
+    }, [isOpen, allSkills.length]);
 
     const filteredSkills = useMemo(() => {
         if (!searchQuery) {
@@ -132,6 +132,106 @@ const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {name: str
                     <div className="pt-4 border-t mt-auto">
                         <Button onClick={handleAdd} className="w-full" disabled={Object.values(selectedSkills).every(v => !v.isSelected)}>
                             Add Selected Skills
+                        </Button>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+    )
+}
+
+const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string, description: string, prerequisites: string, effect: string }[]) => void }) => {
+    const { toast } = useToast();
+    const [selectedFeats, setSelectedFeats] = useState<Record<string, {isSelected: boolean, feat: FeatFromLibrary}>>({});
+    const [isOpen, setIsOpen] = useState(false);
+    const [allFeats, setAllFeats] = useState<FeatFromLibrary[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    useEffect(() => {
+        if (isOpen && allFeats.length === 0) {
+            listFeatsFromLibraryAction().then(feats => {
+                setAllFeats(feats);
+            });
+        }
+    }, [isOpen, allFeats.length]);
+
+    const filteredFeats = useMemo(() => {
+        if (!searchQuery) {
+            return allFeats;
+        }
+        const lowercasedQuery = searchQuery.toLowerCase();
+        return allFeats.filter(feat => 
+            feat.name.toLowerCase().includes(lowercasedQuery) || 
+            feat.description.toLowerCase().includes(lowercasedQuery)
+        );
+    }, [searchQuery, allFeats]);
+    
+    const handleSelectFeat = (feat: FeatFromLibrary, isSelected: boolean) => {
+        setSelectedFeats(prev => ({...prev, [feat.name]: { isSelected, feat }}));
+    }
+
+    const handleAdd = () => {
+        const featsToAdd = Object.values(selectedFeats)
+            .filter(val => val.isSelected)
+            .map(val => ({ 
+                name: val.feat.name,
+                description: val.feat.description,
+                prerequisites: val.feat.prerequisites,
+                effect: val.feat.effect || ''
+            }));
+        
+        onAddFeats(featsToAdd);
+        toast({
+            title: "Feats Added",
+            description: `${featsToAdd.length} feats were added from the library.`
+        });
+        setSelectedFeats({});
+        setIsOpen(false);
+        setSearchQuery('');
+    }
+
+    return (
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+                <Button type="button" variant="secondary"><BookOpen className="mr-2"/>Browse Feat Library</Button>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-lg">
+                <SheetHeader>
+                    <SheetTitle>Feat Library</SheetTitle>
+                    <SheetDescription>
+                        Browse and select common feats to add to your system.
+                    </SheetDescription>
+                </SheetHeader>
+                <div className="py-4 h-[calc(100%-120px)] flex flex-col">
+                    <Input 
+                        placeholder="Search for a feat..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="mb-4"
+                    />
+                    <ScrollArea className="flex-grow pr-4">
+                       <div className="space-y-2">
+                            {filteredFeats.map(feat => (
+                                <div key={feat.name} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
+                                    <Checkbox 
+                                        id={`lib-feat-${feat.name}`}
+                                        checked={!!selectedFeats[feat.name]?.isSelected}
+                                        onCheckedChange={(checked) => handleSelectFeat(feat, !!checked)}
+                                    />
+                                    <label htmlFor={`lib-feat-${feat.name}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
+                                        <div className="flex justify-between">
+                                          <span>{feat.name}</span>
+                                          <span className="text-xs text-muted-foreground">{feat.prerequisites}</span>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">{feat.description}</p>
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </ScrollArea>
+                    <div className="pt-4 border-t mt-auto">
+                        <Button onClick={handleAdd} className="w-full" disabled={Object.values(selectedFeats).every(v => !v.isSelected)}>
+                            Add Selected Feats
                         </Button>
                     </div>
                 </div>
@@ -298,6 +398,10 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       appendSkill(skillsWithAttributes);
   };
 
+  const handleAddFeatsFromLibrary = (featsToAdd: {name: string, description: string, prerequisites: string, effect: string }[]) => {
+      appendFeat(featsToAdd);
+  }
+
 
   return (
     <div className="space-y-8">
@@ -421,7 +525,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               <CardDescription>Define character abilities. You can add them manually or use AI to get suggestions based on your attributes.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Accordion type="multiple" className="w-full space-y-2">
+              <Accordion type="multiple" className="w-full space-y-2" defaultValue={['Unassigned']}>
                 {orderedSkillGroups.map(({ attribute, skills }) => (
                   <AccordionItem key={attribute} value={attribute} className="border rounded-md px-3">
                     <AccordionTrigger>
@@ -562,7 +666,10 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                   </div>
                 </div>
               ))}
-              <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: '', effect: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: '', effect: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
+                <FeatLibraryBrowser onAddFeats={handleAddFeatsFromLibrary} />
+              </div>
             </CardContent>
           </Card>
           <Button type="submit" disabled={isSaving} className="w-full" size="lg">

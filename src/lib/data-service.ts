@@ -29,6 +29,15 @@ export interface SkillFromLibrary {
     description: string;
 }
 
+export interface FeatFromLibrary {
+    name: string;
+    description: string;
+    prerequisites: string;
+    category: string; // e.g., 'Combat', 'General', 'Magic'
+    effect?: string;
+}
+
+
 const dataDir = path.join(process.cwd(), 'data');
 const systemsDir = path.join(dataDir, 'systems');
 const charactersDir = path.join(dataDir, 'characters');
@@ -209,7 +218,7 @@ export async function listCharacters(): Promise<Character[]> {
     }
 }
 
-// =========== Skill Library API ===========
+// =========== Library APIs ===========
 
 export async function listSkillsFromLibrary(): Promise<SkillFromLibrary[]> {
     await dataReady;
@@ -223,6 +232,23 @@ export async function listSkillsFromLibrary(): Promise<SkillFromLibrary[]> {
             return [];
         }
         console.error('Failed to read skill library:', error);
+        return [];
+    }
+}
+
+export async function listFeatsFromLibrary(): Promise<FeatFromLibrary[]> {
+    await dataReady;
+    const filePath = path.join(dataDir, 'feat-library.json');
+    try {
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(fileContent) as FeatFromLibrary[];
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            await fs.writeFile(filePath, '[]', 'utf-8');
+            console.warn('feat-library.json not found. Created an empty one. Returning empty list.');
+            return [];
+        }
+        console.error('Failed to read feat library:', error);
         return [];
     }
 }
