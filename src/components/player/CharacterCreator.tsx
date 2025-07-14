@@ -260,6 +260,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     if (isEditMode && initialCharacter?.data) {
         let charData = JSON.parse(JSON.stringify(initialCharacter.data));
 
+        // Backward compatibility for feats
         if (charData.feats && Array.isArray(charData.feats)) {
             charData.feats = charData.feats.map((feat: any) => 
                 typeof feat === 'string' ? { name: feat, effect: '' } : (feat || { name: '', effect: ''})
@@ -270,6 +271,14 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         if (!charData.skills || !Array.isArray(charData.skills)) {
             charData.skills = [];
         }
+
+        // Backward compatibility for vitals
+        if (charData.hp !== undefined && charData.maxHp !== undefined && !charData.vitals) {
+            charData.vitals = { hp: charData.hp, maxHp: charData.maxHp };
+            delete charData.hp;
+            delete charData.maxHp;
+        }
+
 
         defaultValues = { ...defaultValues, ...charData };
     }
@@ -324,33 +333,25 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   }
 
   const uiSchema = JSON.parse(system.schemas.uiSchema);
-  
   const formSchema = JSON.parse(system.schemas.formSchema);
-  const orderedFields = Object.keys(formSchema.properties);
 
-  const renderField = (fieldName: string) => {
-    const fieldConfig = uiSchema[fieldName];
-    if (!fieldConfig) return null;
+  const renderFieldset = (fieldName: string, fieldConfig: any) => (
+    <Card key={fieldName}>
+      <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Object.entries(fieldConfig.fields).map(([subFieldName, subFieldConfig]: [string, any]) => (
+          <NumberFieldRenderer
+            key={subFieldName}
+            control={form.control}
+            name={`${fieldName}.${subFieldName}`}
+            label={subFieldConfig['ui:label']}
+          />
+        ))}
+      </CardContent>
+    </Card>
+  );
 
-    if (fieldConfig['ui:fieldset']) {
-      return (
-        <Card key={fieldName}>
-          <CardHeader><CardTitle>{fieldConfig['ui:label']}</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(fieldConfig.fields).map(([subFieldName, subFieldConfig]: [string, any]) => (
-              <NumberFieldRenderer
-                key={subFieldName}
-                control={form.control}
-                name={`${fieldName}.${subFieldName}`}
-                label={subFieldConfig['ui:label']}
-              />
-            ))}
-          </CardContent>
-        </Card>
-      );
-    }
-    
-    return (
+  const renderRegularField = (fieldName: string, fieldConfig: any) => (
       <Card key={fieldName}>
         <CardHeader>
           <CardTitle>{fieldConfig['ui:label'] || fieldName}</CardTitle>
@@ -364,13 +365,10 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
             />
         </CardContent>
       </Card>
-    );
-  };
+  );
 
   const basicInfoFields = ['name', 'class', 'level'];
-  const fieldsetSections = orderedFields.filter(f => uiSchema[f]?.['ui:fieldset']);
-  const customSections = ['skills', 'feats'];
-  const otherSections = orderedFields.filter(f => !basicInfoFields.includes(f) && !fieldsetSections.includes(f) && !customSections.includes(f) && !uiSchema[f]?.['ui:fieldset']);
+  const allOtherFields = Object.keys(formSchema.properties).filter(f => !basicInfoFields.includes(f));
 
   return (
     <Form {...form}>
@@ -391,12 +389,15 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
             </CardContent>
         </Card>
 
-        {fieldsetSections.map(fieldName => renderField(fieldName))}
+        {allOtherFields.map(fieldName => {
+            const fieldConfig = uiSchema[fieldName];
+            if (!fieldConfig) return null;
 
-        {customSections.map(fieldName => uiSchema[fieldName] && renderField(fieldName))}
-
-        {otherSections.map(fieldName => uiSchema[fieldName] && renderField(fieldName))}
-
+            if (fieldConfig['ui:fieldset']) {
+                return renderFieldset(fieldName, fieldConfig);
+            }
+            return renderRegularField(fieldName, fieldConfig);
+        })}
 
         <Button type="submit" size="lg" className="w-full" disabled={isSaving}>
           {isSaving ? (
