@@ -22,6 +22,7 @@ export interface GameSystem {
     feats: Feat[];
     saves: { name: string; baseAttribute: string }[];
     schemas: { formSchema: string; uiSchema: string };
+    usesD20StyleModifiers?: boolean;
 }
 
 export interface SkillFromLibrary {

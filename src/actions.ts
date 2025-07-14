@@ -28,6 +28,7 @@ const GameSystemSchemaForImport = z.object({
   feats: z.array(z.object({ name: z.string(), description: z.string(), prerequisites: z.string(), effect: z.string().optional() })),
   saves: z.array(z.object({ name: z.string(), baseAttribute: z.string() })),
   schemas: z.object({ formSchema: z.string(), uiSchema: z.string() }).optional(),
+  usesD20StyleModifiers: z.boolean().optional(),
 });
 
 const CharacterSchemaForImport = z.object({
@@ -137,7 +138,7 @@ export async function saveSystemAction(
     fullSystemData = {
       ...cleanedData,
       systemId,
-      description: `A custom system with creationData.attributes.length} attributes.`,
+      description: `A custom system with ${creationData.attributes.length} attributes.`,
       schemas,
     };
   }

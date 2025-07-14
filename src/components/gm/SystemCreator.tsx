@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
 import { listFeatsFromLibraryAction, listSkillsFromLibraryAction, saveSystemAction, suggestSkillsAction } from '@/actions';
 import { useEffect, useState, useMemo } from 'react';
@@ -26,6 +26,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Switch } from '../ui/switch';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -34,6 +35,7 @@ const saveSchema = z.object({ name: z.string().min(1, 'Name is required'), baseA
 
 const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
+  usesD20StyleModifiers: z.boolean().optional(),
   attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
   skills: z.array(skillSchema),
   feats: z.array(featSchema),
@@ -271,12 +273,14 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     resolver: zodResolver(systemSchema),
     defaultValues: isEditMode ? {
         systemName: initialData.systemName,
+        usesD20StyleModifiers: initialData.usesD20StyleModifiers,
         attributes: initialData.attributes,
         skills: initialData.skills,
         feats: initialData.feats,
         saves: initialData.saves,
     } : {
       systemName: '',
+      usesD20StyleModifiers: false,
       attributes: [{ name: 'Strength', description: 'Physical power' }],
       skills: [{ name: 'Athletics', baseAttribute: 'Strength' }],
       feats: [{ name: 'Power Attack', description: 'Trade accuracy for damage', prerequisites: 'Strength 13', effect: '-5 Hit, +5 Dmg' }],
@@ -288,6 +292,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     if (initialData) {
         form.reset({
             systemName: initialData.systemName,
+            usesD20StyleModifiers: initialData.usesD20StyleModifiers,
             attributes: initialData.attributes,
             skills: initialData.skills,
             feats: initialData.feats,
@@ -351,8 +356,9 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
+    const fullData = isEditMode ? { ...initialData, ...data } : data;
     try {
-        const result = await saveSystemAction(data as any);
+        const result = await saveSystemAction(fullData as any);
         if (result.success && result.systemId) {
             toast({
             title: `System ${isEditMode ? 'Updated' : 'Saved'}!`,
@@ -429,7 +435,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
             <CardHeader>
               <CardTitle>System Details</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <FormField
                 control={form.control}
                 name="systemName"
@@ -440,6 +446,26 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                       <Input placeholder="e.g., D20 Modern" {...field} />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="usesD20StyleModifiers"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Use D20-Style Modifiers</FormLabel>
+                      <FormDescription>
+                        Enable to calculate and display attribute modifiers (e.g., +2) like in D&D.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />

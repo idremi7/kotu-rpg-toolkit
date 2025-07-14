@@ -26,8 +26,6 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
 
   const { data } = character;
   
-  const isD20System = system.systemId.includes('d20') || system.systemId.includes('dnd');
-
   const handlePrint = () => {
     window.print();
   };
@@ -69,8 +67,8 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
                     {data.attributes && Object.entries(data.attributes).map(([key, value]) => (
                         <div key={key} className="bg-muted/50 rounded-md p-2 flex flex-col justify-center">
                             <div className="text-xs uppercase text-muted-foreground">{key}</div>
-                            <div className="font-bold text-lg">{isD20System ? getModifier(value as number) : (value as number)}</div>
-                            {isD20System && <div className="text-sm text-foreground/80">{value as number}</div>}
+                            <div className="font-bold text-lg">{system.usesD20StyleModifiers ? getModifier(value as number) : (value as number)}</div>
+                            {system.usesD20StyleModifiers && <div className="text-sm text-foreground/80">{value as number}</div>}
                         </div>
                     ))}
                 </div>
