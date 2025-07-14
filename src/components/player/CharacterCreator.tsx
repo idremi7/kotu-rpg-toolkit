@@ -268,7 +268,7 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
 
   const onSubmit = async (data: any) => {
     setIsSaving(true);
-    const result = await saveCharacterAction(systemId, data);
+    const result = await saveCharacterAction(systemId, data, false);
     
     if (result.success && result.characterId) {
         toast({

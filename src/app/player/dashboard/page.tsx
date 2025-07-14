@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PlusCircle, User } from "lucide-react";
 import Link from "next/link";
 import { listCharactersAction } from "@/actions";
+import { ImportCharacterButton } from "@/components/ImportCharacterButton";
 
 export default async function PlayerDashboard() {
   const characters = await listCharactersAction();
@@ -14,14 +15,15 @@ export default async function PlayerDashboard() {
             <h1 className="font-headline text-4xl font-bold">Player Dashboard</h1>
             <p className="text-muted-foreground mt-1">Manage your heroes and embark on new adventures.</p>
         </div>
-        {characters.length > 0 && (
-         <Button asChild size="lg">
-          <Link href="/player/characters/create">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Create New Character
-          </Link>
-        </Button>
-        )}
+        <div className="flex items-center gap-2">
+            <ImportCharacterButton />
+            <Button asChild size="lg">
+                <Link href="/player/characters/create">
+                    <PlusCircle className="mr-2 h-5 w-5" />
+                    Create New Character
+                </Link>
+            </Button>
+        </div>
       </div>
       
       {characters.length > 0 ? (
@@ -50,12 +52,15 @@ export default async function PlayerDashboard() {
          <div className="text-center py-16 border-2 border-dashed rounded-lg mt-12">
           <h2 className="text-2xl font-semibold mb-2">No Characters Found</h2>
           <p className="text-muted-foreground mb-4">It looks like you haven't created any characters yet.</p>
-          <Button asChild size="lg">
-            <Link href="/player/characters/create">
-              <PlusCircle className="mr-2 h-5 w-5" />
-              Create Your First Character
-            </Link>
-          </Button>
+          <div className="flex justify-center gap-4">
+            <ImportCharacterButton />
+            <Button asChild size="lg">
+                <Link href="/player/characters/create">
+                <PlusCircle className="mr-2 h-5 w-5" />
+                Create Your First Character
+                </Link>
+            </Button>
+          </div>
         </div>
       )}
     </div>

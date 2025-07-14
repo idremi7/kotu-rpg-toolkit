@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PlusCircle, Swords } from "lucide-react";
 import Link from "next/link";
 import { listSystemsAction } from "@/actions";
+import { ImportSystemButton } from "@/components/ImportSystemButton";
 
 export default async function GMDashboard() {
   const systems = await listSystemsAction();
@@ -14,12 +15,15 @@ export default async function GMDashboard() {
           <h1 className="font-headline text-4xl font-bold">GM Dashboard</h1>
           <p className="text-muted-foreground mt-1">Manage your game systems and campaigns.</p>
         </div>
-        <Button asChild size="lg">
-          <Link href="/gm/systems/create">
-            <PlusCircle className="mr-2 h-5 w-5" />
-            Create New System
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+            <ImportSystemButton />
+            <Button asChild size="lg">
+            <Link href="/gm/systems/create">
+                <PlusCircle className="mr-2 h-5 w-5" />
+                Create New System
+            </Link>
+            </Button>
+        </div>
       </div>
       
       {systems.length > 0 ? (
@@ -47,12 +51,15 @@ export default async function GMDashboard() {
         <div className="text-center py-16 border-2 border-dashed rounded-lg mt-12">
           <h2 className="text-2xl font-semibold mb-2">No Systems Found</h2>
           <p className="text-muted-foreground mb-4">It looks like you haven't created any game systems yet.</p>
-          <Button asChild size="lg">
-            <Link href="/gm/systems/create">
-              <PlusCircle className="mr-2 h-5 w-5" />
-              Create Your First System
-            </Link>
-          </Button>
+          <div className="flex justify-center gap-4">
+            <ImportSystemButton />
+            <Button asChild size="lg">
+                <Link href="/gm/systems/create">
+                <PlusCircle className="mr-2 h-5 w-5" />
+                Create Your First System
+                </Link>
+            </Button>
+          </div>
         </div>
       )}
     </div>
