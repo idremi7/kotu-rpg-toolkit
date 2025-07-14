@@ -332,7 +332,6 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     const fieldConfig = uiSchema[fieldName];
     if (!fieldConfig) return null;
 
-    // Render fieldsets (Attributes, Saves)
     if (fieldConfig['ui:fieldset']) {
       return (
         <Card key={fieldName}>
@@ -351,7 +350,6 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
       );
     }
 
-    // Render custom widgets (Skills, Feats) and others
     return (
       <Card key={fieldName}>
         <CardHeader>
@@ -394,7 +392,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
 
         <Card>
             <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {vitalsFields.map(fieldName => uiSchema[fieldName] && (
                     <FormFieldRenderer
                         key={fieldName}
