@@ -1,6 +1,9 @@
 import { getCharacterAction, getSystemAction } from '@/actions';
 import { BackButton } from '@/components/BackButton';
 import { CharacterCreator } from '@/components/player/CharacterCreator';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 export default async function EditCharacterPage({
@@ -24,7 +27,12 @@ export default async function EditCharacterPage({
     <div className="container mx-auto px-4 py-8">
       <div className="relative mb-8 flex items-center justify-center">
         <div className="absolute left-0">
-          <BackButton />
+          <Button asChild variant="outline" size="icon">
+            <Link href="/player/dashboard">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="sr-only">Back to Dashboard</span>
+            </Link>
+          </Button>
         </div>
         <div className="text-center">
           <h1 className="font-headline text-4xl font-bold">Edit Character</h1>
