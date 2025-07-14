@@ -15,6 +15,7 @@ import { getSystemAction, saveCharacterAction } from '@/app/actions';
 import type { GameSystem } from '@/lib/data-service';
 import { useRouter } from 'next/navigation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { BackButton } from '../BackButton';
 
 const CustomSkillWidget = ({ control, name, options }: { control: any, name: string, options: any[] }) => {
   const { fields, append, remove } = useFieldArray({ control, name });
@@ -277,12 +278,16 @@ export function CharacterCreator({ systemId }: { systemId: string }) {
 
   return (
     <>
-      <div className="text-center mb-8">
-        <h1 className="font-headline text-4xl font-bold">Forge Your Hero</h1>
-        <p className="text-muted-foreground">
-          You are creating a character for the <span className="text-primary font-semibold">{systemName}</span>{' '}
-          system.
-        </p>
+      <div className="flex items-center gap-4 mb-8">
+        <BackButton />
+        <div className="text-center flex-grow">
+            <h1 className="font-headline text-4xl font-bold">Forge Your Hero</h1>
+            <p className="text-muted-foreground">
+            You are creating a character for the <span className="text-primary font-semibold">{systemName}</span>{' '}
+            system.
+            </p>
+        </div>
+        <div className="w-10"></div>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto">
