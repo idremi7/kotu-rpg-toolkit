@@ -18,9 +18,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 
 const CustomSkillWidget = ({ control, name, options }: { control: any, name: string, options: any[] }) => {
   const { fields, append, remove } = useFieldArray({ control, name });
+  const datalistId = 'skill-suggestions';
 
   return (
     <div className="space-y-4">
+       <datalist id={datalistId}>
+        {options.map((opt: any) => (
+          <option key={opt.name} value={opt.name} />
+        ))}
+      </datalist>
       {fields.map((field, index) => (
         <div key={field.id} className="flex gap-2 items-center">
           <FormField
@@ -28,18 +34,13 @@ const CustomSkillWidget = ({ control, name, options }: { control: any, name: str
             name={`${name}.${index}.name`}
             render={({ field }) => (
               <FormItem className="flex-1">
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a skill" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {options.map((opt: any) => (
-                      <SelectItem key={opt.name} value={opt.name}>{opt.name} ({opt.baseAttribute})</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                 <FormControl>
+                    <Input 
+                        placeholder="Type or select a skill" 
+                        list={datalistId}
+                        {...field} 
+                    />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
