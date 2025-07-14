@@ -31,7 +31,7 @@ export default function Home() {
     <div className="flex flex-col">
       <section className="text-center py-20 px-4 bg-card/50">
         <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight">
-          KOTU: RPG Toolkit
+          V.E.R.S.A.: RPG Toolkit
         </h1>
         <p className="mt-6 text-2xl md:text-3xl text-foreground max-w-4xl mx-auto font-semibold">
           The Universal Toolkit for Your Tabletop RPG Adventures.
