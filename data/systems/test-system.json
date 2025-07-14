@@ -1,5 +1,5 @@
 {
-  "systemId": "test-system-for-creator",
+  "systemId": "test-system",
   "systemName": "Test System for Creator",
   "description": "A system designed to test the character creator features, including vitals and custom feats.",
   "usesD20StyleModifiers": true,
