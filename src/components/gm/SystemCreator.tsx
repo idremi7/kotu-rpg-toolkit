@@ -215,37 +215,35 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
   const groupedSkills = useMemo(() => {
-    return skillFields.reduce((acc, skill, index) => {
-      const baseAttribute = watchedSkills[index]?.baseAttribute || 'Unassigned';
+    return watchedSkills.reduce((acc, skill, index) => {
+      const baseAttribute = skill.baseAttribute || 'Unassigned';
       if (!acc[baseAttribute]) {
         acc[baseAttribute] = [];
       }
-      acc[baseAttribute].push({ ...skill, originalIndex: index });
+      // We use the original skillFields `id` for React's key prop
+      acc[baseAttribute].push({ ...skill, originalIndex: index, fieldId: skillFields[index].id });
       return acc;
-    }, {} as Record<string, (typeof skillFields[0] & { originalIndex: number })[]>);
-  }, [skillFields, watchedSkills]);
+    }, {} as Record<string, (typeof watchedSkills[0] & { originalIndex: number, fieldId: string })[]>);
+  }, [watchedSkills, skillFields]);
 
 
   const orderedSkillGroups = useMemo(() => {
     const attributeOrder = validAttributes.map(attr => attr.name);
-    const orderedGroups = attributeOrder
-        .filter(attrName => groupedSkills[attrName])
-        .map(attrName => ({
-            attribute: attrName,
-            skills: groupedSkills[attrName],
-        }));
+    const groupKeys = [...attributeOrder];
 
-    const allGroupedSkills = Object.keys(groupedSkills);
-    allGroupedSkills.forEach(attrName => {
-        if (!attributeOrder.includes(attrName)) {
-             orderedGroups.push({
-                attribute: attrName,
-                skills: groupedSkills[attrName],
-            });
+    // Add any other group keys that might exist (like 'Unassigned')
+    Object.keys(groupedSkills).forEach(key => {
+        if (!groupKeys.includes(key)) {
+            groupKeys.push(key);
         }
     });
     
-    return orderedGroups;
+    return groupKeys
+        .filter(key => groupedSkills[key] && groupedSkills[key].length > 0)
+        .map(key => ({
+            attribute: key,
+            skills: groupedSkills[key],
+        }));
   }, [groupedSkills, validAttributes]);
 
 
@@ -343,7 +341,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       
       toast({
         title: `${newFeats.length} Feats Added`,
-        description: `${featsToAdd.length - newFeats.length} feats were already in the system.`
+        description: `${featsToAdd.length - newFeats.length} feata were already in the system.`
       });
   }
 
@@ -502,7 +500,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     <AccordionContent className="pt-2">
                       <div className="space-y-2">
                         {skills.map(skill => (
-                          <div key={skill.id} className="flex gap-2 items-end">
+                          <div key={skill.fieldId} className="flex gap-2 items-end">
                             <FormField
                               control={form.control}
                               name={`skills.${skill.originalIndex}.name`}
