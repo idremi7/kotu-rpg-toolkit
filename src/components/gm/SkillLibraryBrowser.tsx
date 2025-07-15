@@ -4,7 +4,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FormLabel } from '@/components/ui/form';
 import { BookOpen } from 'lucide-react';
 import { listSkillsFromLibraryAction } from '@/actions';
 import { useToast } from '@/hooks/use-toast';
