@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
-import { saveSystemAction, suggestSkillsAction } from '@/actions';
+import { saveSystemAction, suggestSkillsAction, listFeatsFromLibraryAction } from '@/actions';
 import { useEffect, useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -28,7 +28,6 @@ import { Checkbox } from '../ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Switch } from '../ui/switch';
 import { SkillLibraryBrowser } from './SkillLibraryBrowser';
-import { listFeatsFromLibraryAction } from '@/actions';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -216,17 +215,15 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
   const groupedSkills = useMemo(() => {
-    const currentSkills = form.getValues('skills');
     return skillFields.reduce((acc, skill, index) => {
-      const baseAttribute = currentSkills[index]?.baseAttribute || 'Unassigned';
+      const baseAttribute = watchedSkills[index]?.baseAttribute || 'Unassigned';
       if (!acc[baseAttribute]) {
         acc[baseAttribute] = [];
       }
       acc[baseAttribute].push({ ...skill, originalIndex: index });
       return acc;
     }, {} as Record<string, (typeof skillFields[0] & { originalIndex: number })[]>);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [skillFields.length, form]);
+  }, [skillFields, watchedSkills]);
 
 
   const orderedSkillGroups = useMemo(() => {
@@ -312,16 +309,42 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     return null;
   }
   
-  const handleAddSkillsFromLibrary = (skillsToAdd: {name: string, category: string}[]) => {
-      const skillsWithAttributes = skillsToAdd.map(skill => {
-          const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
-          return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
-      });
-      appendSkill(skillsWithAttributes);
+  const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
+    const existingSkillNames = new Set(watchedSkills.map(s => s.name.toLowerCase()));
+    
+    const newSkills = skillsToAdd
+        .filter(skill => !existingSkillNames.has(skill.name.toLowerCase()))
+        .map(skill => {
+            const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
+            return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
+        });
+
+    if (newSkills.length > 0) {
+        appendSkill(newSkills);
+        toast({
+            title: `${newSkills.length} Skills Added`,
+            description: `Added new skills from the library. Please assign a base attribute if needed.`
+        });
+    } else {
+         toast({
+            title: `No New Skills Added`,
+            description: `All selected skills already exist in your system.`
+        });
+    }
   };
 
   const handleAddFeatsFromLibrary = (featsToAdd: Feat[]) => {
-      appendFeat(featsToAdd);
+      const existingFeatNames = new Set(form.getValues('feats').map(f => f.name.toLowerCase()));
+      const newFeats = featsToAdd.filter(feat => !existingFeatNames.has(feat.name.toLowerCase()));
+
+      if (newFeats.length > 0) {
+        appendFeat(newFeats);
+      }
+      
+      toast({
+        title: `${newFeats.length} Feats Added`,
+        description: `${featsToAdd.length - newFeats.length} feats were already in the system.`
+      });
   }
 
 
