@@ -8,7 +8,6 @@ import {
   saveCharacter,
   getCharacter as getCharacterFromDb,
   listCharacters as listCharactersFromDb,
-  listSkillsFromLibrary as listSkillsFromLibraryFromDb,
   listFeatsFromLibrary as listFeatsFromLibraryFromDb,
 } from '@/lib/data-service';
 import type { GameSystem, Feat, Character } from '@/lib/data-service';
@@ -16,6 +15,7 @@ import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
 import type { SuggestSkillsInput } from '@/ai/flows/suggest-skills-flow';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
+import skillLibrary from '@/data/skill-library.json';
 
 const GameSystemSchemaForImport = z.object({
   systemId: z.string(),
@@ -218,7 +218,7 @@ export async function suggestSkillsAction(input: SuggestSkillsInput) {
 }
 
 export async function listSkillsFromLibraryAction() {
-    return await listSkillsFromLibraryFromDb();
+    return skillLibrary;
 }
 
 export async function listFeatsFromLibraryAction() {
