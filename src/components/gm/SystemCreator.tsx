@@ -538,65 +538,87 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               <CardDescription>Special talents characters can acquire.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {featFields.map((field, index) => (
-                <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-end p-3 border rounded-md">
-                  <FormField
-                    control={form.control}
-                    name={`feats.${index}.name`}
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-1">
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`feats.${index}.description`}
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-1">
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`feats.${index}.prerequisites`}
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-1">
-                        <FormLabel>Prerequisites</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                   <FormField
-                    control={form.control}
-                    name={`feats.${index}.effect`}
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-1">
-                        <FormLabel>Effect</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+2, -10%, etc." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="md:col-span-4 flex justify-end">
-                    <Button type="button" variant="destructive" size="icon" onClick={() => removeFeat(index)}><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                </div>
-              ))}
+               <div className="border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Prerequisites</TableHead>
+                      <TableHead>Effect</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {featFields.map((field, index) => (
+                      <TableRow key={field.id}>
+                        <TableCell>
+                           <FormField
+                              control={form.control}
+                              name={`feats.${index}.name`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        </TableCell>
+                        <TableCell>
+                           <FormField
+                              control={form.control}
+                              name={`feats.${index}.description`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        </TableCell>
+                         <TableCell>
+                           <FormField
+                              control={form.control}
+                              name={`feats.${index}.prerequisites`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        </TableCell>
+                         <TableCell>
+                           <FormField
+                              control={form.control}
+                              name={`feats.${index}.effect`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input {...field} placeholder="+2, -10%, etc." />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button type="button" variant="ghost" size="icon" onClick={() => removeFeat(index)}>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete Feat</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
               <div className="flex gap-2">
                 <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: '', effect: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
                 <FeatLibraryBrowser onAddFeats={handleAddFeatsFromLibrary} />
