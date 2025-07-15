@@ -41,7 +41,7 @@ export const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {na
 
         const filtered = allSkills.filter(skill => {
             const categoryMatch = categoryFilter === 'all' || skill.category.toLowerCase() === categoryFilter.toLowerCase();
-            const searchMatch = !lowercasedQuery || 
+            const searchMatch = !searchQuery || 
                                 skill.name.toLowerCase().includes(lowercasedQuery) || 
                                 skill.description.toLowerCase().includes(lowercasedQuery);
             return categoryMatch && searchMatch;
