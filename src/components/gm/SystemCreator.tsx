@@ -28,6 +28,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Switch } from '../ui/switch';
 import { SkillLibraryBrowser } from './SkillLibraryBrowser';
+import { listFeatsFromLibraryAction } from '@/actions';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -55,7 +56,6 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
     const [isOpen, setIsOpen] = useState(false);
     const [allFeats, setAllFeats] = useState<FeatFromLibrary[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [featsLang, setFeatsLang] = useState<'en' | 'fr'>('en');
 
     useEffect(() => {
         if (isOpen && allFeats.length === 0) {
@@ -67,15 +67,12 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
 
     const filteredFeats = useMemo(() => {
         return allFeats.filter(feat => {
-            const langMatch = !feat.lang || feat.lang === featsLang;
-            if (!langMatch) return false;
-
             if (!searchQuery) return true;
             const lowercasedQuery = searchQuery.toLowerCase();
             return feat.name.toLowerCase().includes(lowercasedQuery) || 
                    feat.description.toLowerCase().includes(lowercasedQuery);
         });
-    }, [searchQuery, allFeats, featsLang]);
+    }, [searchQuery, allFeats]);
     
     const handleSelectFeat = (feat: FeatFromLibrary, isSelected: boolean) => {
         setSelectedFeats(prev => ({...prev, [feat.name]: { isSelected, feat }}));
@@ -121,10 +118,6 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="flex-grow"
                         />
-                         <div className="flex rounded-md border p-1">
-                            <Button type="button" size="sm" variant={featsLang === 'en' ? 'secondary' : 'ghost'} onClick={() => setFeatsLang('en')}>EN</Button>
-                            <Button type="button" size="sm" variant={featsLang === 'fr' ? 'secondary' : 'ghost'} onClick={() => setFeatsLang('fr')}>FR</Button>
-                        </div>
                     </div>
                     <ScrollArea className="flex-grow pr-4">
                        <div className="space-y-2">
@@ -223,15 +216,18 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
   const groupedSkills = useMemo(() => {
+    const currentSkills = form.getValues('skills');
     return skillFields.reduce((acc, skill, index) => {
-      const baseAttribute = watchedSkills[index]?.baseAttribute || 'Unassigned';
+      const baseAttribute = currentSkills[index]?.baseAttribute || 'Unassigned';
       if (!acc[baseAttribute]) {
         acc[baseAttribute] = [];
       }
       acc[baseAttribute].push({ ...skill, originalIndex: index });
       return acc;
     }, {} as Record<string, (typeof skillFields[0] & { originalIndex: number })[]>);
-  }, [skillFields, watchedSkills]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skillFields.length, form]);
+
 
   const orderedSkillGroups = useMemo(() => {
     const attributeOrder = validAttributes.map(attr => attr.name);
@@ -627,5 +623,3 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     </div>
   );
 }
-
-    
