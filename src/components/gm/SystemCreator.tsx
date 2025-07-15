@@ -25,9 +25,9 @@ import type { GameSystem, Feat, FeatFromLibrary } from '@/lib/data-service';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Switch } from '../ui/switch';
 import { SkillLibraryBrowser } from './SkillLibraryBrowser';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
@@ -211,41 +211,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   });
 
   const watchedAttributes = form.watch('attributes');
-  const watchedSkills = form.watch('skills');
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
-
-  const groupedSkills = useMemo(() => {
-    return watchedSkills.reduce((acc, skill, index) => {
-      const baseAttribute = skill.baseAttribute || 'Unassigned';
-      if (!acc[baseAttribute]) {
-        acc[baseAttribute] = [];
-      }
-      // We use the original skillFields `id` for React's key prop
-      acc[baseAttribute].push({ ...skill, originalIndex: index, fieldId: skillFields[index].id });
-      return acc;
-    }, {} as Record<string, (typeof watchedSkills[0] & { originalIndex: number, fieldId: string })[]>);
-  }, [watchedSkills, skillFields]);
-
-
-  const orderedSkillGroups = useMemo(() => {
-    const attributeOrder = validAttributes.map(attr => attr.name);
-    const groupKeys = [...attributeOrder];
-
-    // Add any other group keys that might exist (like 'Unassigned')
-    Object.keys(groupedSkills).forEach(key => {
-        if (!groupKeys.includes(key)) {
-            groupKeys.push(key);
-        }
-    });
-    
-    return groupKeys
-        .filter(key => groupedSkills[key] && groupedSkills[key].length > 0)
-        .map(key => ({
-            attribute: key,
-            skills: groupedSkills[key],
-        }));
-  }, [groupedSkills, validAttributes]);
-
 
   const handleSaveSystem = async (data: SystemFormData) => {
     setIsSaving(true);
@@ -308,7 +274,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   }
   
   const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
-    const existingSkillNames = new Set(watchedSkills.map(s => s.name.toLowerCase()));
+    const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.toLowerCase()));
     
     const newSkills = skillsToAdd
         .filter(skill => !existingSkillNames.has(skill.name.toLowerCase()))
@@ -319,16 +285,12 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
 
     if (newSkills.length > 0) {
         appendSkill(newSkills);
-        toast({
-            title: `${newSkills.length} Skills Added`,
-            description: `Added new skills from the library. Please assign a base attribute if needed.`
-        });
-    } else {
-         toast({
-            title: `No New Skills Added`,
-            description: `All selected skills already exist in your system.`
-        });
     }
+    
+    toast({
+        title: `${newSkills.length} New Skills Added`,
+        description: `${skillsToAdd.length - newSkills.length} selected skills already existed.`
+    });
   };
 
   const handleAddFeatsFromLibrary = (featsToAdd: Feat[]) => {
@@ -341,7 +303,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       
       toast({
         title: `${newFeats.length} Feats Added`,
-        description: `${featsToAdd.length - newFeats.length} feata were already in the system.`
+        description: `${featsToAdd.length - newFeats.length} feats were already in the system.`
       });
   }
 
@@ -488,40 +450,42 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               <CardDescription>Define character abilities. You can add them manually or use AI to get suggestions based on your attributes.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Accordion type="multiple" className="w-full space-y-2" defaultValue={['Unassigned']}>
-                {orderedSkillGroups.map(({ attribute, skills }) => (
-                  <AccordionItem key={attribute} value={attribute} className="border rounded-md px-3">
-                    <AccordionTrigger>
-                      <div className="flex items-center gap-2">
-                          {attribute}
-                          <span className="text-xs font-normal text-muted-foreground bg-muted h-5 w-5 flex items-center justify-center rounded-full">{skills.length}</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-2">
-                      <div className="space-y-2">
-                        {skills.map(skill => (
-                          <div key={skill.fieldId} className="flex gap-2 items-end">
-                            <FormField
+              <div className="border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50%]">Skill Name</TableHead>
+                      <TableHead className="w-[40%]">Base Attribute</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {skillFields.map((field, index) => (
+                      <TableRow key={field.id}>
+                        <TableCell>
+                           <FormField
                               control={form.control}
-                              name={`skills.${skill.originalIndex}.name`}
+                              name={`skills.${index}.name`}
                               render={({ field }) => (
-                                <FormItem className="flex-1">
+                                <FormItem>
                                   <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} placeholder="e.g. Acrobatics" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
                             />
-                            <FormField
+                        </TableCell>
+                        <TableCell>
+                           <FormField
                               control={form.control}
-                              name={`skills.${skill.originalIndex}.baseAttribute`}
+                              name={`skills.${index}.baseAttribute`}
                               render={({ field }) => (
-                                <FormItem className="w-[150px]">
-                                  <Select onValueChange={field.onChange} value={field.value}>
+                                <FormItem>
+                                  <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger>
-                                        <SelectValue placeholder="Attribute" />
+                                        <SelectValue placeholder="Select an attribute" />
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -534,16 +498,20 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                                 </FormItem>
                               )}
                             />
-                            <Button type="button" variant="destructive" size="icon" onClick={() => removeSkill(skill.originalIndex)}><Trash2 className="h-4 w-4" /></Button>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button type="button" variant="ghost" size="icon" onClick={() => removeSkill(index)}>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete Skill</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
               
-              <div className="flex gap-2 pt-4">
+              <div className="flex flex-wrap gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
                 <SkillLibraryBrowser onAddSkills={handleAddSkillsFromLibrary} />
                  <DropdownMenu>
