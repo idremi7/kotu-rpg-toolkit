@@ -13,7 +13,7 @@ import type { SkillFromLibrary } from '@/lib/data-service';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Separator } from '../ui/separator';
 
 const LanguageToggle = ({ selectedLang, onLangChange }: { selectedLang: 'en' | 'fr' | 'all', onLangChange: (lang: 'en' | 'fr' | 'all') => void }) => {
     return (
@@ -120,33 +120,32 @@ export const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {na
                     </div>
                     <LanguageToggle selectedLang={lang} onLangChange={setLang} />
                     <ScrollArea className="flex-grow pr-4 -mx-4 px-4">
-                       <Accordion type="multiple" className="w-full" defaultValue={Object.keys(filteredAndGroupedSkills)}>
-                           {Object.entries(filteredAndGroupedSkills).map(([category, skills]) => (
-                               <AccordionItem value={category} key={category}>
-                                   <AccordionTrigger>{category}</AccordionTrigger>
-                                   <AccordionContent>
-                                        <div className="space-y-2">
-                                            {skills.map(skill => (
-                                                <div key={`${skill.name}-${skill.lang}`} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
-                                                    <Checkbox 
-                                                        id={`lib-${skill.name}-${skill.lang}`}
-                                                        checked={!!selectedSkills[skill.name]?.isSelected}
-                                                        onCheckedChange={(checked) => handleSelectSkill(skill.name, skill.category, !!checked)}
-                                                    />
-                                                    <label htmlFor={`lib-${skill.name}-${skill.lang}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
-                                                        <div className="flex justify-between">
-                                                          <span>{skill.name}</span>
-                                                          <span className="text-xs text-muted-foreground">{skill.lang?.toUpperCase()}</span>
-                                                        </div>
-                                                        <p className="text-xs text-muted-foreground">{skill.description}</p>
-                                                    </label>
-                                                </div>
-                                            ))}
-                                        </div>
-                                   </AccordionContent>
-                               </AccordionItem>
+                       <div className="space-y-4">
+                           {Object.entries(filteredAndGroupedSkills).map(([category, skills], index) => (
+                               <div key={category}>
+                                   {index > 0 && <Separator className="my-4" />}
+                                   <h3 className="text-lg font-semibold mb-2">{category}</h3>
+                                    <div className="space-y-2">
+                                        {skills.map(skill => (
+                                            <div key={`${skill.name}-${skill.lang}`} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
+                                                <Checkbox 
+                                                    id={`lib-${skill.name}-${skill.lang}`}
+                                                    checked={!!selectedSkills[skill.name]?.isSelected}
+                                                    onCheckedChange={(checked) => handleSelectSkill(skill.name, skill.category, !!checked)}
+                                                />
+                                                <label htmlFor={`lib-${skill.name}-${skill.lang}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
+                                                    <div className="flex justify-between">
+                                                      <span>{skill.name}</span>
+                                                      <span className="text-xs text-muted-foreground">{skill.lang?.toUpperCase()}</span>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">{skill.description}</p>
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                               </div>
                            ))}
-                       </Accordion>
+                       </div>
                     </ScrollArea>
                     <div className="pt-4 border-t mt-auto">
                         <Button onClick={handleAdd} className="w-full" disabled={Object.values(selectedSkills).every(v => !v.isSelected)}>
