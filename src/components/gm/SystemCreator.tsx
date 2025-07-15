@@ -359,37 +359,57 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               <CardDescription>Define the core stats of your system.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {attributeFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                  <FormField
-                    control={form.control}
-                    name={`attributes.${index}.name`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`attributes.${index}.description`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="button" variant="destructive" size="icon" onClick={() => removeAttribute(index)}><Trash2 className="h-4 w-4" /></Button>
-                </div>
-              ))}
+              <div className="border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[40%]">Attribute Name</TableHead>
+                      <TableHead className="w-[50%]">Description</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {attributeFields.map((field, index) => (
+                      <TableRow key={field.id}>
+                        <TableCell>
+                          <FormField
+                            control={form.control}
+                            name={`attributes.${index}.name`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <FormField
+                            control={form.control}
+                            name={`attributes.${index}.description`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button type="button" variant="ghost" size="icon" onClick={() => removeAttribute(index)}>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete Attribute</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
               <Button type="button" variant="outline" onClick={() => appendAttribute({ name: '', description: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Attribute</Button>
             </CardContent>
           </Card>
@@ -400,46 +420,66 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               <CardDescription>Define character saving throws.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {saveFields.map((field, index) => (
-                <div key={field.id} className="flex gap-2 items-end p-3 border rounded-md">
-                  <FormField
-                    control={form.control}
-                    name={`saves.${index}.name`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`saves.${index}.baseAttribute`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>Base Attribute</FormLabel>
-                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select an attribute" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {validAttributes.map(attr => (
-                                <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="button" variant="destructive" size="icon" onClick={() => removeSave(index)}><Trash2 className="h-4 w-4" /></Button>
-                </div>
-              ))}
+              <div className="border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50%]">Save Name</TableHead>
+                      <TableHead className="w-[40%]">Base Attribute</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {saveFields.map((field, index) => (
+                      <TableRow key={field.id}>
+                        <TableCell>
+                          <FormField
+                            control={form.control}
+                            name={`saves.${index}.name`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <FormField
+                            control={form.control}
+                            name={`saves.${index}.baseAttribute`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select an attribute" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {validAttributes.map(attr => (
+                                      <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button type="button" variant="ghost" size="icon" onClick={() => removeSave(index)}>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete Save</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
               <Button type="button" variant="outline" onClick={() => appendSave({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Save</Button>
             </CardContent>
           </Card>
