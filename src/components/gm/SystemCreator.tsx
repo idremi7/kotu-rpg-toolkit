@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
-import { listFeatsFromLibraryAction, saveSystemAction, suggestSkillsAction } from '@/actions';
+import { saveSystemAction, suggestSkillsAction } from '@/actions';
 import { useEffect, useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { GameSystem, FeatFromLibrary } from '@/lib/data-service';
+import type { GameSystem, Feat, FeatFromLibrary } from '@/lib/data-service';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
@@ -55,6 +55,7 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
     const [isOpen, setIsOpen] = useState(false);
     const [allFeats, setAllFeats] = useState<FeatFromLibrary[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [featsLang, setFeatsLang] = useState<'en' | 'fr'>('en');
 
     useEffect(() => {
         if (isOpen && allFeats.length === 0) {
@@ -66,12 +67,15 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
 
     const filteredFeats = useMemo(() => {
         return allFeats.filter(feat => {
+            const langMatch = !feat.lang || feat.lang === featsLang;
+            if (!langMatch) return false;
+
             if (!searchQuery) return true;
             const lowercasedQuery = searchQuery.toLowerCase();
             return feat.name.toLowerCase().includes(lowercasedQuery) || 
                    feat.description.toLowerCase().includes(lowercasedQuery);
         });
-    }, [searchQuery, allFeats]);
+    }, [searchQuery, allFeats, featsLang]);
     
     const handleSelectFeat = (feat: FeatFromLibrary, isSelected: boolean) => {
         setSelectedFeats(prev => ({...prev, [feat.name]: { isSelected, feat }}));
@@ -110,12 +114,18 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
                     </SheetDescription>
                 </SheetHeader>
                 <div className="py-4 h-[calc(100%-120px)] flex flex-col">
-                    <Input 
-                        placeholder="Search for a feat..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="mb-4"
-                    />
+                    <div className="flex gap-2 mb-4">
+                        <Input 
+                            placeholder="Search for a feat..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="flex-grow"
+                        />
+                         <div className="flex rounded-md border p-1">
+                            <Button type="button" size="sm" variant={featsLang === 'en' ? 'secondary' : 'ghost'} onClick={() => setFeatsLang('en')}>EN</Button>
+                            <Button type="button" size="sm" variant={featsLang === 'fr' ? 'secondary' : 'ghost'} onClick={() => setFeatsLang('fr')}>FR</Button>
+                        </div>
+                    </div>
                     <ScrollArea className="flex-grow pr-4">
                        <div className="space-y-2">
                             {filteredFeats.map((feat, index) => (
@@ -209,18 +219,19 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   });
 
   const watchedAttributes = form.watch('attributes');
+  const watchedSkills = form.watch('skills');
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
   const groupedSkills = useMemo(() => {
     return skillFields.reduce((acc, skill, index) => {
-      const baseAttribute = form.getValues(`skills.${index}.baseAttribute`) || 'Unassigned';
+      const baseAttribute = watchedSkills[index]?.baseAttribute || 'Unassigned';
       if (!acc[baseAttribute]) {
         acc[baseAttribute] = [];
       }
       acc[baseAttribute].push({ ...skill, originalIndex: index });
       return acc;
     }, {} as Record<string, (typeof skillFields[0] & { originalIndex: number })[]>);
-  }, [skillFields, form.watch('skills')]);
+  }, [skillFields, watchedSkills]);
 
   const orderedSkillGroups = useMemo(() => {
     const attributeOrder = validAttributes.map(attr => attr.name);
@@ -231,12 +242,16 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
             skills: groupedSkills[attrName],
         }));
 
-    if (groupedSkills['Unassigned']) {
-        orderedGroups.push({
-            attribute: 'Unassigned',
-            skills: groupedSkills['Unassigned'],
-        });
-    }
+    const allGroupedSkills = Object.keys(groupedSkills);
+    allGroupedSkills.forEach(attrName => {
+        if (!attributeOrder.includes(attrName)) {
+             orderedGroups.push({
+                attribute: attrName,
+                skills: groupedSkills[attrName],
+            });
+        }
+    });
+    
     return orderedGroups;
   }, [groupedSkills, validAttributes]);
 
@@ -309,7 +324,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       appendSkill(skillsWithAttributes);
   };
 
-  const handleAddFeatsFromLibrary = (featsToAdd: {name: string, description: string, prerequisites: string, effect: string }[]) => {
+  const handleAddFeatsFromLibrary = (featsToAdd: Feat[]) => {
       appendFeat(featsToAdd);
   }
 
@@ -485,11 +500,11 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                               control={form.control}
                               name={`skills.${skill.originalIndex}.baseAttribute`}
                               render={({ field }) => (
-                                <FormItem className="flex-1">
+                                <FormItem className="w-[150px]">
                                   <Select onValueChange={field.onChange} value={field.value}>
                                     <FormControl>
                                       <SelectTrigger>
-                                        <SelectValue placeholder="Select an attribute" />
+                                        <SelectValue placeholder="Attribute" />
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -612,3 +627,5 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     </div>
   );
 }
+
+    
