@@ -29,7 +29,6 @@ export interface SkillFromLibrary {
     name: string;
     category: string;
     description: string;
-    lang: 'en' | 'fr';
 }
 
 export interface FeatFromLibrary {
@@ -38,7 +37,6 @@ export interface FeatFromLibrary {
     prerequisites: string;
     category: string; // e.g., 'Combat', 'General', 'Magic'
     effect?: string;
-    lang: 'en' | 'fr';
 }
 
 

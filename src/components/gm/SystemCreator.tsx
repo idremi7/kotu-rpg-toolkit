@@ -49,23 +49,12 @@ interface SystemCreatorProps {
     initialData?: GameSystem;
 }
 
-const LanguageToggle = ({ selectedLang, onLangChange }: { selectedLang: 'en' | 'fr' | 'all', onLangChange: (lang: 'en' | 'fr' | 'all') => void }) => {
-    return (
-        <div className="flex justify-center gap-2 my-2">
-            <Button size="sm" variant={selectedLang === 'en' ? 'default' : 'outline'} onClick={() => onLangChange('en')}>English</Button>
-            <Button size="sm" variant={selectedLang === 'fr' ? 'default' : 'outline'} onClick={() => onLangChange('fr')}>Français</Button>
-            <Button size="sm" variant={selectedLang === 'all' ? 'default' : 'outline'} onClick={() => onLangChange('all')}>All</Button>
-        </div>
-    );
-};
-
 const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string, description: string, prerequisites: string, effect: string }[]) => void }) => {
     const { toast } = useToast();
     const [selectedFeats, setSelectedFeats] = useState<Record<string, {isSelected: boolean, feat: FeatFromLibrary}>>({});
     const [isOpen, setIsOpen] = useState(false);
     const [allFeats, setAllFeats] = useState<FeatFromLibrary[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [lang, setLang] = useState<'en' | 'fr' | 'all'>('en');
 
     useEffect(() => {
         if (isOpen && allFeats.length === 0) {
@@ -77,16 +66,12 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
 
     const filteredFeats = useMemo(() => {
         return allFeats.filter(feat => {
-            const langMatch = lang === 'all' || !feat.lang || feat.lang === lang;
-            if (!langMatch) return false;
-
             if (!searchQuery) return true;
-
             const lowercasedQuery = searchQuery.toLowerCase();
             return feat.name.toLowerCase().includes(lowercasedQuery) || 
                    feat.description.toLowerCase().includes(lowercasedQuery);
         });
-    }, [searchQuery, allFeats, lang]);
+    }, [searchQuery, allFeats]);
     
     const handleSelectFeat = (feat: FeatFromLibrary, isSelected: boolean) => {
         setSelectedFeats(prev => ({...prev, [feat.name]: { isSelected, feat }}));
@@ -129,19 +114,18 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
                         placeholder="Search for a feat..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="mb-2"
+                        className="mb-4"
                     />
-                    <LanguageToggle selectedLang={lang} onLangChange={setLang} />
                     <ScrollArea className="flex-grow pr-4">
                        <div className="space-y-2">
                             {filteredFeats.map((feat, index) => (
-                                <div key={`${feat.name}-${feat.lang}-${index}`} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
+                                <div key={`${feat.name}-${index}`} className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted/50">
                                     <Checkbox 
-                                        id={`lib-feat-${feat.name}-${feat.lang}-${index}`}
+                                        id={`lib-feat-${feat.name}-${index}`}
                                         checked={!!selectedFeats[feat.name]?.isSelected}
                                         onCheckedChange={(checked) => handleSelectFeat(feat, !!checked)}
                                     />
-                                    <label htmlFor={`lib-feat-${feat.name}-${feat.lang}-${index}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
+                                    <label htmlFor={`lib-feat-${feat.name}-${index}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-grow">
                                         <div className="flex justify-between">
                                           <span>{feat.name}</span>
                                           <span className="text-xs text-muted-foreground">{feat.prerequisites}</span>
