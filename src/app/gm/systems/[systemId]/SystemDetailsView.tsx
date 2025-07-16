@@ -156,7 +156,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
           
-          <Card className="md:col-span-2 lg:col-span-3">
+          <Card className="md:col-span-2">
               <CardHeader>
                   <CardTitle>Skills</CardTitle>
               </CardHeader>
@@ -180,7 +180,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
 
-          <Card className="md:col-span-2 lg:col-span-3">
+          <Card>
               <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
                <CardContent className="space-y-4">
                   {feats.map((feat: any, index: number) => (
