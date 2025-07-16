@@ -13,11 +13,12 @@ export default function CharacterSheetPage({ params }: { params: { characterId: 
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
+  const { characterId } = params;
 
   useEffect(() => {
     if (mounted) {
       const loadData = async () => {
-        const charData = await getCharacter(params.characterId);
+        const charData = await getCharacter(characterId);
         if (charData) {
           const sysData = await getSystem(charData.systemId);
           setCharacter(charData);
@@ -27,7 +28,7 @@ export default function CharacterSheetPage({ params }: { params: { characterId: 
       };
       loadData();
     }
-  }, [params.characterId, mounted]);
+  }, [characterId, mounted]);
 
   if (!mounted || isLoading) {
     return (

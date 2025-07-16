@@ -15,11 +15,12 @@ export default function EditCharacterPage({ params }: { params: { characterId: s
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
+  const { characterId } = params;
 
   useEffect(() => {
     if (mounted) {
       const loadData = async () => {
-        const char = await getCharacter(params.characterId);
+        const char = await getCharacter(characterId);
         if (char) {
           const sys = await getSystem(char.systemId);
           setCharacter(char);
@@ -29,7 +30,7 @@ export default function EditCharacterPage({ params }: { params: { characterId: s
       };
       loadData();
     }
-  }, [params.characterId, mounted]);
+  }, [characterId, mounted]);
 
   if (!mounted || isLoading) {
     return (

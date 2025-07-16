@@ -13,17 +13,18 @@ export default function CreateCharacterPage({ params }: { params: { systemId: st
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
+  const { systemId } = params;
 
   useEffect(() => {
     if (mounted) {
-        getSystem(params.systemId).then(data => {
+        getSystem(systemId).then(data => {
             if (data) {
                 setSystem(data);
             }
             setIsLoading(false);
         });
     }
-  }, [params.systemId, mounted]);
+  }, [systemId, mounted]);
 
   if (!mounted || isLoading) {
     return (

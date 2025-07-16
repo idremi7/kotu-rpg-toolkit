@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getSystem } from '@/lib/data-service';
-import type { GameSystem } from '@/lib/data-service';
+import type { GameSystem, Feat } from '@/lib/data-service';
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -20,17 +20,18 @@ export default function SystemDetailsPage({ params }: { params: { systemId: stri
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
+  const { systemId } = params;
 
   useEffect(() => {
       if (mounted) {
-        getSystem(params.systemId).then(data => {
+        getSystem(systemId).then(data => {
             if (data) {
                 setSystem(data);
             }
             setIsLoading(false);
         });
       }
-  }, [params.systemId, mounted]);
+  }, [systemId, mounted]);
 
   if (!mounted || isLoading) {
     return (
@@ -66,7 +67,7 @@ export default function SystemDetailsPage({ params }: { params: { systemId: stri
         <div className="flex items-center gap-2">
             <ExportSystemButton system={system} />
             <Button asChild variant="outline">
-            <Link href={`/gm/systems/${params.systemId}/edit`}>
+            <Link href={`/gm/systems/${systemId}/edit`}>
                 <Pencil className="mr-2 h-4 w-4" />
                 Edit System
             </Link>

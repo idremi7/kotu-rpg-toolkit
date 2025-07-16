@@ -13,10 +13,11 @@ export default function EditSystemPage({ params }: { params: { systemId: string 
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
+  const { systemId } = params;
 
   useEffect(() => {
     if (mounted) {
-      getSystem(params.systemId).then(data => {
+      getSystem(systemId).then(data => {
         if (!data) {
           notFound();
         } else {
@@ -25,7 +26,7 @@ export default function EditSystemPage({ params }: { params: { systemId: string 
         setIsLoading(false);
       });
     }
-  }, [params.systemId, mounted]);
+  }, [systemId, mounted]);
   
   if (!mounted || isLoading) {
     return (
