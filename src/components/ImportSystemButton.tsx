@@ -4,14 +4,15 @@ import { useRef } from 'react';
 import { Button } from './ui/button';
 import { Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { saveSystemAction } from '@/actions';
+import { importSystem } from '@/lib/data-service';
 import { cn } from '@/lib/utils';
 
 interface ImportSystemButtonProps {
     className?: string;
+    onImport?: () => void;
 }
 
-export function ImportSystemButton({ className }: ImportSystemButtonProps) {
+export function ImportSystemButton({ className, onImport }: ImportSystemButtonProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -34,13 +35,14 @@ export function ImportSystemButton({ className }: ImportSystemButtonProps) {
         const text = e.target?.result as string;
         const systemData = JSON.parse(text);
         
-        const result = await saveSystemAction(systemData, true);
+        const result = await importSystem(systemData);
 
         if (result.success) {
           toast({
             title: 'System Imported',
             description: `Successfully imported the "${systemData.systemName}" system.`,
           });
+          onImport?.();
         } else {
           toast({
             variant: 'destructive',

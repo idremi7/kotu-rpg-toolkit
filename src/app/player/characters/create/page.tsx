@@ -1,12 +1,35 @@
-import { listSystemsAction } from "@/actions";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { listSystems } from "@/lib/data-service";
+import type { GameSystemSummary } from '@/lib/data-service';
 import { BackButton } from "@/components/BackButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Swords } from "lucide-react";
+import { Swords, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useMounted } from '@/hooks/use-mounted';
 
+export default function SelectSystemPage() {
+  const [systems, setSystems] = useState<GameSystemSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const mounted = useMounted();
 
-export default async function SelectSystemPage() {
-  const systems = await listSystemsAction();
+  useEffect(() => {
+    if (mounted) {
+        listSystems().then(data => {
+            setSystems(data);
+            setIsLoading(false);
+        });
+    }
+  }, [mounted]);
+
+  if (!mounted || isLoading) {
+    return (
+        <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

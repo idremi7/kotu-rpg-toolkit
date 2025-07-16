@@ -1,13 +1,44 @@
+'use client';
 
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Swords } from "lucide-react";
+import { PlusCircle, Swords, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { listSystemsAction } from "@/actions";
+import { listSystems } from "@/lib/data-service";
+import type { GameSystemSummary } from '@/lib/data-service';
 import { ImportSystemButton } from "@/components/ImportSystemButton";
+import { useMounted } from '@/hooks/use-mounted';
 
-export default async function GMDashboard() {
-  const systems = await listSystemsAction();
+export default function GMDashboard() {
+  const [systems, setSystems] = useState<GameSystemSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const mounted = useMounted();
+
+  const loadSystems = async () => {
+    setIsLoading(true);
+    const systemList = await listSystems();
+    setSystems(systemList);
+    setIsLoading(false);
+  };
+  
+  useEffect(() => {
+    if (mounted) {
+      loadSystems();
+    }
+  }, [mounted]);
+
+  if (!mounted) {
+    return null;
+  }
+  
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -18,7 +49,7 @@ export default async function GMDashboard() {
         </div>
         {systems.length > 0 && (
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <ImportSystemButton className="w-full sm:w-auto" />
+              <ImportSystemButton onImport={loadSystems} className="w-full sm:w-auto" />
               <Button asChild size="lg" className="w-full sm:w-auto">
               <Link href="/gm/systems/create">
                   <PlusCircle className="mr-2 h-5 w-5" />
@@ -55,7 +86,7 @@ export default async function GMDashboard() {
           <h2 className="text-2xl font-semibold mb-2">No Systems Found</h2>
           <p className="text-muted-foreground mb-4">It looks like you haven't created any game systems yet.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4 px-4">
-            <ImportSystemButton className="w-full" />
+            <ImportSystemButton onImport={loadSystems} className="w-full" />
             <Button asChild size="lg" className="w-full">
                 <Link href="/gm/systems/create">
                 <PlusCircle className="mr-2 h-5 w-5" />

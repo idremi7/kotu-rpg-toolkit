@@ -4,15 +4,16 @@ import { useRef } from 'react';
 import { Button } from './ui/button';
 import { Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { saveCharacterAction } from '@/actions';
+import { saveCharacter } from '@/lib/data-service';
 import { cn } from '@/lib/utils';
 import type { Character } from '@/lib/data-service';
 
 interface ImportCharacterButtonProps {
     className?: string;
+    onImport?: () => void;
 }
 
-export function ImportCharacterButton({ className }: ImportCharacterButtonProps) {
+export function ImportCharacterButton({ className, onImport }: ImportCharacterButtonProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,20 +36,15 @@ export function ImportCharacterButton({ className }: ImportCharacterButtonProps)
         const text = e.target?.result as string;
         const characterData = JSON.parse(text) as Character;
         
-        const result = await saveCharacterAction(characterData);
+        await saveCharacter(characterData);
 
-        if (result.success) {
-          toast({
-            title: 'Character Imported',
-            description: `Successfully imported ${characterData.data.name}.`,
-          });
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'Import Failed',
-            description: result.error || 'The character file might be corrupt or invalid.',
-          });
-        }
+        toast({
+          title: 'Character Imported',
+          description: `Successfully imported ${characterData.data.name}.`,
+        });
+
+        onImport?.();
+
       } catch (error) {
         toast({
           variant: 'destructive',

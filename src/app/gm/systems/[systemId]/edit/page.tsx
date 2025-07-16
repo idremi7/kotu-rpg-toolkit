@@ -1,13 +1,42 @@
-import { getSystemAction } from '@/actions';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { getSystem } from '@/lib/data-service';
+import type { GameSystem } from '@/lib/data-service';
 import { notFound } from 'next/navigation';
 import { SystemCreator } from '@/components/gm/SystemCreator';
 import { BackButton } from '@/components/BackButton';
+import { Loader2 } from 'lucide-react';
+import { useMounted } from '@/hooks/use-mounted';
 
-export default async function EditSystemPage({ params }: { params: { systemId: string } }) {
-  const system = await getSystemAction(params.systemId);
+export default function EditSystemPage({ params }: { params: { systemId: string } }) {
+  const [system, setSystem] = useState<GameSystem | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const mounted = useMounted();
+
+  useEffect(() => {
+    if (mounted) {
+      getSystem(params.systemId).then(data => {
+        if (!data) {
+          notFound();
+        } else {
+          setSystem(data);
+        }
+        setIsLoading(false);
+      });
+    }
+  }, [params.systemId, mounted]);
+  
+  if (!mounted || isLoading) {
+    return (
+        <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    );
+  }
 
   if (!system) {
-    notFound();
+    return notFound();
   }
 
   return (

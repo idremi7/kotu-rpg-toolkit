@@ -1,10 +1,37 @@
-import { getSystemAction } from "@/actions";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { getSystem } from "@/lib/data-service";
+import type { GameSystem } from '@/lib/data-service';
 import { BackButton } from "@/components/BackButton";
 import { CharacterCreator } from "@/components/player/CharacterCreator";
 import { notFound } from "next/navigation";
+import { Loader2 } from 'lucide-react';
+import { useMounted } from '@/hooks/use-mounted';
 
-export default async function CreateCharacterPage({ params }: { params: { systemId: string }}) {
-  const system = await getSystemAction(params.systemId);
+export default function CreateCharacterPage({ params }: { params: { systemId: string }}) {
+  const [system, setSystem] = useState<GameSystem | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const mounted = useMounted();
+
+  useEffect(() => {
+    if (mounted) {
+        getSystem(params.systemId).then(data => {
+            if (data) {
+                setSystem(data);
+            }
+            setIsLoading(false);
+        });
+    }
+  }, [params.systemId, mounted]);
+
+  if (!mounted || isLoading) {
+    return (
+        <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    );
+  }
 
   if (!system) {
       notFound();

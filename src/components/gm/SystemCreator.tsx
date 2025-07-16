@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -9,7 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
-import { saveSystemAction, suggestSkillsAction, listFeatsFromLibraryAction } from '@/actions';
+import { saveSystem, listFeatsFromLibrary, listSkillsFromLibrary } from '@/lib/data-service';
+import { suggestSkillsAction } from '@/ai/flows/suggest-skills-flow';
 import { useEffect, useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { GameSystem, Feat, FeatFromLibrary, CustomRule } from '@/lib/data-service';
+import type { GameSystem, Feat, FeatFromLibrary, CustomRule, SkillFromLibrary } from '@/lib/data-service';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
@@ -61,7 +61,7 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
 
     useEffect(() => {
         if (isOpen && allFeats.length === 0) {
-            listFeatsFromLibraryAction().then(feats => {
+            listFeatsFromLibrary().then(feats => {
                 setAllFeats(feats);
             });
         }
@@ -227,7 +227,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     setIsSaving(true);
     const fullData = isEditMode ? { ...initialData, ...data } : data;
     try {
-        const result = await saveSystemAction(fullData as any);
+        const result = await saveSystem(fullData as any);
         if (result.success && result.systemId) {
             toast({
             title: `System ${isEditMode ? 'Updated' : 'Saved'}!`,
@@ -298,16 +298,20 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       }
       
       const duplicatesCount = skillsToAdd.length - newSkills.length;
+      const newSkillsCount = newSkills.length;
 
-      if (newSkills.length > 0) {
-          toast({
-              title: "Skills Added",
-              description: `${newSkills.length} new ${newSkills.length > 1 ? 'skills' : 'skill'} added. ${duplicatesCount > 0 ? `${duplicatesCount} ${duplicatesCount > 1 ? 'skills' : 'skill'} were ignored as duplicates.` : ''}`.trim(),
-          });
-      } else {
+      if (newSkillsCount > 0) {
+        const title = "Skills Added";
+        const desc_part1 = `${newSkillsCount} new ${newSkillsCount > 1 ? 'skill' : 'skill'} has been added.`;
+        const desc_part2 = duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount > 1 ? 'skills were' : 'skill was'} ignored.` : '';
+        toast({
+            title: title,
+            description: `${desc_part1} ${desc_part2}`.trim(),
+        });
+      } else if (duplicatesCount > 0) {
           toast({
               title: "No New Skills Added",
-              description: `All ${skillsToAdd.length} selected ${skillsToAdd.length > 1 ? 'skills' : 'skill'} already exist in your system.`,
+              description: `All ${duplicatesCount} selected ${duplicatesCount > 1 ? 'skills' : 'skill'} already exist in your system.`,
           });
       }
   };
@@ -791,5 +795,3 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     </div>
   );
 }
-
-    

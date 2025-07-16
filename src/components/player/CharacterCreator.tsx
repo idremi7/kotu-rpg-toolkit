@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -10,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Textarea } from '@/components/ui/textarea';
 import { UserPlus, Loader2, PlusCircle, Trash2, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { saveCharacterAction } from '@/actions';
+import { saveCharacter } from '@/lib/data-service';
 import type { GameSystem, Character } from '@/lib/data-service';
 import { useRouter } from 'next/navigation';
 
@@ -320,7 +319,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         data: processedData,
     };
 
-    const result = await saveCharacterAction(characterToSave);
+    const result = await saveCharacter(characterToSave);
     
     if (result.success && result.characterId) {
         toast({
@@ -377,16 +376,18 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
                 ))}
             </CardContent>
         </Card>
+        
+        {uiSchema.vitals && (
+            <Card>
+                <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <NumberFieldRenderer control={form.control} name="vitals.hp" label="Current HP" />
+                    <NumberFieldRenderer control={form.control} name="vitals.maxHp" label="Maximum HP" />
+                </CardContent>
+            </Card>
+        )}
 
-        <Card>
-            <CardHeader><CardTitle>Vitals</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <NumberFieldRenderer control={form.control} name="vitals.hp" label="Current HP" />
-                <NumberFieldRenderer control={form.control} name="vitals.maxHp" label="Maximum HP" />
-            </CardContent>
-        </Card>
-
-        {fieldsets.map(({ name, config }) => (
+        {fieldsets.filter(f => f.name !== 'vitals').map(({ name, config }) => (
             <FormFieldRenderer
                 key={name}
                 control={form.control}
