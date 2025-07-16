@@ -17,6 +17,8 @@ import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
+const createAttributeId = (name: string) => `attr-${name.replace(/\s+/g, '-')}`;
+
 export function SystemDetailsView({ systemId }: { systemId: string }) {
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -123,7 +125,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
             <CardHeader><CardTitle>Attributes</CardTitle></CardHeader>
             <CardContent className="space-y-2">
                 {attributes.map((attr: any) => (
-                    <div key={attr.name}>
+                    <div key={attr.name} id={createAttributeId(attr.name)} className="scroll-mt-20">
                         <h4 className="font-semibold">{attr.name}</h4>
                         <p className="text-sm text-muted-foreground">{attr.description}</p>
                     </div>
@@ -135,8 +137,11 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
             <CardHeader><CardTitle>Saves</CardTitle></CardHeader>
             <CardContent className="space-y-2">
                 {saves.map((save: any) => (
-                    <div key={save.name}>
-                        <h4 className="font-semibold">{save.name} <Badge variant="outline">{save.baseAttribute}</Badge></h4>
+                    <div key={save.name} className="flex items-baseline justify-between">
+                        <h4 className="font-semibold">{save.name}</h4> 
+                        <a href={`#${createAttributeId(save.baseAttribute)}`} aria-label={`Scroll to ${save.baseAttribute} definition`}>
+                            <Badge variant="outline" className="transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer">{save.baseAttribute}</Badge>
+                        </a>
                     </div>
                 ))}
             </CardContent>
