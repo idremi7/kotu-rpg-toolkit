@@ -151,7 +151,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
                     <div className="space-y-4">
                         {Object.entries(groupedSkills).map(([attribute, skillList]) => (
                             <div key={attribute}>
-                                <h4 className="font-bold text-primary mb-1">{attribute}</h4>
+                                <h4 className="font-bold mb-1">{attribute}</h4>
                                 <ul className="list-disc list-inside space-y-1 pl-2">
                                     {skillList.map((skill: any, index: number) => (
                                         <li key={`${skill.name}-${index}`} className="text-sm">
