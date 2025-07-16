@@ -141,7 +141,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               <CardHeader><CardTitle>Saves</CardTitle></CardHeader>
               <CardContent className="space-y-2">
                   {saves.map((save: any) => (
-                      <div key={save.name} className="flex items-baseline justify-between">
+                      <div key={save.name} className="flex items-center justify-between">
                           <h4 className="font-semibold">{save.name}</h4> 
                           <Tooltip>
                             <TooltipTrigger>
