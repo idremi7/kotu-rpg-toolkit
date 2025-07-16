@@ -284,32 +284,32 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   }
   
   const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
-    const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.trim().toLowerCase()));
-    
-    const newSkills = skillsToAdd
-        .filter(skill => !existingSkillNames.has(skill.name.trim().toLowerCase()))
-        .map(skill => {
-            const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
-            return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
-        });
+      const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.trim().toLowerCase()));
+      
+      const newSkills = skillsToAdd
+          .filter(skill => !existingSkillNames.has(skill.name.trim().toLowerCase()))
+          .map(skill => {
+              const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
+              return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
+          });
 
-    if (newSkills.length > 0) {
-        appendSkill(newSkills);
-    }
-    
-    const duplicatesCount = skillsToAdd.length - newSkills.length;
+      if (newSkills.length > 0) {
+          appendSkill(newSkills);
+      }
+      
+      const duplicatesCount = skillsToAdd.length - newSkills.length;
 
-    if (newSkills.length > 0) {
-        toast({
-            title: `${newSkills.length} New Skill(s) Added`,
-            description: duplicatesCount > 0 ? `${duplicatesCount} skill(s) were ignored as duplicates.` : `All selected skills were added.`,
-        });
-    } else {
-        toast({
-            title: "No New Skills Added",
-            description: "All selected skills already exist in your system.",
-        });
-    }
+      if (newSkills.length > 0) {
+          toast({
+              title: "Skills Added",
+              description: `${newSkills.length} new ${newSkills.length > 1 ? 'skills' : 'skill'} added. ${duplicatesCount > 0 ? `${duplicatesCount} ${duplicatesCount > 1 ? 'skills' : 'skill'} were ignored as duplicates.` : ''}`.trim(),
+          });
+      } else {
+          toast({
+              title: "No New Skills Added",
+              description: `All ${skillsToAdd.length} selected ${skillsToAdd.length > 1 ? 'skills' : 'skill'} already exist in your system.`,
+          });
+      }
   };
 
   const handleAddFeatsFromLibrary = (featsToAdd: Feat[]) => {
@@ -323,15 +323,15 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       const duplicatesCount = featsToAdd.length - newFeats.length;
 
       if (newFeats.length > 0) {
-        toast({
-          title: `${newFeats.length} New Feat(s) Added`,
-          description: duplicatesCount > 0 ? `${duplicatesCount} feat(s) were ignored as duplicates.` : `All selected feats were added.`,
-        });
+          toast({
+              title: "Feats Added",
+              description: `${newFeats.length} new ${newFeats.length > 1 ? 'feats' : 'feat'} added. ${duplicatesCount > 0 ? `${duplicatesCount} ${duplicatesCount > 1 ? 'feats' : 'feat'} were ignored as duplicates.` : ''}`.trim(),
+          });
       } else {
-        toast({
-          title: "No New Feats Added",
-          description: "All selected feats already exist in your system.",
-        });
+          toast({
+              title: "No New Feats Added",
+              description: `All ${featsToAdd.length} selected ${featsToAdd.length > 1 ? 'feats' : 'feat'} already exist in your system.`,
+          });
       }
   }
 
@@ -791,3 +791,5 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     </div>
   );
 }
+
+    
