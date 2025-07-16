@@ -226,21 +226,25 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
           </Card>
 
           <Card className="lg:col-span-2">
-              <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
-               <CardContent className="space-y-4">
-                  {feats.map((feat: any, index: number) => (
-                      <div key={`${feat.name}-${index}`}>
-                          <div className="flex justify-between items-start gap-4">
-                            <div className="flex-grow">
+            <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
+            <CardContent className="space-y-1">
+                {feats.map((feat: any, index: number) => (
+                    <Tooltip key={`${feat.name}-${index}`} delayDuration={300}>
+                        <TooltipTrigger asChild>
+                            <div className="p-2 rounded-md hover:bg-muted/50 cursor-help">
                                 <h4 className="font-semibold">{feat.name}</h4>
                                 <p className="text-sm text-muted-foreground">{feat.description}</p>
                                 {feat.prerequisites && <p className="text-xs text-muted-foreground mt-1">Requires: {feat.prerequisites}</p>}
                             </div>
-                             {feat.effect && <Badge variant="secondary" className="whitespace-normal text-right max-w-[50%] shrink-0">{feat.effect}</Badge>}
-                          </div>
-                      </div>
-                  ))}
-              </CardContent>
+                        </TooltipTrigger>
+                        {feat.effect && (
+                        <TooltipContent>
+                            <p className="max-w-xs">{feat.effect}</p>
+                        </TooltipContent>
+                        )}
+                    </Tooltip>
+                ))}
+            </CardContent>
           </Card>
           
           {customRules && customRules.length > 0 && (
