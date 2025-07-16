@@ -40,12 +40,7 @@ const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
   usesD20StyleModifiers: z.boolean().optional(),
   attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
-  skills: z.array(skillSchema).refine((skills) => {
-    const names = skills.map(s => s.name?.trim().toLowerCase()).filter(Boolean);
-    return new Set(names).size === names.length;
-  }, {
-    message: "Skill names must be unique",
-  }),
+  skills: z.array(skillSchema),
   feats: z.array(featSchema),
   saves: z.array(saveSchema),
   customRules: z.array(customRuleSchema).optional(),
@@ -225,6 +220,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
 
   const watchedAttributes = form.watch('attributes');
   const watchedSkills = form.watch('skills');
+  const watchedFeats = form.watch('feats');
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
   const handleSaveSystem = async (data: SystemFormData) => {
@@ -340,6 +336,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   }
 
   const skillNames = watchedSkills.map(s => s.name?.trim().toLowerCase()).filter(Boolean);
+  const featNames = watchedFeats.map(f => f.name?.trim().toLowerCase()).filter(Boolean);
 
 
   return (
@@ -636,23 +633,34 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {featFields.map((field, index) => (
-                      <TableRow key={field.id}>
-                        <TableCell>
+                    {featFields.map((field, index) => {
+                      const currentFeatName = watchedFeats[index]?.name?.trim().toLowerCase();
+                      const isDuplicate = currentFeatName ? featNames.indexOf(currentFeatName) !== index : false;
+
+                      return (
+                      <TableRow key={field.id} className="items-start">
+                        <TableCell className="align-top">
                            <FormField
                               control={form.control}
                               name={`feats.${index}.name`}
                               render={({ field }) => (
                                 <FormItem>
                                   <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} placeholder="e.g., Power Attack" />
                                   </FormControl>
-                                  <FormMessage />
+                                  <div className="h-5">
+                                    {isDuplicate && (
+                                        <p className="text-sm font-medium text-destructive">
+                                            This feat name already exists.
+                                        </p>
+                                    )}
+                                    <FormMessage />
+                                  </div>
                                 </FormItem>
                               )}
                             />
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="align-top">
                            <FormField
                               control={form.control}
                               name={`feats.${index}.description`}
@@ -666,7 +674,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                               )}
                             />
                         </TableCell>
-                         <TableCell>
+                         <TableCell className="align-top">
                            <FormField
                               control={form.control}
                               name={`feats.${index}.prerequisites`}
@@ -680,7 +688,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                               )}
                             />
                         </TableCell>
-                         <TableCell>
+                         <TableCell className="align-top">
                            <FormField
                               control={form.control}
                               name={`feats.${index}.effect`}
@@ -694,14 +702,15 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                               )}
                             />
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right align-top">
                           <Button type="button" variant="ghost" size="icon" onClick={() => removeFeat(index)}>
                             <Trash2 className="h-4 w-4" />
                             <span className="sr-only">Delete Feat</span>
                           </Button>
                         </TableCell>
                       </TableRow>
-                    ))}
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -782,5 +791,3 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     </div>
   );
 }
-
-    
