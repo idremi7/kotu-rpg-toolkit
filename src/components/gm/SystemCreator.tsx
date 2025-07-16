@@ -228,8 +228,9 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
 
   const handleSaveSystem = async (data: SystemFormData) => {
     const skillNames = data.skills.map(s => s.name.trim().toLowerCase());
-    const duplicateSkills = skillNames.filter((name, index) => skillNames.indexOf(name) !== index);
-    if (duplicateSkills.length > 0) {
+    const hasDuplicates = new Set(skillNames).size !== skillNames.length;
+    
+    if (hasDuplicates) {
         toast({
             variant: "destructive",
             title: "Duplicate Skills Found",
@@ -340,13 +341,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       });
   }
 
-  const skillNameCounts = watchedSkills.reduce((acc, skill) => {
-    const name = skill.name.trim().toLowerCase();
-    if (name) {
-      acc[name] = (acc[name] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  const skillNames = watchedSkills.map(s => s.name.trim().toLowerCase());
 
 
   return (
@@ -542,8 +537,8 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                   </TableHeader>
                   <TableBody>
                     {skillFields.map((field, index) => {
-                       const currentSkillName = watchedSkills[index]?.name.trim().toLowerCase();
-                       const isDuplicate = currentSkillName && skillNameCounts[currentSkillName] > 1;
+                       const currentSkillName = skillNames[index];
+                       const isDuplicate = currentSkillName ? skillNames.indexOf(currentSkillName) !== index : false;
 
                         return (
                             <TableRow key={field.id}>
