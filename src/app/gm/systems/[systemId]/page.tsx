@@ -1,3 +1,4 @@
+
 import { getSystemAction } from '@/actions';
 import { notFound } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -101,8 +102,8 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
         <Card className="lg:col-span-2">
             <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
              <CardContent className="space-y-4">
-                {feats.map((feat: any) => (
-                    <div key={feat.name}>
+                {feats.map((feat: any, index: number) => (
+                    <div key={`${feat.name}-${index}`}>
                         <div className="flex justify-between items-baseline">
                            <h4 className="font-semibold">{feat.name}</h4>
                            {feat.effect && <Badge variant="secondary">{feat.effect}</Badge>}
