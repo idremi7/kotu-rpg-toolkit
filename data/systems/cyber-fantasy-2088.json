@@ -1,7 +1,8 @@
+
 {
   "systemId": "cyber-fantasy-2088",
   "systemName": "Cyber-Fantasy 2088",
-  "description": "A custom system with 5 attributes.",
+  "description": "In the neon-drenched, rain-slicked streets of 2088, magic has re-emerged to clash with chrome and circuitry. Arcane energies flow through data streams, elves sling spells from the back of hoverbikes, and dwarven mechanics forge enchanted cybernetics. This is a world of stark contrasts, where corporate monoliths are guarded by both AI sentinels and summoned elementals. Players navigate this dangerous landscape as street samurai with runic swords, deckers who hack reality itself, or mages who bend the laws of physics and metaphysics. Will you sell your soul for corporate power, or fight for freedom in the digital and ethereal underworlds?",
   "usesD20StyleModifiers": true,
   "attributes": [
     {
