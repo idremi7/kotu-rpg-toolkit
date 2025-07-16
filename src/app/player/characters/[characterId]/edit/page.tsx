@@ -10,12 +10,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useMounted } from '@/hooks/use-mounted';
 
-export default function EditCharacterPage({ params }: { params: { characterId: string } }) {
+export default function EditCharacterPage({ params: { characterId } }: { params: { characterId: string } }) {
   const [character, setCharacter] = useState<Character | null>(null);
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
-  const { characterId } = params;
 
   useEffect(() => {
     if (mounted) {

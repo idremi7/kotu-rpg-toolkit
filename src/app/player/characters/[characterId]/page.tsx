@@ -8,12 +8,11 @@ import { notFound } from "next/navigation";
 import { Loader2 } from 'lucide-react';
 import { useMounted } from '@/hooks/use-mounted';
 
-export default function CharacterSheetPage({ params }: { params: { characterId: string }}) {
+export default function CharacterSheetPage({ params: { characterId } }: { params: { characterId: string }}) {
   const [character, setCharacter] = useState<Character | null>(null);
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
-  const { characterId } = params;
 
   useEffect(() => {
     if (mounted) {

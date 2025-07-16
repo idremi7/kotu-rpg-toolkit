@@ -9,11 +9,10 @@ import { notFound } from "next/navigation";
 import { Loader2 } from 'lucide-react';
 import { useMounted } from '@/hooks/use-mounted';
 
-export default function CreateCharacterPage({ params }: { params: { systemId: string }}) {
+export default function CreateCharacterPage({ params: { systemId } }: { params: { systemId: string }}) {
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
-  const { systemId } = params;
 
   useEffect(() => {
     if (mounted) {
@@ -52,7 +51,7 @@ export default function CreateCharacterPage({ params }: { params: { systemId: st
             </p>
         </div>
       </div>
-      <CharacterCreator systemId={params.systemId} system={system} />
+      <CharacterCreator systemId={systemId} system={system} />
     </div>
   );
 }

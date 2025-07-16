@@ -16,11 +16,10 @@ import { ExportSystemButton } from '@/components/ExportSystemButton';
 import { Separator } from '@/components/ui/separator';
 import { useMounted } from '@/hooks/use-mounted';
 
-export default function SystemDetailsPage({ params }: { params: { systemId: string }}) {
+export default function SystemDetailsPage({ params: { systemId } }: { params: { systemId: string }}) {
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
-  const { systemId } = params;
 
   useEffect(() => {
       if (mounted) {

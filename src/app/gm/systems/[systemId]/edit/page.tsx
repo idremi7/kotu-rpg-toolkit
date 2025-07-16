@@ -9,11 +9,10 @@ import { BackButton } from '@/components/BackButton';
 import { Loader2 } from 'lucide-react';
 import { useMounted } from '@/hooks/use-mounted';
 
-export default function EditSystemPage({ params }: { params: { systemId: string } }) {
+export default function EditSystemPage({ params: { systemId } }: { params: { systemId: string } }) {
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
-  const { systemId } = params;
 
   useEffect(() => {
     if (mounted) {
