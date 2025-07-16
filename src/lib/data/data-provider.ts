@@ -62,6 +62,7 @@ export interface DataProvider {
     importSystem(systemData: any): Promise<{ success: boolean, error?: string }>;
     getSystem(systemId: string): Promise<GameSystem | null>;
     listSystems(): Promise<GameSystemSummary[]>;
+    deleteSystem(systemId: string): Promise<{ success: boolean, error?: string }>;
 
     saveCharacter(characterData: Character): Promise<{ success: boolean, characterId?: string, error?: string }>;
     getCharacter(characterId: string): Promise<Character | null>;

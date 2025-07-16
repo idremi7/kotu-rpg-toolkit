@@ -34,6 +34,10 @@ export const listSystems = () => {
   return dataProvider.listSystems();
 };
 
+export const deleteSystem = (systemId: string) => {
+    return dataProvider.deleteSystem(systemId);
+};
+
 // --- Characters API ---
 export const saveCharacter = (characterData: any) => {
   return dataProvider.saveCharacter(characterData);

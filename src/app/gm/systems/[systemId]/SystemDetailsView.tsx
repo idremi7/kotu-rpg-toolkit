@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getSystem } from '@/lib/data-service';
+import { deleteSystem, getSystem } from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -11,15 +11,19 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/BackButton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Pencil, Loader2 } from 'lucide-react';
+import { Pencil, Loader2, Trash2 } from 'lucide-react';
 import { ExportSystemButton } from '@/components/ExportSystemButton';
 import { Separator } from '@/components/ui/separator';
 import { useMounted } from '@/hooks/use-mounted';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 export function SystemDetailsView({ systemId }: { systemId: string }) {
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const mounted = useMounted();
+  const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
       if (mounted) {
@@ -31,6 +35,26 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
         });
       }
   }, [systemId, mounted]);
+  
+  const handleDeleteSystem = async () => {
+    if (!system) return;
+
+    const result = await deleteSystem(system.systemId);
+    if (result.success) {
+      toast({
+        title: 'System Deleted',
+        description: `The system "${system.systemName}" has been successfully deleted.`,
+      });
+      router.push('/gm/dashboard');
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Deletion Failed',
+        description: result.error || 'An unknown error occurred while deleting the system.',
+      });
+    }
+  };
+
 
   if (!mounted || isLoading) {
     return (
@@ -71,6 +95,30 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
                 Edit System
             </Link>
             </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" >
+                  <Trash2 className="mr-2 h-4 w-4"/>
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the 
+                    <span className="font-semibold text-foreground"> {system.systemName} </span>
+                     system. Any characters created with this system may become inaccessible or display incorrectly.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteSystem}>
+                    Yes, delete system
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
         </div>
       </div>
 

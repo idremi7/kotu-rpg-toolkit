@@ -225,6 +225,16 @@ export class LocalStorageProvider implements DataProvider {
             description: system.description,
         }));
     }
+
+    async deleteSystem(systemId: string): Promise<{ success: boolean; error?: string }> {
+        const systems = getItem<Record<string, GameSystem>>(SYSTEMS_KEY) || {};
+        if (systems[systemId]) {
+            delete systems[systemId];
+            setItem(SYSTEMS_KEY, systems);
+            return { success: true };
+        }
+        return { success: false, error: "System not found." };
+    }
     
     async saveCharacter(characterData: Character): Promise<{ success: boolean; characterId?: string | undefined; error?: string | undefined; }> {
         const characters = getItem<Record<string, Character>>(CHARACTERS_KEY) || {};
