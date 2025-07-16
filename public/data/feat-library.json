@@ -21,7 +21,7 @@
     { "name": "Dodge", "description": "You gain a +1 dodge bonus to your AC.", "prerequisites": "Dex 13", "category": "Combat", "effect": "+1 Dodge AC", "lang": "en" },
     { "name": "Esquive", "description": "Vous gagnez un bonus d'esquive de +1 à votre CA.", "prerequisites": "Dex 13", "category": "Combat", "effect": "+1 Esquive CA", "lang": "fr" },
     { "name": "Endurance", "description": "You gain a +4 bonus on checks to avoid nonlethal damage.", "prerequisites": "None", "category": "General", "effect": "+4 vs nonlethal damage", "lang": "en" },
-    { "name": "Endurance", "description": "Vous gagnez un bonus de +4 aux tests pour éviter les dégâts non-létaux.", "prerequisites": "Aucun", "category": "Général", "effect": "+4 vs dégâts non-létaux", "lang": "fr" },
+    { "name": "Vigueur", "description": "Vous gagnez un bonus de +4 aux tests pour éviter les dégâts non-létaux.", "prerequisites": "Aucun", "category": "Général", "effect": "+4 vs dégâts non-létaux", "lang": "fr" },
     { "name": "Great Fortitude", "description": "You get a +2 bonus on all Fortitude saving throws.", "prerequisites": "None", "category": "General", "effect": "+2 Fortitude", "lang": "en" },
     { "name": "Vigueur Surhumaine", "description": "Vous obtenez un bonus de +2 à tous les jets de Vigueur.", "prerequisites": "Aucun", "category": "Général", "effect": "+2 Vigueur", "lang": "fr" },
     { "name": "Improved Initiative", "description": "You get a +4 bonus on initiative checks.", "prerequisites": "None", "category": "Combat", "effect": "+4 Initiative", "lang": "en" },
