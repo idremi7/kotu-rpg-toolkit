@@ -11,13 +11,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/BackButton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Pencil, Loader2, Trash2, Rows, Columns } from 'lucide-react';
+import { Pencil, Loader2, Trash2, Rows, Columns, ChevronDown } from 'lucide-react';
 import { ExportSystemButton } from '@/components/ExportSystemButton';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { cn } from '@/lib/utils';
 
 export function SystemDetailsView({ systemId }: { systemId: string }) {
   const [system, setSystem] = useState<GameSystem | null>(null);
@@ -146,38 +147,68 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           
-          <Card className="lg:col-span-1">
-              <CardHeader><CardTitle>Attributes</CardTitle></CardHeader>
-              <CardContent className="space-y-2">
-                  {attributes.map((attr: any) => (
-                      <div key={attr.name}>
-                          <h4 className="font-semibold">{attr.name}</h4>
-                          <p className="text-sm text-muted-foreground">{attr.description}</p>
-                      </div>
-                  ))}
-              </CardContent>
-          </Card>
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Card>
+                <CardHeader><CardTitle>Attributes</CardTitle></CardHeader>
+                <CardContent className="space-y-2">
+                    {attributes.map((attr: any) => (
+                        <div key={attr.name}>
+                            <h4 className="font-semibold">{attr.name}</h4>
+                            <p className="text-sm text-muted-foreground">{attr.description}</p>
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+            
+            <Card>
+                <CardHeader><CardTitle>Saves</CardTitle></CardHeader>
+                <CardContent className="space-y-2">
+                    {saves.map((save: any) => (
+                        <div key={save.name} className="flex items-center gap-2">
+                            <h4 className="font-semibold">{save.name}</h4> 
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Badge variant="outline">{save.baseAttribute}</Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{getAttributeDescription(save.baseAttribute)}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+
+            <Card className="md:col-span-2">
+                <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
+                <CardContent>
+                    <Accordion type="multiple" className="w-full">
+                    {feats.map((feat: any, index: number) => (
+                        <AccordionItem value={`feat-${index}`} key={`${feat.name}-${index}`} className="border-b last:border-b-0">
+                            <AccordionTrigger 
+                                disabled={!feat.effect} 
+                                className={cn("py-3 text-left hover:no-underline", !feat.effect && "cursor-default")}
+                            >
+                                <div className="flex-1">
+                                    <h4 className="font-semibold">{feat.name}</h4>
+                                    <p className="text-sm text-muted-foreground">{feat.description}</p>
+                                    {feat.prerequisites && <p className="text-xs text-muted-foreground mt-1">Requires: {feat.prerequisites}</p>}
+                                </div>
+                                {feat.effect && <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-foreground/80 italic bg-muted/30 p-3 rounded-md whitespace-pre-wrap">
+                                    {feat.effect}
+                                </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                    ))}
+                    </Accordion>
+                </CardContent>
+            </Card>
+          </div>
           
-          <Card className="lg:col-span-1">
-              <CardHeader><CardTitle>Saves</CardTitle></CardHeader>
-              <CardContent className="space-y-2">
-                  {saves.map((save: any) => (
-                      <div key={save.name} className="flex items-center gap-2">
-                          <h4 className="font-semibold">{save.name}</h4> 
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Badge variant="outline">{save.baseAttribute}</Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{getAttributeDescription(save.baseAttribute)}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                      </div>
-                  ))}
-              </CardContent>
-          </Card>
-          
-          <Card className="flex flex-col lg:row-span-2 lg:col-span-1">
+          <Card className="flex flex-col lg:row-span-2">
               <CardHeader>
                   <div className="flex justify-between items-center">
                     <CardTitle>Skills</CardTitle>
@@ -202,7 +233,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
                   </div>
               </CardHeader>
               <CardContent className="flex-grow min-h-0">
-                  <ScrollArea className="h-full pr-4">
+                  <ScrollArea className="h-full pr-4 -mx-4 px-4">
                       <Accordion type="multiple" value={openAccordionItems} onValueChange={setOpenAccordionItems} className="w-full">
                           {Object.entries(groupedSkills).map(([attribute, skillList]) => (
                               <AccordionItem value={attribute} key={attribute}>
@@ -223,28 +254,6 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
                       </Accordion>
                   </ScrollArea>
               </CardContent>
-          </Card>
-
-          <Card className="lg:col-span-2">
-            <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
-            <CardContent className="space-y-1">
-                {feats.map((feat: any, index: number) => (
-                    <Tooltip key={`${feat.name}-${index}`} delayDuration={300}>
-                        <TooltipTrigger asChild>
-                            <div className="p-2 rounded-md hover:bg-muted/50 cursor-help">
-                                <h4 className="font-semibold">{feat.name}</h4>
-                                <p className="text-sm text-muted-foreground">{feat.description}</p>
-                                {feat.prerequisites && <p className="text-xs text-muted-foreground mt-1">Requires: {feat.prerequisites}</p>}
-                            </div>
-                        </TooltipTrigger>
-                        {feat.effect && (
-                        <TooltipContent>
-                            <p className="max-w-xs">{feat.effect}</p>
-                        </TooltipContent>
-                        )}
-                    </Tooltip>
-                ))}
-            </CardContent>
           </Card>
           
           {customRules && customRules.length > 0 && (
