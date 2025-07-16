@@ -6,7 +6,7 @@ const SYSTEMS_KEY = 'versa_systems';
 const CHARACTERS_KEY = 'versa_characters';
 const SKILL_LIBRARY_KEY = 'versa_skill_library';
 const FEAT_LIBRARY_KEY = 'versa_feat_library';
-
+const DATA_SEED_KEY = 'versa_data_seeded'; // Key to check if initial data is loaded
 
 // ===== LocalStorage Helper Functions =====
 function getItem<T>(key: string): T | null {
@@ -106,15 +106,60 @@ function generateSchemas(system: Omit<GameSystem, 'schemas'> | GameSystem) {
 export class LocalStorageProvider implements DataProvider {
 
     constructor() {
-      // In a real app, this might be where you check for a login token, etc.
-      // For now, we'll ensure our static libraries are loaded.
       if (typeof window !== 'undefined') {
-          this.initializeAllLibraries();
+          this.seedInitialData();
       }
     }
 
+    private async seedInitialData() {
+        const isSeeded = getItem<boolean>(DATA_SEED_KEY);
+        if (isSeeded) {
+            return; // Data has already been seeded
+        }
+
+        try {
+            const manifestResponse = await fetch('/data/manifest.json');
+            if (!manifestResponse.ok) throw new Error('Failed to fetch data manifest.');
+            const manifest = await manifestResponse.json();
+
+            // Load Systems
+            const systems = getItem<Record<string, GameSystem>>(SYSTEMS_KEY) || {};
+            for (const systemPath of manifest.systems) {
+                const response = await fetch(systemPath);
+                if (response.ok) {
+                    const systemData = await response.json();
+                    if (systemData.systemId && !systems[systemData.systemId]) {
+                        systems[systemData.systemId] = systemData;
+                    }
+                }
+            }
+            setItem(SYSTEMS_KEY, systems);
+
+            // Load Characters
+            const characters = getItem<Record<string, Character>>(CHARACTERS_KEY) || {};
+            for (const charPath of manifest.characters) {
+                const response = await fetch(charPath);
+                if (response.ok) {
+                    const charData = await response.json();
+                    if (charData.characterId && !characters[charData.characterId]) {
+                        characters[charData.characterId] = charData;
+                    }
+                }
+            }
+            setItem(CHARACTERS_KEY, characters);
+
+            // Load Libraries
+            await this.initializeLibrary(SKILL_LIBRARY_KEY, manifest.libraries.skills);
+            await this.initializeLibrary(FEAT_LIBRARY_KEY, manifest.libraries.feats);
+            
+            setItem(DATA_SEED_KEY, true); // Mark as seeded
+        } catch (error) {
+            console.error("Failed to seed initial data:", error);
+        }
+    }
+
     private async initializeLibrary(key: string, jsonPath: string) {
-        if (getItem(key)) return; // Already initialized
+        if (getItem(key)) return; 
 
         try {
             const response = await fetch(jsonPath);
@@ -125,16 +170,8 @@ export class LocalStorageProvider implements DataProvider {
             setItem(key, data);
         } catch (error) {
             console.error(`Failed to fetch and initialize library from ${jsonPath}:`, error);
-            // Set an empty array to prevent repeated fetch attempts
             setItem(key, []);
         }
-    }
-
-    private async initializeAllLibraries() {
-        await Promise.all([
-            this.initializeLibrary(SKILL_LIBRARY_KEY, '/data/skill-library.json'),
-            this.initializeLibrary(FEAT_LIBRARY_KEY, '/data/feat-library.json'),
-        ]);
     }
     
     async saveSystem(systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'> | GameSystem): Promise<{ success: boolean; systemId?: string | undefined; error?: string | undefined; }> {
@@ -254,12 +291,10 @@ export class LocalStorageProvider implements DataProvider {
     }
     
     async listSkillsFromLibrary(): Promise<SkillFromLibrary[]> {
-        await this.initializeAllLibraries();
         return getItem<SkillFromLibrary[]>(SKILL_LIBRARY_KEY) || [];
     }
     
     async listFeatsFromLibrary(): Promise<FeatFromLibrary[]> {
-        await this.initializeAllLibraries();
         return getItem<FeatFromLibrary[]>(FEAT_LIBRARY_KEY) || [];
     }
 }
