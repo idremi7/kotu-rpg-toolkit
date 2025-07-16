@@ -289,36 +289,36 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   }
   
   const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
-    const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.trim().toLowerCase()));
-    
-    const newSkills = skillsToAdd
-        .filter(skill => !existingSkillNames.has(skill.name.trim().toLowerCase()))
-        .map(skill => {
-            const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
-            return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
-        });
+      const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.trim().toLowerCase()));
+      
+      const newSkills = skillsToAdd
+          .filter(skill => !existingSkillNames.has(skill.name.trim().toLowerCase()))
+          .map(skill => {
+              const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
+              return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
+          });
 
-    if (newSkills.length > 0) {
-        appendSkill(newSkills);
-    }
-    
-    const duplicatesCount = skillsToAdd.length - newSkills.length;
-    const newSkillsCount = newSkills.length;
+      if (newSkills.length > 0) {
+          appendSkill(newSkills);
+      }
+      
+      const duplicatesCount = skillsToAdd.length - newSkills.length;
+      const newSkillsCount = newSkills.length;
 
-    if (newSkillsCount > 0) {
-      const title = "Skills Added";
-      const desc_part1 = `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill has' : 'skills have'} been added.`;
-      const desc_part2 = duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : '';
-      toast({
-          title: title,
-          description: `${desc_part1} ${desc_part2}`.trim(),
-      });
-    } else if (duplicatesCount > 0) {
+      if (newSkillsCount > 0) {
+        const title = "Skills Added";
+        const desc_part1 = `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill has' : 'skills have'} been added.`;
+        const desc_part2 = duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : '';
         toast({
-            title: "No New Skills Added",
-            description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'skill' : 'skills'} already exist in your system.`,
+            title: title,
+            description: `${desc_part1} ${desc_part2}`.trim(),
         });
-    }
+      } else if (duplicatesCount > 0) {
+          toast({
+              title: "No New Skills Added",
+              description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'skill' : 'skills'} already exist in your system.`,
+          });
+      }
   };
 
   const handleAddFeatsFromLibrary = (featsToAdd: Feat[]) => {
