@@ -25,6 +25,7 @@ const GameSystemSchemaForImport = z.object({
   skills: z.array(z.object({ name: z.string(), baseAttribute: z.string() })),
   feats: z.array(z.object({ name: z.string(), description: z.string(), prerequisites: z.string(), effect: z.string().optional() })),
   saves: z.array(z.object({ name: z.string(), baseAttribute: z.string() })),
+  customRules: z.array(z.object({ title: z.string(), description: z.string() })).optional(),
   schemas: z.object({ formSchema: z.string(), uiSchema: z.string() }).optional(),
   usesD20StyleModifiers: z.boolean().optional(),
 });

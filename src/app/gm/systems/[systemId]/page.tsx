@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Pencil } from 'lucide-react';
 import { ExportSystemButton } from '@/components/ExportSystemButton';
+import { Separator } from '@/components/ui/separator';
 
 export default async function SystemDetailsPage({ params }: { params: { systemId: string }}) {
   const system = await getSystemAction(params.systemId);
@@ -17,7 +18,7 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
     notFound();
   }
 
-  const { systemName, attributes, skills, feats, saves } = system;
+  const { systemName, attributes, skills, feats, saves, customRules } = system;
 
   const groupedSkills = skills.reduce((acc, skill) => {
     const { baseAttribute } = skill;
@@ -112,6 +113,21 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
                 ))}
             </CardContent>
         </Card>
+        
+        {customRules && customRules.length > 0 && (
+          <Card className="md:col-span-2 lg:col-span-3">
+            <CardHeader><CardTitle>Custom Rules</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              {customRules.map((rule, index) => (
+                <div key={index}>
+                  <h4 className="font-semibold">{rule.title}</h4>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{rule.description}</p>
+                  {index < customRules.length - 1 && <Separator className="mt-4" />}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,11 @@ export interface Feat {
     value?: number; // Legacy numeric value, for migration
 }
 
+export interface CustomRule {
+    title: string;
+    description: string;
+}
+
 export interface GameSystem {
     systemId: string;
     systemName: string;
@@ -21,6 +26,7 @@ export interface GameSystem {
     skills: { name: string; baseAttribute: string }[];
     feats: Feat[];
     saves: { name: string; baseAttribute: string }[];
+    customRules?: CustomRule[];
     schemas: { formSchema: string; uiSchema: string };
     usesD20StyleModifiers?: boolean;
 }

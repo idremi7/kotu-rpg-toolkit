@@ -28,11 +28,13 @@ import { Checkbox } from '../ui/checkbox';
 import { Switch } from '../ui/switch';
 import { SkillLibraryBrowser } from './SkillLibraryBrowser';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Textarea } from '../ui/textarea';
 
 const attributeSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string() });
 const skillSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
 const featSchema = z.object({ name: z.string().min(1, 'Name is required'), description: z.string(), prerequisites: z.string(), effect: z.string().optional() });
 const saveSchema = z.object({ name: z.string().min(1, 'Name is required'), baseAttribute: z.string().min(1, 'Attribute is required') });
+const customRuleSchema = z.object({ title: z.string().min(1, 'Title is required'), description: z.string().min(1, 'Description is required') });
 
 const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
@@ -41,6 +43,7 @@ const systemSchema = z.object({
   skills: z.array(skillSchema),
   feats: z.array(featSchema),
   saves: z.array(saveSchema),
+  customRules: z.array(customRuleSchema).optional(),
 });
 
 type SystemFormData = z.infer<typeof systemSchema>;
@@ -167,6 +170,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
         skills: initialData.skills,
         feats: initialData.feats,
         saves: initialData.saves,
+        customRules: initialData.customRules || [],
     } : {
       systemName: '',
       usesD20StyleModifiers: false,
@@ -174,6 +178,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       skills: [{ name: 'Athletics', baseAttribute: 'Strength' }],
       feats: [{ name: 'Power Attack', description: 'Trade accuracy for damage', prerequisites: 'Strength 13', effect: '-5 Hit, +5 Dmg' }],
       saves: [{ name: 'Fortitude', baseAttribute: 'Constitution' }],
+      customRules: [],
     },
   });
 
@@ -186,6 +191,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
             skills: initialData.skills,
             feats: initialData.feats,
             saves: initialData.saves,
+            customRules: initialData.customRules || [],
         });
     }
   }, [initialData, form]);
@@ -208,6 +214,11 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
    const { fields: saveFields, append: appendSave, remove: removeSave } = useFieldArray({
     control: form.control,
     name: 'saves',
+  });
+
+  const { fields: customRuleFields, append: appendCustomRule, remove: removeCustomRule } = useFieldArray({
+    control: form.control,
+    name: 'customRules',
   });
 
   const watchedAttributes = form.watch('attributes');
@@ -665,6 +676,68 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Custom Rules</CardTitle>
+              <CardDescription>Add any unique mechanics, world rules, or special conditions for your system.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[30%]">Rule Title</TableHead>
+                      <TableHead className="w-[60%]">Description</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {customRuleFields.map((field, index) => (
+                      <TableRow key={field.id} className="items-start">
+                        <TableCell className="align-top">
+                           <FormField
+                              control={form.control}
+                              name={`customRules.${index}.title`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input {...field} placeholder="e.g., Sanity Checks" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        </TableCell>
+                        <TableCell className="align-top">
+                           <FormField
+                              control={form.control}
+                              name={`customRules.${index}.description`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Textarea {...field} placeholder="Describe how this rule works..." className="min-h-[40px]"/>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                        </TableCell>
+                        <TableCell className="text-right align-top">
+                          <Button type="button" variant="ghost" size="icon" onClick={() => removeCustomRule(index)}>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete Rule</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <Button type="button" variant="outline" onClick={() => appendCustomRule({ title: '', description: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Custom Rule</Button>
+            </CardContent>
+          </Card>
+
           <Button type="submit" disabled={isSaving} className="w-full" size="lg">
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             {isEditMode ? 'Update System' : 'Save System'}
