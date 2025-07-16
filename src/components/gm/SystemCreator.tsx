@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -39,7 +40,12 @@ const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
   usesD20StyleModifiers: z.boolean().optional(),
   attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
-  skills: z.array(skillSchema),
+  skills: z.array(skillSchema).refine((skills) => {
+    const names = skills.map(s => s.name);
+    return new Set(names).size === names.length;
+  }, {
+    message: "Skill names must be unique", // This is a general message, we'll show specific ones in the UI
+  }),
   feats: z.array(featSchema),
   saves: z.array(saveSchema),
   customRules: z.array(customRuleSchema).optional(),
@@ -90,10 +96,6 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
             }));
         
         onAddFeats(featsToAdd);
-        toast({
-            title: "Feats Added",
-            description: `${featsToAdd.length} feats were added from the library.`
-        });
         setSelectedFeats({});
         setIsOpen(false);
         setSearchQuery('');
@@ -322,13 +324,15 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
         appendFeat(newFeats);
       }
       
+      const duplicatesCount = featsToAdd.length - newFeats.length;
+      
       toast({
-        title: `${newFeats.length} Feats Added`,
-        description: `${featsToAdd.length - newFeats.length} feats were already in the system.`
+        title: `${newFeats.length} Feat(s) Added`,
+        description: duplicatesCount > 0 ? `${duplicatesCount} feat(s) were ignored as duplicates.` : `All selected feats were added.`,
       });
   }
 
-  const skillNames = watchedSkills.map(s => s.name.trim().toLowerCase()).filter(Boolean);
+  const skillNames = watchedSkills.map(s => s.name?.trim().toLowerCase()).filter(Boolean);
 
 
   return (
@@ -529,7 +533,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
 
                         return (
                             <TableRow key={field.id}>
-                                <TableCell>
+                                <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`skills.${index}.name`}
@@ -550,7 +554,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                                     )}
                                     />
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="align-top">
                                 <FormField
                                     control={form.control}
                                     name={`skills.${index}.baseAttribute`}
@@ -573,7 +577,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                                     )}
                                     />
                                 </TableCell>
-                                <TableCell className="text-right">
+                                <TableCell className="text-right align-top">
                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeSkill(index)}>
                                     <Trash2 className="h-4 w-4" />
                                     <span className="sr-only">Delete Skill</span>
