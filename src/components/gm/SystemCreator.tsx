@@ -40,14 +40,7 @@ const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
   usesD20StyleModifiers: z.boolean().optional(),
   attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
-  skills: z.array(skillSchema).refine((skills) => {
-    const names = skills.map(skill => skill.name.trim().toLowerCase());
-    return new Set(names).size === names.length;
-  }, {
-    message: 'Skill names must be unique.',
-    // This is a dummy path, the real logic is in the form field render
-    path: ['skills'],
-  }),
+  skills: z.array(skillSchema),
   feats: z.array(featSchema),
   saves: z.array(saveSchema),
   customRules: z.array(customRuleSchema).optional(),
@@ -230,9 +223,21 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   });
 
   const watchedAttributes = form.watch('attributes');
+  const watchedSkills = form.watch('skills');
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
   const handleSaveSystem = async (data: SystemFormData) => {
+    const skillNames = data.skills.map(s => s.name.trim().toLowerCase());
+    const duplicateSkills = skillNames.filter((name, index) => skillNames.indexOf(name) !== index);
+    if (duplicateSkills.length > 0) {
+        toast({
+            variant: "destructive",
+            title: "Duplicate Skills Found",
+            description: "Please ensure all skill names are unique before saving.",
+        });
+        return;
+    }
+
     setIsSaving(true);
     const fullData = isEditMode ? { ...initialData, ...data } : data;
     try {
@@ -334,6 +339,14 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
         description: `${featsToAdd.length - newFeats.length} feats were already in the system.`
       });
   }
+
+  const skillNameCounts = watchedSkills.reduce((acc, skill) => {
+    const name = skill.name.trim().toLowerCase();
+    if (name) {
+      acc[name] = (acc[name] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>);
 
 
   return (
@@ -528,53 +541,63 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {skillFields.map((field, index) => (
-                      <TableRow key={field.id}>
-                        <TableCell>
-                           <FormField
-                              control={form.control}
-                              name={`skills.${index}.name`}
-                              render={({ field }) => (
-                                <FormItem>
-                                    <FormControl>
-                                        <Input {...field} placeholder="e.g. Acrobatics" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                               )}
-                            />
-                        </TableCell>
-                        <TableCell>
-                           <FormField
-                              control={form.control}
-                              name={`skills.${index}.baseAttribute`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
-                                    <FormControl>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Select an attribute" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      {validAttributes.map(attr => (
-                                        <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button type="button" variant="ghost" size="icon" onClick={() => removeSkill(index)}>
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Delete Skill</span>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {skillFields.map((field, index) => {
+                       const currentSkillName = watchedSkills[index]?.name.trim().toLowerCase();
+                       const isDuplicate = currentSkillName && skillNameCounts[currentSkillName] > 1;
+
+                        return (
+                            <TableRow key={field.id}>
+                                <TableCell>
+                                <FormField
+                                    control={form.control}
+                                    name={`skills.${index}.name`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <Input {...field} placeholder="e.g. Acrobatics" />
+                                            </FormControl>
+                                            <FormMessage />
+                                            {isDuplicate && (
+                                                <p className="text-sm font-medium text-destructive">
+                                                    This skill name already exists.
+                                                </p>
+                                            )}
+                                        </FormItem>
+                                    )}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                <FormField
+                                    control={form.control}
+                                    name={`skills.${index}.baseAttribute`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                                            <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select an attribute" />
+                                            </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                            {validAttributes.map(attr => (
+                                                <SelectItem key={attr.name} value={attr.name}>{attr.name}</SelectItem>
+                                            ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    />
+                                </TableCell>
+                                <TableCell className="text-right">
+                                <Button type="button" variant="ghost" size="icon" onClick={() => removeSkill(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                    <span className="sr-only">Delete Skill</span>
+                                </Button>
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -597,11 +620,6 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-               {form.formState.errors.skills && (
-                  <p className="text-sm font-medium text-destructive">
-                      {form.formState.errors.skills.message}
-                  </p>
-              )}
             </CardContent>
           </Card>
 
