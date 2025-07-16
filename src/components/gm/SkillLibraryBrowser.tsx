@@ -66,18 +66,24 @@ export const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {na
             .map(([name, { category }]) => ({ name, category }));
         
         onAddSkills(skillsToAdd);
-        toast({
-            title: "Skills Added",
-            description: `${skillsToAdd.length} skills were added from the library. Please assign a base attribute if needed.`
-        });
+        
+        // Reset state after adding
         setSelectedSkills({});
-        setIsOpen(false);
         setSearchQuery('');
         setCategoryFilter('all');
+        setIsOpen(false);
+    }
+    
+    const handleOpenChange = (open: boolean) => {
+        setIsOpen(open);
+        // Reset selections when closing the sheet
+        if (!open) {
+            setSelectedSkills({});
+        }
     }
 
     return (
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <Sheet open={isOpen} onOpenChange={handleOpenChange}>
             <SheetTrigger asChild>
                 <Button type="button" variant="secondary"><BookOpen className="mr-2"/>Browse Skill Library</Button>
             </SheetTrigger>
