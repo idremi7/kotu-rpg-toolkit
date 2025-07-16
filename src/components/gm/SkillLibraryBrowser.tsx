@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BookOpen } from 'lucide-react';
-import { listSkillsFromLibraryAction } from '@/actions';
+import { listSkillsFromLibrary } from '@/lib/data-service';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { SkillFromLibrary } from '@/lib/data-service';
@@ -24,7 +24,7 @@ export const SkillLibraryBrowser = ({ onAddSkills }: { onAddSkills: (skills: {na
 
     useEffect(() => {
         if (isOpen && allSkills.length === 0) {
-            listSkillsFromLibraryAction().then(skills => {
+            listSkillsFromLibrary().then(skills => {
                 setAllSkills(skills);
             });
         }

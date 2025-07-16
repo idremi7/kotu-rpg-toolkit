@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -6,10 +7,10 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
-import { saveSystem, listFeatsFromLibrary, listSkillsFromLibrary } from '@/lib/data-service';
-import { suggestSkillsAction } from '@/ai/flows/suggest-skills-flow';
+import { saveSystem, listFeatsFromLibrary } from '@/lib/data-service';
+import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
 import { useEffect, useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { GameSystem, Feat, FeatFromLibrary, CustomRule, SkillFromLibrary } from '@/lib/data-service';
+import type { GameSystem, Feat, FeatFromLibrary, CustomRule } from '@/lib/data-service';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
@@ -255,28 +256,32 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   const handleSuggestSkills = async (count: number) => {
     setIsSuggestingSkills(true);
     const formData = form.getValues();
-    const result = await suggestSkillsAction({
-      systemName: formData.systemName,
-      attributes: formData.attributes,
-      existingSkills: formData.skills.map(s => s.name),
-      count: count,
-    });
-    
-    if (result.success && result.skills) {
-      appendSkill(result.skills);
-      toast({
-        title: "Skills Suggested",
-        description: `AI has added ${result.skills.length} new skill suggestions.`,
+    try {
+      const result = await suggestSkills({
+        systemName: formData.systemName,
+        attributes: formData.attributes,
+        existingSkills: formData.skills.map(s => s.name),
+        count: count,
       });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Suggestion Failed",
-        description: result.error || "Could not get suggestions from AI.",
-      });
+      
+      if (result?.skills) {
+        appendSkill(result.skills);
+        toast({
+          title: "Skills Suggested",
+          description: `AI has added ${result.skills.length} new skill suggestions.`,
+        });
+      } else {
+        throw new Error("No skills returned from AI.");
+      }
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Suggestion Failed",
+            description: error.message || "Could not get suggestions from AI.",
+        });
+    } finally {
+      setIsSuggestingSkills(false);
     }
-    
-    setIsSuggestingSkills(false);
   };
   
   if (!mounted) {
@@ -302,8 +307,8 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
 
       if (newSkillsCount > 0) {
         const title = "Skills Added";
-        const desc_part1 = `${newSkillsCount} new ${newSkillsCount > 1 ? 'skill' : 'skill'} has been added.`;
-        const desc_part2 = duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount > 1 ? 'skills were' : 'skill was'} ignored.` : '';
+        const desc_part1 = `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill' : 'skills'} ${newSkillsCount === 1 ? 'has' : 'have'} been added.`;
+        const desc_part2 = duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : '';
         toast({
             title: title,
             description: `${desc_part1} ${desc_part2}`.trim(),
@@ -311,7 +316,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       } else if (duplicatesCount > 0) {
           toast({
               title: "No New Skills Added",
-              description: `All ${duplicatesCount} selected ${duplicatesCount > 1 ? 'skills' : 'skill'} already exist in your system.`,
+              description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'skill' : 'skills'} already exist in your system.`,
           });
       }
   };
@@ -325,16 +330,17 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       }
       
       const duplicatesCount = featsToAdd.length - newFeats.length;
+      const newFeatsCount = newFeats.length;
 
-      if (newFeats.length > 0) {
+      if (newFeatsCount > 0) {
           toast({
               title: "Feats Added",
-              description: `${newFeats.length} new ${newFeats.length > 1 ? 'feats' : 'feat'} added. ${duplicatesCount > 0 ? `${duplicatesCount} ${duplicatesCount > 1 ? 'feats' : 'feat'} were ignored as duplicates.` : ''}`.trim(),
+              description: `${newFeatsCount} new ${newFeatsCount === 1 ? 'feat' : 'feats'} added. ${duplicatesCount > 0 ? `${duplicatesCount} ${duplicatesCount === 1 ? 'feat was' : 'feats were'} ignored as duplicates.` : ''}`.trim(),
           });
-      } else {
+      } else if(duplicatesCount > 0) {
           toast({
               title: "No New Feats Added",
-              description: `All ${featsToAdd.length} selected ${featsToAdd.length > 1 ? 'feats' : 'feat'} already exist in your system.`,
+              description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'feat' : 'feats'} already exist in your system.`,
           });
       }
   }
