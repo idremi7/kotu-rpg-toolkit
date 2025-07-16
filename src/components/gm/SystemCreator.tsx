@@ -41,10 +41,10 @@ const systemSchema = z.object({
   usesD20StyleModifiers: z.boolean().optional(),
   attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
   skills: z.array(skillSchema).refine((skills) => {
-    const names = skills.map(s => s.name);
+    const names = skills.map(s => s.name?.trim().toLowerCase()).filter(Boolean);
     return new Set(names).size === names.length;
   }, {
-    message: "Skill names must be unique", // This is a general message, we'll show specific ones in the UI
+    message: "Skill names must be unique",
   }),
   feats: z.array(featSchema),
   saves: z.array(saveSchema),
@@ -288,10 +288,10 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   }
   
   const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
-    const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.toLowerCase()));
+    const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.trim().toLowerCase()));
     
     const newSkills = skillsToAdd
-        .filter(skill => !existingSkillNames.has(skill.name.toLowerCase()))
+        .filter(skill => !existingSkillNames.has(skill.name.trim().toLowerCase()))
         .map(skill => {
             const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
             return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
@@ -317,19 +317,26 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   };
 
   const handleAddFeatsFromLibrary = (featsToAdd: Feat[]) => {
-      const existingFeatNames = new Set(form.getValues('feats').map(f => f.name.toLowerCase()));
-      const newFeats = featsToAdd.filter(feat => !existingFeatNames.has(feat.name.toLowerCase()));
+      const existingFeatNames = new Set(form.getValues('feats').map(f => f.name.trim().toLowerCase()));
+      const newFeats = featsToAdd.filter(feat => !existingFeatNames.has(feat.name.trim().toLowerCase()));
 
       if (newFeats.length > 0) {
         appendFeat(newFeats);
       }
       
       const duplicatesCount = featsToAdd.length - newFeats.length;
-      
-      toast({
-        title: `${newFeats.length} Feat(s) Added`,
-        description: duplicatesCount > 0 ? `${duplicatesCount} feat(s) were ignored as duplicates.` : `All selected feats were added.`,
-      });
+
+      if (newFeats.length > 0) {
+        toast({
+          title: `${newFeats.length} Feat(s) Added`,
+          description: duplicatesCount > 0 ? `${duplicatesCount} feat(s) were ignored as duplicates.` : `All selected feats were added.`,
+        });
+      } else {
+        toast({
+          title: "No New Feats Added",
+          description: "All selected feats already exist in your system.",
+        });
+      }
   }
 
   const skillNames = watchedSkills.map(s => s.name?.trim().toLowerCase()).filter(Boolean);
@@ -775,3 +782,5 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     </div>
   );
 }
+
+    
