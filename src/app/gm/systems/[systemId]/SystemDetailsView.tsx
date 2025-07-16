@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/BackButton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Pencil, Loader2, Trash2 } from 'lucide-react';
+import { Pencil, Loader2, Trash2, Rows, Columns } from 'lucide-react';
 import { ExportSystemButton } from '@/components/ExportSystemButton';
 import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -24,11 +24,30 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { toast } = useToast();
+  
+  const [openAccordionItems, setOpenAccordionItems] = useState<string[]>([]);
+  const [allAttributeKeys, setAllAttributeKeys] = useState<string[]>([]);
+
 
   useEffect(() => {
       getSystem(systemId).then(data => {
           if (data) {
               setSystem(data);
+              
+              const grouped = data.skills.reduce((acc, skill) => {
+                const { baseAttribute } = skill;
+                if (!acc[baseAttribute]) acc[baseAttribute] = [];
+                acc[baseAttribute].push(skill);
+                return acc;
+              }, {} as Record<string, typeof data.skills>);
+
+              const defaultOpen = Object.entries(grouped)
+                .filter(([, skillList]) => skillList.length < 10)
+                .map(([attribute]) => attribute);
+              
+              setOpenAccordionItems(defaultOpen);
+              setAllAttributeKeys(Object.keys(grouped));
+
           }
           setIsLoading(false);
       });
@@ -80,10 +99,6 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
   const getAttributeDescription = (attrName: string) => {
     return attributes.find(attr => attr.name === attrName)?.description || 'No description available.';
   }
-
-  const defaultOpenAccordionItems = Object.entries(groupedSkills)
-    .filter(([, skillList]) => skillList.length < 10)
-    .map(([attribute]) => attribute);
 
   return (
     <TooltipProvider>
@@ -163,11 +178,31 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
           
           <Card className="flex flex-col lg:row-span-2">
               <CardHeader>
-                  <CardTitle>Skills</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Skills</CardTitle>
+                     <div className="flex items-center gap-1">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={() => setOpenAccordionItems(allAttributeKeys)} className="h-7 w-7">
+                                    <Rows className="h-4 w-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Expand All</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={() => setOpenAccordionItems([])} className="h-7 w-7">
+                                    <Columns className="h-4 w-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Collapse All</TooltipContent>
+                        </Tooltip>
+                    </div>
+                  </div>
               </CardHeader>
               <CardContent className="flex-grow min-h-0">
                   <ScrollArea className="h-full pr-4">
-                      <Accordion type="multiple" defaultValue={defaultOpenAccordionItems} className="w-full">
+                      <Accordion type="multiple" value={openAccordionItems} onValueChange={setOpenAccordionItems} className="w-full">
                           {Object.entries(groupedSkills).map(([attribute, skillList]) => (
                               <AccordionItem value={attribute} key={attribute}>
                                   <AccordionTrigger>
