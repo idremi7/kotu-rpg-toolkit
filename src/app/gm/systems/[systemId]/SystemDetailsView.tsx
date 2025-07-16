@@ -156,12 +156,12 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
           
-          <Card>
+          <Card className="flex flex-col">
               <CardHeader>
                   <CardTitle>Skills</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow min-h-0">
-                  <ScrollArea className="h-full pr-4">
+                  <ScrollArea className="h-64 pr-4">
                       <div className="space-y-4">
                           {Object.entries(groupedSkills).map(([attribute, skillList]) => (
                               <div key={attribute}>
