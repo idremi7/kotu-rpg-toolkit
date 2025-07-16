@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
 import { saveSystem, listFeatsFromLibrary } from '@/lib/data-service';
 import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
+import { suggestFeats } from '@/ai/flows/suggest-feats-flow';
 import { useEffect, useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -152,6 +153,7 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
 export function SystemCreator({ initialData }: SystemCreatorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isSuggestingSkills, setIsSuggestingSkills] = useState(false);
+  const [isSuggestingFeats, setIsSuggestingFeats] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const mounted = useMounted();
@@ -281,6 +283,37 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
         });
     } finally {
       setIsSuggestingSkills(false);
+    }
+  };
+
+  const handleSuggestFeats = async (count: number) => {
+    setIsSuggestingFeats(true);
+    const formData = form.getValues();
+    try {
+      const result = await suggestFeats({
+        systemName: formData.systemName,
+        attributes: formData.attributes,
+        existingFeats: formData.feats.map(f => f.name),
+        count: count,
+      });
+      
+      if (result?.feats) {
+        appendFeat(result.feats);
+        toast({
+          title: "Feats Suggested",
+          description: `AI has added ${result.feats.length} new feat suggestions.`,
+        });
+      } else {
+        throw new Error("No feats returned from AI.");
+      }
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Suggestion Failed",
+            description: error.message || "Could not get suggestions from AI.",
+        });
+    } finally {
+      setIsSuggestingFeats(false);
     }
   };
   
@@ -717,9 +750,23 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                   </TableBody>
                 </Table>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: '', effect: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
                 <FeatLibraryBrowser onAddFeats={handleAddFeatsFromLibrary} />
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button type="button" variant="secondary" disabled={isSuggestingFeats}>
+                        {isSuggestingFeats ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        Suggest with AI
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleSuggestFeats(1)}>Suggest 1 Feat</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSuggestFeats(5)}>Suggest 5 Feats</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSuggestFeats(10)}>Suggest 10 Feats</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </CardContent>
           </Card>
