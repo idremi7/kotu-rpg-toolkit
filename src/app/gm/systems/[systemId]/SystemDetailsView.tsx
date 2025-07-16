@@ -145,7 +145,8 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          <Card>
+          
+          <Card className="lg:col-span-1">
               <CardHeader><CardTitle>Attributes</CardTitle></CardHeader>
               <CardContent className="space-y-2">
                   {attributes.map((attr: any) => (
@@ -157,7 +158,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
           
-          <Card>
+          <Card className="lg:col-span-1">
               <CardHeader><CardTitle>Saves</CardTitle></CardHeader>
               <CardContent className="space-y-2">
                   {saves.map((save: any) => (
@@ -176,7 +177,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
           
-          <Card className="flex flex-col lg:row-span-2">
+          <Card className="flex flex-col lg:row-span-2 lg:col-span-1">
               <CardHeader>
                   <div className="flex justify-between items-center">
                     <CardTitle>Skills</CardTitle>
@@ -229,12 +230,14 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
                <CardContent className="space-y-4">
                   {feats.map((feat: any, index: number) => (
                       <div key={`${feat.name}-${index}`}>
-                          <div className="flex justify-between items-baseline">
-                             <h4 className="font-semibold">{feat.name}</h4>
-                             {feat.effect && <Badge variant="secondary">{feat.effect}</Badge>}
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="flex-grow">
+                                <h4 className="font-semibold">{feat.name}</h4>
+                                <p className="text-sm text-muted-foreground">{feat.description}</p>
+                                {feat.prerequisites && <p className="text-xs text-muted-foreground mt-1">Requires: {feat.prerequisites}</p>}
+                            </div>
+                             {feat.effect && <Badge variant="secondary" className="whitespace-normal text-right max-w-[50%] shrink-0">{feat.effect}</Badge>}
                           </div>
-                          <p className="text-sm text-muted-foreground">{feat.description}</p>
-                          {feat.prerequisites && <p className="text-xs text-muted-foreground">Requires: {feat.prerequisites}</p>}
                       </div>
                   ))}
               </CardContent>
