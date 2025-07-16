@@ -6,7 +6,6 @@ import { deleteSystem, getSystem } from '@/lib/data-service';
 import type { GameSystem } from '@/lib/data-service';
 import { notFound, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { BackButton } from '@/components/BackButton';
@@ -148,23 +147,21 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
                 <CardTitle>Skills</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow min-h-0">
-                <ScrollArea className="h-full">
-                    <Accordion type="multiple" className="w-full">
+                <ScrollArea className="h-full pr-4">
+                    <div className="space-y-4">
                         {Object.entries(groupedSkills).map(([attribute, skillList]) => (
-                            <AccordionItem key={attribute} value={attribute}>
-                                <AccordionTrigger>{attribute}</AccordionTrigger>
-                                <AccordionContent>
-                                    <div className="space-y-2 pl-2">
-                                        {skillList.map((skill: any, index: number) => (
-                                            <div key={`${skill.name}-${index}`}>
-                                                <h4 className="font-semibold">{skill.name}</h4>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </AccordionContent>
-                            </AccordionItem>
+                            <div key={attribute}>
+                                <h4 className="font-bold text-primary mb-1">{attribute}</h4>
+                                <ul className="list-disc list-inside space-y-1 pl-2">
+                                    {skillList.map((skill: any, index: number) => (
+                                        <li key={`${skill.name}-${index}`} className="text-sm">
+                                            {skill.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         ))}
-                    </Accordion>
+                    </div>
                 </ScrollArea>
             </CardContent>
         </Card>
