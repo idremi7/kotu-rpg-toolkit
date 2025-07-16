@@ -125,7 +125,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          <Card className="lg:col-span-2">
+          <Card>
               <CardHeader><CardTitle>Attributes</CardTitle></CardHeader>
               <CardContent className="space-y-2">
                   {attributes.map((attr: any) => (
@@ -156,16 +156,16 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
           
-          <Card className="flex flex-col lg:col-span-3">
+          <Card className="flex flex-col lg:row-span-2">
               <CardHeader>
                   <CardTitle>Skills</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow min-h-0">
-                  <ScrollArea className="h-64 pr-4">
+                  <ScrollArea className="h-full pr-4">
                       <div className="space-y-4">
                           {Object.entries(groupedSkills).map(([attribute, skillList]) => (
                               <div key={attribute}>
-                                  <h4 className="font-bold mb-1">{attribute}</h4>
+                                  <h4 className="font-bold mb-1 text-primary">{attribute}</h4>
                                   <ul className="list-disc list-inside space-y-1 pl-2">
                                       {skillList.map((skill: any, index: number) => (
                                           <li key={`${skill.name}-${index}`} className="text-sm">
