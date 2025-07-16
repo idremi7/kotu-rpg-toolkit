@@ -302,15 +302,15 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     const duplicatesCount = skillsToAdd.length - newSkillsCount;
 
     if (newSkillsCount > 0) {
-        toast({
-            title: "Skills Added",
-            description: `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill has' : 'skills have'} been added. ${duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : ''}`.trim(),
-        });
+      toast({
+        title: "Skills Added",
+        description: `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill has' : 'skills have'} been added. ${duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : ''}`.trim(),
+      });
     } else if (duplicatesCount > 0) {
-        toast({
-            title: "No New Skills Added",
-            description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'skill' : 'skills'} already exist in your system.`,
-        });
+      toast({
+        title: "No New Skills Added",
+        description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'skill' : 'skills'} already exist in your system.`,
+      });
     }
   };
 
@@ -326,15 +326,15 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       const newFeatsCount = newFeats.length;
 
       if (newFeatsCount > 0) {
-          toast({
-              title: "Feats Added",
-              description: `${newFeatsCount} new ${newFeatsCount === 1 ? 'feat' : 'feats'} added. ${duplicatesCount > 0 ? `${duplicatesCount} ${duplicatesCount === 1 ? 'feat was' : 'feats were'} ignored as duplicates.` : ''}`.trim(),
-          });
-      } else if(duplicatesCount > 0) {
-          toast({
-              title: "No New Feats Added",
-              description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'feat' : 'feats'} already exist in your system.`,
-          });
+        toast({
+          title: "Feats Added",
+          description: `${newFeatsCount} new ${newFeatsCount === 1 ? 'feat' : 'feats'} added. ${duplicatesCount > 0 ? `${duplicatesCount} ${duplicatesCount === 1 ? 'feat was' : 'feats were'} ignored as duplicates.` : ''}`.trim(),
+        });
+      } else if (duplicatesCount > 0) {
+        toast({
+          title: "No New Feats Added",
+          description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'feat' : 'feats'} already exist in your system.`,
+        });
       }
   }
 
