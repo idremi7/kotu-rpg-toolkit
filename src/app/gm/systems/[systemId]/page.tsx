@@ -84,8 +84,8 @@ export default async function SystemDetailsPage({ params }: { params: { systemId
                                 <AccordionTrigger>{attribute}</AccordionTrigger>
                                 <AccordionContent>
                                     <div className="space-y-2 pl-2">
-                                        {skillList.map((skill: any) => (
-                                            <div key={skill.name}>
+                                        {skillList.map((skill: any, index: number) => (
+                                            <div key={`${skill.name}-${index}`}>
                                                 <h4 className="font-semibold">{skill.name}</h4>
                                             </div>
                                         ))}
