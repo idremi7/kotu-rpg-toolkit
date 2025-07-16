@@ -20,50 +20,50 @@ import { FileSystemProvider } from './data/file-system-provider';
 const dataProvider: DataProvider = new FileSystemProvider();
 
 // --- Systems API ---
-export const saveSystem = (systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'> | GameSystem) => {
+export const saveSystem = async (systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'> | GameSystem) => {
   return dataProvider.saveSystem(systemData);
 };
 
-export const importSystem = (systemData: any) => {
+export const importSystem = async (systemData: any) => {
   return dataProvider.importSystem(systemData);
 };
 
-export const getSystem = (systemId: string) => {
+export const getSystem = async (systemId: string) => {
   return dataProvider.getSystem(systemId);
 };
 
-export const listSystems = () => {
+export const listSystems = async () => {
   return dataProvider.listSystems();
 };
 
-export const deleteSystem = (systemId: string) => {
+export const deleteSystem = async (systemId: string) => {
     return dataProvider.deleteSystem(systemId);
 };
 
 // --- Characters API ---
-export const saveCharacter = (characterData: any) => {
+export const saveCharacter = async (characterData: any) => {
   return dataProvider.saveCharacter(characterData);
 };
 
-export const getCharacter = (characterId: string) => {
+export const getCharacter = async (characterId: string) => {
   return dataProvider.getCharacter(characterId);
 };
 
-export const listCharacters = () => {
+export const listCharacters = async () => {
   return dataProvider.listCharacters();
 };
 
-export const deleteCharacter = (characterId: string) => {
+export const deleteCharacter = async (characterId: string) => {
   return dataProvider.deleteCharacter(characterId);
 };
 
 
 // --- Library APIs ---
-export const listSkillsFromLibrary = () => {
+export const listSkillsFromLibrary = async () => {
   return dataProvider.listSkillsFromLibrary();
 };
 
-export const listFeatsFromLibrary = () => {
+export const listFeatsFromLibrary = async () => {
   return dataProvider.listFeatsFromLibrary();
 };
 
