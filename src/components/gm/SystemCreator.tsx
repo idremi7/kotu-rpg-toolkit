@@ -23,7 +23,7 @@ import {
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { GameSystem, Feat, FeatFromLibrary, CustomRule } from '@/lib/data-service';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '../ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
 import { Switch } from '../ui/switch';
@@ -297,22 +297,19 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
               return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
           });
-
-      if (newSkills.length > 0) {
-          appendSkill(newSkills);
-      }
       
-      const duplicatesCount = skillsToAdd.length - newSkills.length;
       const newSkillsCount = newSkills.length;
+      const duplicatesCount = skillsToAdd.length - newSkillsCount;
 
       if (newSkillsCount > 0) {
-        const title = "Skills Added";
-        const desc_part1 = `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill has' : 'skills have'} been added.`;
-        const desc_part2 = duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : '';
-        toast({
-            title: title,
-            description: `${desc_part1} ${desc_part2}`.trim(),
-        });
+          appendSkill(newSkills);
+          const title = "Skills Added";
+          const desc_part1 = `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill has' : 'skills have'} been added.`;
+          const desc_part2 = duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : '';
+          toast({
+              title: title,
+              description: `${desc_part1} ${desc_part2}`.trim(),
+          });
       } else if (duplicatesCount > 0) {
           toast({
               title: "No New Skills Added",
@@ -379,7 +376,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     <div className="space-y-0.5">
                       <FormLabel>Use D20-Style Modifiers</FormLabel>
                       <FormDescription>
-                        Enable to calculate and display attribute modifiers (e.g., +2) like in D&D.
+                        Enable to calculate and display attribute modifiers (e.g., +2) like in D&amp;D.
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -801,3 +798,5 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     </div>
   );
 }
+
+    
