@@ -125,7 +125,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          <Card className="lg:col-span-2">
+          <Card>
               <CardHeader><CardTitle>Attributes</CardTitle></CardHeader>
               <CardContent className="space-y-2">
                   {attributes.map((attr: any) => (
@@ -156,7 +156,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
           
-          <Card className="md:col-span-2">
+          <Card>
               <CardHeader>
                   <CardTitle>Skills</CardTitle>
               </CardHeader>
@@ -180,7 +180,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
 
-          <Card>
+          <Card className="lg:col-span-3">
               <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
                <CardContent className="space-y-4">
                   {feats.map((feat: any, index: number) => (
@@ -197,7 +197,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
           </Card>
           
           {customRules && customRules.length > 0 && (
-            <Card className="md:col-span-2 lg:col-span-3">
+            <Card className="lg:col-span-3">
               <CardHeader><CardTitle>Custom Rules</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 {customRules.map((rule, index) => (
