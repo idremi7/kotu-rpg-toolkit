@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { GameSystem, Feat, FeatFromLibrary } from '@/lib/data-service';
+import type { GameSystem, Feat, FeatFromLibrary, CustomRule } from '@/lib/data-service';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
@@ -44,9 +44,9 @@ const systemSchema = z.object({
     const names = skills.map(skill => skill.name.trim().toLowerCase());
     return new Set(names).size === names.length;
   }, {
+    message: 'Skill names must be unique.',
     // This is a dummy path, the real logic is in the form field render
     path: ['skills'],
-    message: 'Skill names must be unique.',
   }),
   feats: z.array(featSchema),
   saves: z.array(saveSchema),
@@ -182,9 +182,9 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       systemName: '',
       usesD20StyleModifiers: false,
       attributes: [{ name: 'Strength', description: 'Physical power' }],
-      skills: [{ name: 'Athletics', baseAttribute: 'Strength' }],
-      feats: [{ name: 'Power Attack', description: 'Trade accuracy for damage', prerequisites: 'Strength 13', effect: '-5 Hit, +5 Dmg' }],
-      saves: [{ name: 'Fortitude', baseAttribute: 'Constitution' }],
+      skills: [],
+      feats: [],
+      saves: [],
       customRules: [],
     },
     mode: 'onChange',
@@ -209,7 +209,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     name: 'attributes',
   });
 
-  const { fields: skillFields, append: appendSkill, remove: removeSkill } = useFieldArray({
+  const { fields: skillFields, append: appendSkill, remove: removeSkill, update } = useFieldArray({
     control: form.control,
     name: 'skills',
   });
@@ -292,13 +292,13 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     return null;
   }
   
-  const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
+  const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; baseAttribute: string }[]) => {
     const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.toLowerCase()));
     
     const newSkills = skillsToAdd
         .filter(skill => !existingSkillNames.has(skill.name.toLowerCase()))
         .map(skill => {
-            const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
+            const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.baseAttribute.toLowerCase());
             return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
         });
 
@@ -525,25 +525,14 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                            <FormField
                               control={form.control}
                               name={`skills.${index}.name`}
-                              render={({ field: formField }) => {
-                                const allSkills = form.getValues('skills');
-                                const isDuplicate = allSkills.some((skill, i) => 
-                                    i !== index && skill.name.trim().toLowerCase() === formField.value.trim().toLowerCase()
-                                );
-                                if (isDuplicate && !form.getFieldState(`skills.${index}.name`).error) {
-                                    form.setError(`skills.${index}.name`, { type: 'manual', message: 'This skill name already exists.' });
-                                } else if (!isDuplicate && form.getFieldState(`skills.${index}.name`).error) {
-                                    form.clearErrors(`skills.${index}.name`);
-                                }
-                                return (
-                                    <FormItem>
+                              render={({ field }) => (
+                                <FormItem>
                                     <FormControl>
-                                        <Input {...formField} placeholder="e.g. Acrobatics" />
+                                        <Input {...field} placeholder="e.g. Acrobatics" />
                                     </FormControl>
                                     <FormMessage />
-                                    </FormItem>
-                                );
-                               }}
+                                </FormItem>
+                               )}
                             />
                         </TableCell>
                         <TableCell>
@@ -599,6 +588,11 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                     </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+               {form.formState.errors.skills && (
+                  <p className="text-sm font-medium text-destructive">
+                      {form.formState.errors.skills.message}
+                  </p>
+              )}
             </CardContent>
           </Card>
 
