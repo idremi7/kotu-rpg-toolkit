@@ -55,7 +55,7 @@ export interface FeatFromLibrary {
 /**
  * @interface DataProvider
  * @description Defines the contract for all data access operations in the application.
- * Any data source (localStorage, API, etc.) must implement this interface.
+ * Any data source (file system, API, etc.) must implement this interface.
  */
 export interface DataProvider {
     saveSystem(systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'> | GameSystem): Promise<{ success: boolean, systemId?: string, error?: string }>;
@@ -67,6 +67,7 @@ export interface DataProvider {
     saveCharacter(characterData: Character): Promise<{ success: boolean, characterId?: string, error?: string }>;
     getCharacter(characterId: string): Promise<Character | null>;
     listCharacters(): Promise<Character[]>;
+    deleteCharacter(characterId: string): Promise<{ success: boolean, error?: string }>;
 
     listSkillsFromLibrary(): Promise<SkillFromLibrary[]>;
     listFeatsFromLibrary(): Promise<FeatFromLibrary[]>;

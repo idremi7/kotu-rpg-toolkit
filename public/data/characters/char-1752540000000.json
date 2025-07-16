@@ -1,0 +1,51 @@
+
+{
+  "characterId": "char-1752540000000",
+  "systemId": "cyber-fantasy-2088",
+  "data": {
+    "name": "Jax",
+    "class": "Street Chronomancer",
+    "level": 3,
+    "vitals": {
+      "hp": 22,
+      "maxHp": 22
+    },
+    "attributes": {
+      "Brawn": 12,
+      "Agility": 16,
+      "Tech": 15,
+      "Mage": 14,
+      "Cool": 10
+    },
+    "saves": {
+      "Fortitude": 1,
+      "Reflex": 4,
+      "Willpower": 0
+    },
+    "skills": [
+      {
+        "name": "Stealth",
+        "value": 5
+      },
+      {
+        "name": "Firearms",
+        "value": 4
+      },
+      {
+        "name": "Hacking",
+        "value": 6
+      },
+      {
+        "name": "Spellcasting",
+        "value": 3
+      }
+    ],
+    "feats": [
+      {
+        "name": "Invisibility Cloak",
+        "effect": "Become invisible for 1 minute"
+      }
+    ],
+    "backstory": "Jax grew up in the neon-drenched alleys of Neo-Kyoto, learning to splice tech and magic to survive. He can manipulate short bursts of time, a skill he uses to stay one step ahead of the corporate enforcers."
+  }
+}

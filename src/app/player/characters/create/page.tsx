@@ -7,23 +7,19 @@ import { BackButton } from "@/components/BackButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Swords, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useMounted } from '@/hooks/use-mounted';
 
 export default function SelectSystemPage() {
   const [systems, setSystems] = useState<GameSystemSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const mounted = useMounted();
 
   useEffect(() => {
-    if (mounted) {
-        listSystems().then(data => {
-            setSystems(data);
-            setIsLoading(false);
-        });
-    }
-  }, [mounted]);
+    listSystems().then(data => {
+        setSystems(data);
+        setIsLoading(false);
+    });
+  }, []);
 
-  if (!mounted || isLoading) {
+  if (isLoading) {
     return (
         <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

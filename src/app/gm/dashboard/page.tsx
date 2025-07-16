@@ -8,12 +8,10 @@ import Link from "next/link";
 import { listSystems } from "@/lib/data-service";
 import type { GameSystemSummary } from '@/lib/data-service';
 import { ImportSystemButton } from "@/components/ImportSystemButton";
-import { useMounted } from '@/hooks/use-mounted';
 
 export default function GMDashboard() {
   const [systems, setSystems] = useState<GameSystemSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const mounted = useMounted();
 
   const loadSystems = async () => {
     setIsLoading(true);
@@ -23,14 +21,9 @@ export default function GMDashboard() {
   };
   
   useEffect(() => {
-    if (mounted) {
-      loadSystems();
-    }
-  }, [mounted]);
+    loadSystems();
+  }, []);
 
-  if (!mounted) {
-    return null;
-  }
   
   if (isLoading) {
     return (

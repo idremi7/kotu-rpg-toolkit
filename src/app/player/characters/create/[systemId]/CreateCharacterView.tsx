@@ -7,25 +7,21 @@ import { BackButton } from "@/components/BackButton";
 import { CharacterCreator } from "@/components/player/CharacterCreator";
 import { notFound } from "next/navigation";
 import { Loader2 } from 'lucide-react';
-import { useMounted } from '@/hooks/use-mounted';
 
 export function CreateCharacterView({ systemId }: { systemId: string }) {
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const mounted = useMounted();
 
   useEffect(() => {
-    if (mounted) {
-        getSystem(systemId).then(data => {
-            if (data) {
-                setSystem(data);
-            }
-            setIsLoading(false);
-        });
-    }
-  }, [systemId, mounted]);
+    getSystem(systemId).then(data => {
+        if (data) {
+            setSystem(data);
+        }
+        setIsLoading(false);
+    });
+  }, [systemId]);
 
-  if (!mounted || isLoading) {
+  if (isLoading) {
     return (
         <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

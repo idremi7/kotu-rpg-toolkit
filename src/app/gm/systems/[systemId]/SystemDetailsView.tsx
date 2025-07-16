@@ -14,27 +14,23 @@ import Link from 'next/link';
 import { Pencil, Loader2, Trash2 } from 'lucide-react';
 import { ExportSystemButton } from '@/components/ExportSystemButton';
 import { Separator } from '@/components/ui/separator';
-import { useMounted } from '@/hooks/use-mounted';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
 export function SystemDetailsView({ systemId }: { systemId: string }) {
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const mounted = useMounted();
   const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
-      if (mounted) {
-        getSystem(systemId).then(data => {
-            if (data) {
-                setSystem(data);
-            }
-            setIsLoading(false);
-        });
-      }
-  }, [systemId, mounted]);
+      getSystem(systemId).then(data => {
+          if (data) {
+              setSystem(data);
+          }
+          setIsLoading(false);
+      });
+  }, [systemId]);
   
   const handleDeleteSystem = async () => {
     if (!system) return;
@@ -56,7 +52,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
   };
 
 
-  if (!mounted || isLoading) {
+  if (isLoading) {
     return (
         <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -108,7 +104,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
                   <AlertDialogDescription>
                     This action cannot be undone. This will permanently delete the 
                     <span className="font-semibold text-foreground"> {system.systemName} </span>
-                     system. Any characters created with this system may become inaccessible or display incorrectly.
+                     system and all associated characters.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

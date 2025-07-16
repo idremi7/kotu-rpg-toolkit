@@ -1,22 +1,22 @@
 
 {
-    "systems": [
-        "/data/systems/dnd-5e.json",
-        "/data/systems/dnd-3-5.json",
-        "/data/systems/cyber-fantasy-2088.json",
-        "/data/systems/d100-modern-sci-fi-.json",
-        "/data/systems/d20-modern.json",
-        "/data/systems/custom-home-ttrpg.json",
-        "/data/systems/test-system.json"
-    ],
-    "characters": [
-        "/data/characters/char-1752540000000.json",
-        "/data/characters/char_1752530425755.json",
-        "/data/characters/char_1752532646914.json",
-        "/data/characters/char_1752536691232.json"
-    ],
-    "libraries": {
-        "skills": "/data/skill-library.json",
-        "feats": "/data/feat-library.json"
-    }
+  "systems": [
+    "/data/systems/custom-home-ttrpg.json",
+    "/data/systems/cyber-fantasy-2088.json",
+    "/data/systems/d100-modern-sci-fi-.json",
+    "/data/systems/d20-modern.json",
+    "/data/systems/dnd-3-5.json",
+    "/data/systems/dnd-5e.json",
+    "/data/systems/test-system.json"
+  ],
+  "characters": [
+    "/data/characters/char-1752540000000.json",
+    "/data/characters/char_1752530425755.json",
+    "/data/characters/char_1752532646914.json",
+    "/data/characters/char_1752536691232.json"
+  ],
+  "libraries": {
+    "skills": "/data/skill-library.json",
+    "feats": "/data/feat-library.json"
+  }
 }

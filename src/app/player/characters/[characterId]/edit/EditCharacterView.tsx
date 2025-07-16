@@ -8,30 +8,26 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { useMounted } from '@/hooks/use-mounted';
 
 export function EditCharacterView({ characterId }: { characterId: string }) {
   const [character, setCharacter] = useState<Character | null>(null);
   const [system, setSystem] = useState<GameSystem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const mounted = useMounted();
 
   useEffect(() => {
-    if (mounted) {
-      const loadData = async () => {
-        const char = await getCharacter(characterId);
-        if (char) {
-          const sys = await getSystem(char.systemId);
-          setCharacter(char);
-          setSystem(sys);
-        }
-        setIsLoading(false);
-      };
-      loadData();
-    }
-  }, [characterId, mounted]);
+    const loadData = async () => {
+      const char = await getCharacter(characterId);
+      if (char) {
+        const sys = await getSystem(char.systemId);
+        setCharacter(char);
+        setSystem(sys);
+      }
+      setIsLoading(false);
+    };
+    loadData();
+  }, [characterId]);
 
-  if (!mounted || isLoading) {
+  if (isLoading) {
     return (
         <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

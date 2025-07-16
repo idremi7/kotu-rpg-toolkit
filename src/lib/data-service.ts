@@ -6,16 +6,18 @@
  *
  * To switch data sources (e.g., from localStorage to a real backend API),
  * you would create a new provider that implements the DataProvider interface
- * and then instantiate it here instead of LocalStorageProvider.
+ * and then instantiate it here instead of FileSystemProvider.
  */
 
+'use server';
+
 import type { DataProvider, GameSystem } from './data/data-provider';
-import { LocalStorageProvider } from './data/local-storage-provider';
+import { FileSystemProvider } from './data/file-system-provider';
 
 // Instantiate the desired data provider.
 // To switch to a backend, you might swap this with:
 // const dataProvider: DataProvider = new ApiProvider();
-const dataProvider: DataProvider = new LocalStorageProvider();
+const dataProvider: DataProvider = new FileSystemProvider();
 
 // --- Systems API ---
 export const saveSystem = (systemData: Omit<GameSystem, 'systemId' | 'schemas' | 'description'> | GameSystem) => {
@@ -50,6 +52,11 @@ export const getCharacter = (characterId: string) => {
 export const listCharacters = () => {
   return dataProvider.listCharacters();
 };
+
+export const deleteCharacter = (characterId: string) => {
+  return dataProvider.deleteCharacter(characterId);
+};
+
 
 // --- Library APIs ---
 export const listSkillsFromLibrary = () => {
