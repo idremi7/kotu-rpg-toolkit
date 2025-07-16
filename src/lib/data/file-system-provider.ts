@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview DataProvider implementation that reads and writes to the local file system.
  * This is suitable for a development environment or a self-hosted scenario.
@@ -124,7 +125,7 @@ export class FileSystemProvider implements DataProvider {
             const fullSystemData: GameSystem = {
                 ...systemData,
                 systemId,
-                description: `A custom system with ${systemData.attributes.length} attributes.`,
+                description: systemData.description || `A custom system with ${systemData.attributes.length} attributes.`,
                 schemas,
             };
             

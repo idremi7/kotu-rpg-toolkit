@@ -86,7 +86,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
     notFound();
   }
 
-  const { systemName, attributes, skills, feats, saves, customRules } = system;
+  const { systemName, description, attributes, skills, feats, saves, customRules } = system;
 
   const groupedSkills = skills.reduce((acc, skill) => {
     const { baseAttribute } = skill;
@@ -107,8 +107,8 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
         <div className="flex items-center mb-8 gap-4">
           <BackButton />
           <div className="text-center flex-grow">
-              <h1 className="font-headline text-4xl font-bold">System Details</h1>
-              <p className="text-muted-foreground">Configuration for the {systemName} system.</p>
+              <h1 className="font-headline text-4xl font-bold">{systemName}</h1>
+              <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">{description}</p>
           </div>
           <div className="flex items-center gap-2">
               <ExportSystemButton system={system} />

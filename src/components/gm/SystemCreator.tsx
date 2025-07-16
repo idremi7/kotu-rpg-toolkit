@@ -40,6 +40,7 @@ const customRuleSchema = z.object({ title: z.string().min(1, 'Title is required'
 
 const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
+  description: z.string().optional(),
   usesD20StyleModifiers: z.boolean().optional(),
   attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
   skills: z.array(skillSchema),
@@ -164,6 +165,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     resolver: zodResolver(systemSchema),
     defaultValues: isEditMode ? {
         systemName: initialData.systemName,
+        description: initialData.description,
         usesD20StyleModifiers: initialData.usesD20StyleModifiers,
         attributes: initialData.attributes,
         skills: initialData.skills,
@@ -172,6 +174,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
         customRules: initialData.customRules || [],
     } : {
       systemName: '',
+      description: '',
       usesD20StyleModifiers: false,
       attributes: [{ name: 'Strength', description: 'Physical power' }],
       skills: [],
@@ -186,6 +189,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     if (initialData) {
         form.reset({
             systemName: initialData.systemName,
+            description: initialData.description,
             usesD20StyleModifiers: initialData.usesD20StyleModifiers,
             attributes: initialData.attributes,
             skills: initialData.skills,
@@ -391,8 +395,27 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                   <FormItem>
                     <FormLabel>System Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., D20 Modern" {...field} />
+                      <Input placeholder="e.g., Cyber-Fantasy 2088" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                     <FormControl>
+                        <Textarea 
+                            placeholder="A brief description of your game system's theme, tone, and unique features."
+                            {...field}
+                         />
+                    </FormControl>
+                    <FormDescription>
+                        This will be shown to players when they choose a system.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
