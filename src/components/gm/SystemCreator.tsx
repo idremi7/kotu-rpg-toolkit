@@ -40,7 +40,14 @@ const systemSchema = z.object({
   systemName: z.string().min(1, 'System name is required'),
   usesD20StyleModifiers: z.boolean().optional(),
   attributes: z.array(attributeSchema).min(1, 'At least one attribute is required.'),
-  skills: z.array(skillSchema),
+  skills: z.array(skillSchema).refine((skills) => {
+    const names = skills.map(skill => skill.name.trim().toLowerCase());
+    return new Set(names).size === names.length;
+  }, {
+    // This is a dummy path, the real logic is in the form field render
+    path: ['skills'],
+    message: 'Skill names must be unique.',
+  }),
   feats: z.array(featSchema),
   saves: z.array(saveSchema),
   customRules: z.array(customRuleSchema).optional(),
@@ -180,6 +187,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       saves: [{ name: 'Fortitude', baseAttribute: 'Constitution' }],
       customRules: [],
     },
+    mode: 'onChange',
   });
 
   useEffect(() => {
@@ -517,14 +525,25 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                            <FormField
                               control={form.control}
                               name={`skills.${index}.name`}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input {...field} placeholder="e.g. Acrobatics" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
+                              render={({ field: formField }) => {
+                                const allSkills = form.getValues('skills');
+                                const isDuplicate = allSkills.some((skill, i) => 
+                                    i !== index && skill.name.trim().toLowerCase() === formField.value.trim().toLowerCase()
+                                );
+                                if (isDuplicate && !form.getFieldState(`skills.${index}.name`).error) {
+                                    form.setError(`skills.${index}.name`, { type: 'manual', message: 'This skill name already exists.' });
+                                } else if (!isDuplicate && form.getFieldState(`skills.${index}.name`).error) {
+                                    form.clearErrors(`skills.${index}.name`);
+                                }
+                                return (
+                                    <FormItem>
+                                    <FormControl>
+                                        <Input {...formField} placeholder="e.g. Acrobatics" />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                );
+                               }}
                             />
                         </TableCell>
                         <TableCell>
