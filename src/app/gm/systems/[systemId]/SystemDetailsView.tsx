@@ -180,7 +180,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardContent>
           </Card>
 
-          <Card className="lg:col-span-3">
+          <Card className="lg:col-span-2">
               <CardHeader><CardTitle>Feats</CardTitle></CardHeader>
                <CardContent className="space-y-4">
                   {feats.map((feat: any, index: number) => (
