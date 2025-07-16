@@ -17,6 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export function SystemDetailsView({ systemId }: { systemId: string }) {
   const [system, setSystem] = useState<GameSystem | null>(null);
@@ -80,6 +81,10 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
     return attributes.find(attr => attr.name === attrName)?.description || 'No description available.';
   }
 
+  const defaultOpenAccordionItems = Object.entries(groupedSkills)
+    .filter(([, skillList]) => skillList.length < 10)
+    .map(([attribute]) => attribute);
+
   return (
     <TooltipProvider>
       <div className="container mx-auto px-4 py-8">
@@ -124,7 +129,7 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           <Card>
               <CardHeader><CardTitle>Attributes</CardTitle></CardHeader>
               <CardContent className="space-y-2">
@@ -162,20 +167,24 @@ export function SystemDetailsView({ systemId }: { systemId: string }) {
               </CardHeader>
               <CardContent className="flex-grow min-h-0">
                   <ScrollArea className="h-full pr-4">
-                      <div className="space-y-4">
+                      <Accordion type="multiple" defaultValue={defaultOpenAccordionItems} className="w-full">
                           {Object.entries(groupedSkills).map(([attribute, skillList]) => (
-                              <div key={attribute}>
-                                  <h4 className="font-bold mb-1">{attribute}</h4>
-                                  <ul className="list-disc list-inside space-y-1 pl-2">
-                                      {skillList.map((skill: any, index: number) => (
-                                          <li key={`${skill.name}-${index}`} className="text-sm">
-                                              {skill.name}
-                                          </li>
-                                      ))}
-                                  </ul>
-                              </div>
+                              <AccordionItem value={attribute} key={attribute}>
+                                  <AccordionTrigger>
+                                    <h4 className="font-bold">{attribute} ({skillList.length})</h4>
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                      <ul className="list-disc list-inside space-y-1 pl-2">
+                                          {skillList.map((skill: any, index: number) => (
+                                              <li key={`${skill.name}-${index}`} className="text-sm">
+                                                  {skill.name}
+                                              </li>
+                                          ))}
+                                      </ul>
+                                  </AccordionContent>
+                              </AccordionItem>
                           ))}
-                      </div>
+                      </Accordion>
                   </ScrollArea>
               </CardContent>
           </Card>
