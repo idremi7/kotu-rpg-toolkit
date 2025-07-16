@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ import Link from "next/link";
 import { listSystems } from "@/lib/data-service";
 import type { GameSystemSummary } from '@/lib/data-service';
 import { ImportSystemButton } from "@/components/ImportSystemButton";
+import { ExpandableText } from '@/components/ExpandableText';
 
 export default function GMDashboard() {
   const [systems, setSystems] = useState<GameSystemSummary[]>([]);
@@ -62,7 +64,9 @@ export default function GMDashboard() {
                   <Swords className="text-primary"/>
                   {system.name}
                 </CardTitle>
-                <CardDescription>{system.description}</CardDescription>
+                <CardDescription as="div">
+                  <ExpandableText text={system.description} maxLength={120} />
+                </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
               </CardContent>
