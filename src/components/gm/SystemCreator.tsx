@@ -209,7 +209,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     name: 'attributes',
   });
 
-  const { fields: skillFields, append: appendSkill, remove: removeSkill, update } = useFieldArray({
+  const { fields: skillFields, append: appendSkill, remove: removeSkill } = useFieldArray({
     control: form.control,
     name: 'skills',
   });
@@ -292,13 +292,13 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     return null;
   }
   
-  const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; baseAttribute: string }[]) => {
+  const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
     const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.toLowerCase()));
     
     const newSkills = skillsToAdd
         .filter(skill => !existingSkillNames.has(skill.name.toLowerCase()))
         .map(skill => {
-            const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.baseAttribute.toLowerCase());
+            const matchedAttribute = validAttributes.find(attr => attr.name.toLowerCase() === skill.category.toLowerCase());
             return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
         });
 
@@ -306,10 +306,19 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
         appendSkill(newSkills);
     }
     
-    toast({
-        title: `${newSkills.length} New Skills Added`,
-        description: `${skillsToAdd.length - newSkills.length} selected skills already existed.`
-    });
+    const duplicatesCount = skillsToAdd.length - newSkills.length;
+
+    if (newSkills.length > 0) {
+      toast({
+        title: `${newSkills.length} New Skill(s) Added`,
+        description: duplicatesCount > 0 ? `${duplicatesCount} skill(s) were ignored as duplicates.` : `All selected skills were added.`,
+      });
+    } else {
+      toast({
+        title: "No New Skills Added",
+        description: "All selected skills already exist in your system.",
+      });
+    }
   };
 
   const handleAddFeatsFromLibrary = (featsToAdd: Feat[]) => {
