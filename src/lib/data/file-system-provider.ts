@@ -12,7 +12,7 @@ import type { DataProvider, GameSystem, GameSystemSummary, Character, SkillFromL
 // Define paths to the data directories
 const SYSTEMS_DIR = path.resolve(process.cwd(), 'data', 'systems');
 const CHARACTERS_DIR = path.resolve(process.cwd(), 'data', 'characters');
-const LIBRARIES_DIR = path.resolve(process.cwd(), 'data');
+const LIBRARIES_DIR = path.resolve(process.cwd(), 'src', 'data');
 
 
 // ===== Schema Generation Logic (same as before, but used server-side) =====
