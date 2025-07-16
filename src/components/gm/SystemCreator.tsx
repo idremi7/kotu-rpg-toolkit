@@ -23,7 +23,7 @@ import {
 import { useMounted } from '@/hooks/use-mounted';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { GameSystem, Feat, FeatFromLibrary, CustomRule } from '@/lib/data-service';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '../ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '../ui/sheet';
 import { ScrollArea } from '../ui/scroll-area';
 import { Checkbox } from '../ui/checkbox';
 import { Switch } from '../ui/switch';
@@ -284,10 +284,6 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
     }
   };
   
-  if (!mounted) {
-    return null;
-  }
-  
   const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
     const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.trim().toLowerCase()));
     
@@ -298,17 +294,17 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
             return { name: skill.name, baseAttribute: matchedAttribute?.name || '' };
         });
     
+    if (newSkills.length > 0) {
+        appendSkill(newSkills);
+    }
+
     const newSkillsCount = newSkills.length;
     const duplicatesCount = skillsToAdd.length - newSkillsCount;
 
     if (newSkillsCount > 0) {
-        appendSkill(newSkills);
-        const title = "Skills Added";
-        const desc_part1 = `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill has' : 'skills have'} been added.`;
-        const desc_part2 = duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : '';
         toast({
-            title: title,
-            description: `${desc_part1} ${desc_part2}`.trim(),
+            title: "Skills Added",
+            description: `${newSkillsCount} new ${newSkillsCount === 1 ? 'skill has' : 'skills have'} been added. ${duplicatesCount > 0 ? `${duplicatesCount} duplicate ${duplicatesCount === 1 ? 'skill was' : 'skills were'} ignored.` : ''}`.trim(),
         });
     } else if (duplicatesCount > 0) {
         toast({
