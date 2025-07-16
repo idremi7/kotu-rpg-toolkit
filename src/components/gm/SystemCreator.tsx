@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -227,18 +226,6 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
   const handleSaveSystem = async (data: SystemFormData) => {
-    const skillNames = data.skills.map(s => s.name.trim().toLowerCase());
-    const hasDuplicates = new Set(skillNames).size !== skillNames.length;
-    
-    if (hasDuplicates) {
-        toast({
-            variant: "destructive",
-            title: "Duplicate Skills Found",
-            description: "Please ensure all skill names are unique before saving.",
-        });
-        return;
-    }
-
     setIsSaving(true);
     const fullData = isEditMode ? { ...initialData, ...data } : data;
     try {
@@ -341,7 +328,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
       });
   }
 
-  const skillNames = watchedSkills.map(s => s.name.trim().toLowerCase());
+  const skillNames = watchedSkills.map(s => s.name.trim().toLowerCase()).filter(Boolean);
 
 
   return (
@@ -537,7 +524,7 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                   </TableHeader>
                   <TableBody>
                     {skillFields.map((field, index) => {
-                       const currentSkillName = skillNames[index];
+                       const currentSkillName = watchedSkills[index]?.name?.trim().toLowerCase();
                        const isDuplicate = currentSkillName ? skillNames.indexOf(currentSkillName) !== index : false;
 
                         return (
@@ -551,12 +538,14 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
                                             <FormControl>
                                                 <Input {...field} placeholder="e.g. Acrobatics" />
                                             </FormControl>
-                                            <FormMessage />
-                                            {isDuplicate && (
-                                                <p className="text-sm font-medium text-destructive">
-                                                    This skill name already exists.
-                                                </p>
-                                            )}
+                                            <div className="h-5">
+                                                {isDuplicate && (
+                                                    <p className="text-sm font-medium text-destructive">
+                                                        This skill name already exists.
+                                                    </p>
+                                                )}
+                                                <FormMessage />
+                                            </div>
                                         </FormItem>
                                     )}
                                     />
