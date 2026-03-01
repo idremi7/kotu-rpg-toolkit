@@ -30,7 +30,7 @@ export interface GameSystem {
     feats: Feat[];
     saves: { name: string; baseAttribute: string }[];
     customRules?: CustomRule[];
-    schemas: { formSchema: string; uiSchema: string };
+    schemas?: { formSchema: string; uiSchema: string }; // now optional; schemas are auto-generated
     usesD20StyleModifiers?: boolean;
 
     // optional engine configuration and extra fields for flexible systems

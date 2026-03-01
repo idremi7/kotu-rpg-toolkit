@@ -13,6 +13,7 @@ import { saveCharacter } from '@/lib/data-service';
 import type { GameSystem, Character } from '@/lib/data-service';
 import { useRouter } from 'next/navigation';
 import { calculateFields } from '@/lib/calculation-engine';
+import { generateFormConfig, formConfigToUiSchema } from '@/lib/schema-generator';
 
 const CustomSkillWidget = ({ control, name, options }: { control: any, name: string, options: any[] }) => {
   const { fields, append, remove } = useFieldArray({ control, name });
@@ -348,20 +349,20 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
 
   useEffect(() => {
     let defaultValues: any = {};
-    if (system?.schemas?.formSchema) {
-      const formSchema = JSON.parse(system.schemas.formSchema);
-      Object.keys(formSchema.properties).forEach((key) => {
-        const prop = formSchema.properties[key];
-        if (prop.default !== undefined) {
-          defaultValues[key] = prop.default;
-        } else if (prop.type === 'object') {
-          defaultValues[key] = {};
-          Object.keys(prop.properties).forEach(subKey => {
-            defaultValues[key][subKey] = prop.properties[subKey].default ?? 0;
-          });
-        }
-      });
-    }
+    // Use auto-generated schema instead of parsing JSON
+    const formConfig = generateFormConfig(system);
+    formConfig.forEach(field => {
+      if (field.type === 'group' && field.fields) {
+        defaultValues[field.fieldName] = {};
+        field.fields.forEach(subField => {
+          defaultValues[field.fieldName][subField.fieldName] = subField.default ?? 0;
+        });
+      } else if (field.type === 'array') {
+        defaultValues[field.fieldName] = [];
+      } else {
+        defaultValues[field.fieldName] = field.default ?? '';
+      }
+    });
     // ensure bonuses array exists for form
     if (!defaultValues.bonuses) {
       defaultValues.bonuses = [];
@@ -449,7 +450,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     setIsSaving(false);
   };
 
-  if (!system?.schemas?.uiSchema) {
+  if (!system) {
     return (
       <div className="flex justify-center items-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -458,7 +459,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     );
   }
 
-  const uiSchema = JSON.parse(system.schemas.uiSchema);
+  const uiSchema = formConfigToUiSchema(generateFormConfig(system));
 
   // Define the order of fields and group them logically
   const topLevelFields = ['name', 'class', 'level'];
