@@ -12,7 +12,6 @@ A web application for Game Masters (GMs) to create custom TTRPG systems (definin
 -   **Language**: TypeScript
 -   **Styling**: Tailwind CSS
 -   **UI Components**: shadcn/ui
--   **AI**: Genkit with Google Gemini for skill suggestions.
 -   **Data Storage**:
     -   Game systems and character data are stored in local JSON files within the `data/` directory at the project root.
     -   The `src/lib/data-service.ts` file is responsible for all file system interactions (reading and writing JSON data).

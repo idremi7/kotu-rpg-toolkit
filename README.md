@@ -7,7 +7,6 @@ VERSA (Versatile Encyclopedic RPG System Assistant) is a web-based application d
 ### For Game Masters (GMs)
 - **Create Custom TTRPG Systems**: Design your own game from the ground up by defining its core mechanics.
 - **Define System Components**: Specify custom attributes, skills, saving throws, and feats that make your game unique.
-- **AI-Powered Skill Suggestions**: Leverage a generative AI assistant to get creative suggestions for skills based on your system's attributes, helping to flesh out your world with less effort.
 - **Dynamic Schema Generation**: The application automatically generates the necessary data and UI schemas for character sheets based on the rules you define.
 
 ### For Players
@@ -23,7 +22,6 @@ This project is built with a modern, component-based architecture:
 - **Language**: TypeScript
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
-- **Generative AI**: [Google Gemini](https://deepmind.google/technologies/gemini/) via [Genkit](https://firebase.google.com/docs/genkit)
 - **Data Storage**: Local JSON files (no database required).
 
 ## Getting Started

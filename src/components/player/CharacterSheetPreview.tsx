@@ -2,6 +2,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
+import { calculateFields } from "@/lib/calculation-engine";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "../ui/badge";
@@ -27,7 +28,20 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
   if (!character || !system) return null;
 
   const { data } = character;
-  
+
+  // compute derived values if system defines calculatedFields
+  const derived =
+    data.derived ||
+    calculateFields(
+      // base numbers come from attributes plus any explicit values stored
+      {
+        ...(data.attributes || {}),
+        ...(data.skills ? data.skills.reduce((acc:any, s:any)=>{acc[s.name]=s.value; return acc;}, {}) : {}),
+        ...(data.bonuses || {}),
+      },
+      system.calculatedFields || []
+    );
+
   const handlePrint = () => {
     window.print();
   };
@@ -88,8 +102,14 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
                     {data.attributes && Object.entries(data.attributes).map(([key, value]) => (
                         <div key={key} className="bg-muted/50 rounded-md p-2 flex flex-col justify-center">
                             <div className="text-xs uppercase text-muted-foreground">{key}</div>
-                            <div className="font-bold text-lg">{system.usesD20StyleModifiers ? getModifier(value as number) : (value as number)}</div>
-                            {system.usesD20StyleModifiers && <div className="text-sm text-foreground/80">{value as number}</div>}
+                            <div className="font-bold text-lg">
+                              {system.usesD20StyleModifiers ? getModifier(value as number) : (value as number)}
+                            </div>
+                            {system.calculatedFields && system.calculatedFields.find(f=>f.name===`${key}Mod`) && (
+                              <div className="text-sm text-foreground/80">
+                                ({derived[`${key}Mod`] ?? '–'} modifier)
+                              </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -103,7 +123,7 @@ export function CharacterSheetPreview({ character, system }: CharacterSheetPrevi
                     {data.saves && Object.entries(data.saves).map(([key, value]) => (
                         <div key={key} className="bg-muted/50 rounded-md p-2">
                             <div className="text-xs uppercase text-muted-foreground">{key}</div>
-                            <div className="font-bold text-lg">{value as number >= 0 ? `+${value}`: value}</div>
+                            <div className="font-bold text-lg">{typeof value === 'number' ? (value >= 0 ? `+${value}` : value) : String(value)}</div>
                         </div>
                     ))}
                 </div>

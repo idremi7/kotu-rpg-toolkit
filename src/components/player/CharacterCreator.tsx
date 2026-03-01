@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { saveCharacter } from '@/lib/data-service';
 import type { GameSystem, Character } from '@/lib/data-service';
 import { useRouter } from 'next/navigation';
+import { calculateFields } from '@/lib/calculation-engine';
 
 const CustomSkillWidget = ({ control, name, options }: { control: any, name: string, options: any[] }) => {
   const { fields, append, remove } = useFieldArray({ control, name });
@@ -138,6 +139,67 @@ const CustomFeatWidget = ({ control, name, options }: { control: any; name: stri
   );
 };
 
+
+// generic array-of-key-values renderer (name/value pairs)
+const FieldArrayRenderer = ({
+  control,
+  name,
+  fieldLabel,
+  valueLabel,
+}: any) => {
+  const { fields, append, remove } = useFieldArray({ control, name });
+
+  return (
+    <div className="space-y-4">
+      {fields.map((field: any, index: number) => (
+        <div key={field.id} className="flex gap-2 items-center">
+          <FormField
+            control={control}
+            name={`${name}.${index}.key`}
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormControl>
+                  <Input placeholder={fieldLabel} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name={`${name}.${index}.value`}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    type="number"
+                    className="w-24"
+                    {...field}
+                    value={field.value ?? 0}
+                    onChange={e => field.onChange(parseInt(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      ))}
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => append({ key: '', value: 0 })}
+      >
+        <PlusCircle className="mr-2 h-4 w-4" />
+        Add row
+      </Button>
+    </div>
+  );
+};
+
 const NumberFieldRenderer = ({ control, name, label }: any) => (
   <FormField
     control={control}
@@ -249,6 +311,7 @@ interface CharacterCreatorProps {
 
 export function CharacterCreator({ systemId, system, initialCharacter }: CharacterCreatorProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const [derivedValues, setDerivedValues] = useState<any>({});
   const { toast } = useToast();
   const router = useRouter();
 
@@ -258,6 +321,31 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
     // We can't use a resolver here because the schema is dynamic
   });
   
+  // recompute derived whenever relevant inputs change
+  const attributes = form.watch("attributes") || {};
+  const skillsWatch = form.watch("skills") || [];
+  const bonusesWatch = form.watch("bonuses") || [];
+
+  useEffect(() => {
+    if (system?.calculatedFields && system.calculatedFields.length > 0) {
+      const baseNumbers: any = {
+        ...attributes,
+      };
+      skillsWatch.forEach((s: any) => {
+        if (s && s.name) {
+          baseNumbers[s.name] = s.value || 0;
+        }
+      });
+      bonusesWatch.forEach((b: any) => {
+        if (b && b.key) {
+          baseNumbers[b.key] = b.value || 0;
+        }
+      });
+      const derived = calculateFields(baseNumbers, system.calculatedFields);
+      setDerivedValues(derived);
+    }
+  }, [attributes, skillsWatch, bonusesWatch, system]);
+
   useEffect(() => {
     let defaultValues: any = {};
     if (system?.schemas?.formSchema) {
@@ -273,6 +361,10 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
           });
         }
       });
+    }
+    // ensure bonuses array exists for form
+    if (!defaultValues.bonuses) {
+      defaultValues.bonuses = [];
     }
 
     if (isEditMode && initialCharacter?.data) {
@@ -303,6 +395,25 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
   const onSubmit = async (data: any) => {
     setIsSaving(true);
     
+    // compute derived values one last time before saving
+    let finalDerived: any = {};
+    if (system?.calculatedFields && system.calculatedFields.length > 0) {
+      const baseNumbers: any = {
+        ...(data.attributes || {}),
+      };
+      (data.skills || []).forEach((s: any) => {
+        if (s && s.name) {
+          baseNumbers[s.name] = s.value || 0;
+        }
+      });
+      (data.bonuses || []).forEach((b: any) => {
+        if (b && b.key) {
+          baseNumbers[b.key] = b.value || 0;
+        }
+      });
+      finalDerived = calculateFields(baseNumbers, system.calculatedFields);
+    }
+
     const processedData = {
         ...data,
         feats: Array.isArray(data.feats) 
@@ -311,6 +422,7 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
         skills: Array.isArray(data.skills)
             ? data.skills.filter((skill: any) => typeof skill === 'object' && skill.name && skill.name.trim() !== '')
             : [],
+        derived: finalDerived,
     };
 
     const characterToSave: Character = {
@@ -385,6 +497,42 @@ export function CharacterCreator({ systemId, system, initialCharacter }: Charact
                     <NumberFieldRenderer control={form.control} name="vitals.maxHp" label="Maximum HP" />
                 </CardContent>
             </Card>
+        )}
+
+        {/* miscellaneous raw bonuses that feed into calculated fields */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Bonuses / Modifiers</CardTitle>
+            <CardDescription>Enter any additional numeric values used by system formulas (ex: masterwork, power attack).</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FieldArrayRenderer
+              control={form.control}
+              name="bonuses"
+              fieldLabel="Bonus name"
+              valueLabel="Value"
+            />
+          </CardContent>
+        </Card>
+
+        {/* live calculated results */}
+        {system?.calculatedFields && system.calculatedFields.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Computed Values</CardTitle>
+              <CardDescription>These numbers are automatically derived from your attributes, skills, and bonuses.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {Object.entries(derivedValues).map(([key, val]) => (
+                  <div key={key} className="bg-muted/50 rounded-md p-2">
+                    <div className="text-sm text-muted-foreground uppercase">{key}</div>
+                    <div className="font-bold text-lg">{String(typeof val === 'number' ? (val >= 0 ? `+${val}` : val) : val)}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {fieldsets.filter(f => f.name !== 'vitals').map(({ name, config }) => (

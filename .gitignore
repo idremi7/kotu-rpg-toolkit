@@ -12,11 +12,6 @@
 /.next/
 /out/
 
-# Firebase
-/.firebase/
-firebase-debug.log
-database-debug.log
-firestore-debug.log
 
 # Temporary data files (used by local data-service)
 /.tmp

@@ -8,10 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { PlusCircle, Trash2, Loader2, Save, Sparkles, ChevronDown, BookOpen } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Save, BookOpen } from 'lucide-react';
 import { saveSystem, listFeatsFromLibrary } from '@/lib/data-service';
-import { suggestSkills } from '@/ai/flows/suggest-skills-flow';
-import { suggestFeats } from '@/ai/flows/suggest-feats-flow';
 import { useEffect, useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -153,8 +151,6 @@ const FeatLibraryBrowser = ({ onAddFeats }: { onAddFeats: (feats: {name: string,
 
 export function SystemCreator({ initialData }: SystemCreatorProps) {
   const [isSaving, setIsSaving] = useState(false);
-  const [isSuggestingSkills, setIsSuggestingSkills] = useState(false);
-  const [isSuggestingFeats, setIsSuggestingFeats] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
   const mounted = useMounted();
@@ -230,97 +226,6 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
   const watchedFeats = form.watch('feats');
   const validAttributes = watchedAttributes.filter(attr => attr.name && attr.name.trim() !== '');
 
-  const handleSaveSystem = async (data: SystemFormData) => {
-    setIsSaving(true);
-    const fullData = isEditMode ? { ...initialData, ...data } : data;
-    try {
-        const result = await saveSystem(fullData as any);
-        if (result.success && result.systemId) {
-            toast({
-            title: `System ${isEditMode ? 'Updated' : 'Saved'}!`,
-            description: `${data.systemName} has been successfully ${isEditMode ? 'updated' : 'saved'}.`,
-            });
-            router.push(`/gm/systems/${result.systemId}`);
-        } else {
-            toast({
-            variant: "destructive",
-            title: `Failed to ${isEditMode ? 'update' : 'save'} system`,
-            description: result.error || "An unknown error occurred.",
-            });
-        }
-    } catch (error) {
-        toast({
-            variant: "destructive",
-            title: `Failed to ${isEditMode ? 'update' : 'save'} system`,
-            description: "An unknown error occurred.",
-        });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleSuggestSkills = async (count: number) => {
-    setIsSuggestingSkills(true);
-    const formData = form.getValues();
-    try {
-      const result = await suggestSkills({
-        systemName: formData.systemName,
-        attributes: formData.attributes,
-        existingSkills: formData.skills.map(s => s.name),
-        count: count,
-      });
-      
-      if (result?.skills) {
-        appendSkill(result.skills);
-        toast({
-          title: "Skills Suggested",
-          description: `AI has added ${result.skills.length} new skill suggestions.`,
-        });
-      } else {
-        throw new Error("No skills returned from AI.");
-      }
-    } catch (error: any) {
-        toast({
-            variant: "destructive",
-            title: "Suggestion Failed",
-            description: error.message || "Could not get suggestions from AI.",
-        });
-    } finally {
-      setIsSuggestingSkills(false);
-    }
-  };
-
-  const handleSuggestFeats = async (count: number) => {
-    setIsSuggestingFeats(true);
-    const formData = form.getValues();
-    try {
-      const result = await suggestFeats({
-        systemName: formData.systemName,
-        attributes: formData.attributes,
-        existingFeats: formData.feats.map(f => f.name),
-        count: count,
-      });
-      
-      if (result?.feats) {
-        appendFeat(result.feats);
-        toast({
-          title: "Feats Suggested",
-          description: `AI has added ${result.feats.length} new feat suggestions.`,
-        });
-      } else {
-        throw new Error("No feats returned from AI.");
-      }
-    } catch (error: any) {
-        toast({
-            variant: "destructive",
-            title: "Suggestion Failed",
-            description: error.message || "Could not get suggestions from AI.",
-        });
-    } finally {
-      setIsSuggestingFeats(false);
-    }
-  };
-  
   const handleAddSkillsFromLibrary = (skillsToAdd: { name: string; category: string }[]) => {
     const existingSkillNames = new Set(form.getValues('skills').map(s => s.name.trim().toLowerCase()));
     
@@ -348,6 +253,35 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
         title: "No New Skills Added",
         description: `All ${duplicatesCount} selected ${duplicatesCount === 1 ? 'skill' : 'skills'} already exist in your system.`,
       });
+    }
+  };
+
+  const handleSaveSystem = async (data: SystemFormData) => {
+    setIsSaving(true);
+    const fullData = isEditMode ? { ...initialData, ...data } : data;
+    try {
+        const result = await saveSystem(fullData as any);
+        if (result.success && result.systemId) {
+            toast({
+            title: `System ${isEditMode ? 'Updated' : 'Saved'}!`,
+            description: `${data.systemName} has been successfully ${isEditMode ? 'updated' : 'saved'}.`,
+            });
+            router.push(`/gm/systems/${result.systemId}`);
+        } else {
+            toast({
+            variant: "destructive",
+            title: `Failed to ${isEditMode ? 'update' : 'save'} system`,
+            description: result.error || "An unknown error occurred.",
+            });
+        }
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: `Failed to ${isEditMode ? 'update' : 'save'} system`,
+            description: "An unknown error occurred.",
+        });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -656,20 +590,6 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={() => appendSkill({ name: '', baseAttribute: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Skill</Button>
                 <SkillLibraryBrowser onAddSkills={handleAddSkillsFromLibrary} />
-                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button type="button" variant="secondary" disabled={isSuggestingSkills}>
-                        {isSuggestingSkills ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                        Suggest with AI
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => handleSuggestSkills(1)}>Suggest 1 Skill</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleSuggestSkills(10)}>Suggest 10 Skills</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleSuggestSkills(20)}>Suggest 20 Skills</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </CardContent>
           </Card>
@@ -776,20 +696,6 @@ export function SystemCreator({ initialData }: SystemCreatorProps) {
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={() => appendFeat({ name: '', description: '', prerequisites: '', effect: '' })}><PlusCircle className="mr-2 h-4 w-4" /> Add Feat</Button>
                 <FeatLibraryBrowser onAddFeats={handleAddFeatsFromLibrary} />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button type="button" variant="secondary" disabled={isSuggestingFeats}>
-                        {isSuggestingFeats ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                        Suggest with AI
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => handleSuggestFeats(1)}>Suggest 1 Feat</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleSuggestFeats(5)}>Suggest 5 Feats</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleSuggestFeats(10)}>Suggest 10 Feats</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </CardContent>
           </Card>

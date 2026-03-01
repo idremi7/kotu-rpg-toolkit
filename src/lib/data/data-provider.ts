@@ -12,17 +12,29 @@ export interface CustomRule {
     description: string;
 }
 
+// allows defining any computed value that depends on attributes, skills, etc.
+export interface CalculatedField {
+    name: string;
+    formula: string; // e.g. "@STR + @skillBonus + @masterwork"
+    dependsOn: string[]; // variable names referenced in formula
+    description?: string;
+}
+
 export interface GameSystem {
     systemId: string;
     systemName: string;
     description: string;
     attributes: { name: string; description: string }[];
+    // legacy d20 fields; new systems may use ``characteristics`` or ``calculatedFields`` instead
     skills: { name: string; baseAttribute: string }[];
     feats: Feat[];
     saves: { name: string; baseAttribute: string }[];
     customRules?: CustomRule[];
     schemas: { formSchema: string; uiSchema: string };
     usesD20StyleModifiers?: boolean;
+
+    // optional engine configuration and extra fields for flexible systems
+    calculatedFields?: CalculatedField[];
 }
 
 export interface GameSystemSummary {

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, FileText, UserPlus, Swords, Cpu, Database, Wind } from 'lucide-react';
+import { Users, FileText, UserPlus, Swords, Database, Wind } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
@@ -11,7 +11,7 @@ const howItWorksSteps = [
     icon: <Users className="w-24 h-24 text-primary" />,
     title: '1. The GM Crafts a World',
     description:
-      'As a Game Master, you define the rules of your universe. Create custom attributes, skills, and feats to build a unique system for your campaign. Use AI to get suggestions and speed up your creative process.',
+      'As a Game Master, you define the rules of your universe. Create custom attributes, skills, and feats to build a unique system for your campaign.',
   },
   {
     icon: <FileText className="w-24 h-24 text-primary" />,
@@ -30,7 +30,6 @@ const howItWorksSteps = [
 const techStack = [
     { name: 'Next.js', icon: <Wind />, description: 'The React framework for building fast, modern web applications.' },
     { name: 'Shadcn/UI', icon: <div className="text-2xl font-bold">⌘</div>, description: 'Beautifully designed components that you can copy and paste into your apps.' },
-    { name: 'Genkit & Gemini', icon: <Cpu />, description: 'Google\'s open-source generative AI toolkit for building AI-powered features.' },
     { name: 'Tailwind CSS', icon: <Wind />, description: 'A utility-first CSS framework for rapid UI development.' },
     { name: 'Local JSON', icon: <Database />, description: 'Simple, file-based storage for portability and ease of use—no database required.'},
 ];
